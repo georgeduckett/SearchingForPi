@@ -22,6 +22,7 @@ interface Needle {
   cy: number      // centre y
   angle: number   // radians
   crosses: boolean
+  scale?: number  // for animation
 }
 
 interface State {
@@ -30,6 +31,12 @@ interface State {
   total:    number
   running:  boolean
   rafId:    number | null
+  animating: boolean
+  currentNeedle: Needle | null
+  animationStartY: number
+  animationEndY: number
+  animationStartTime: number
+  initialAngle: number
 }
 
 // ─── Maths ───────────────────────────────────────────────────────────────────
@@ -51,7 +58,7 @@ function doesCross(cy: number, angle: number): boolean {
 
 // ─── Page Factory ─────────────────────────────────────────────────────────────
 export function createBuffonPage(): Page {
-  const state: State = { needles: [], crosses: 0, total: 0, running: false, rafId: null }
+  const state: State = { needles: [], crosses: 0, total: 0, running: false, rafId: null, animating: false, currentNeedle: null, animationStartY: 0, animationEndY: 0, animationStartTime: 0, initialAngle: 0 }
 
   let canvas:     HTMLCanvasElement
   let ctx:        CanvasRenderingContext2D
@@ -86,8 +93,10 @@ export function createBuffonPage(): Page {
   }
 
   function drawNeedle(n: Needle): void {
-    const dx = (NEEDLE_LENGTH / 2) * Math.cos(n.angle)
-    const dy = (NEEDLE_LENGTH / 2) * Math.sin(n.angle)
+    const scale = n.scale || 1
+    const length = NEEDLE_LENGTH * scale
+    const dx = (length / 2) * Math.cos(n.angle)
+    const dy = (length / 2) * Math.sin(n.angle)
 
     ctx.strokeStyle = n.crosses ? C_CROSS : C_NO_CROSS
     ctx.lineWidth   = n.crosses ? 1.8 : 1
@@ -102,7 +111,7 @@ export function createBuffonPage(): Page {
       ctx.globalAlpha = 1
       ctx.fillStyle = C_CROSS_DOT
       ctx.beginPath()
-      ctx.arc(n.cx, n.cy, 2, 0, Math.PI * 2)
+      ctx.arc(n.cx, n.cy, 2 * scale, 0, Math.PI * 2)
       ctx.fill()
     }
 
@@ -112,6 +121,9 @@ export function createBuffonPage(): Page {
   function drawBackground_and_needles(): void {
     drawBackground()
     for (const n of state.needles) drawNeedle(n)
+    if (state.animating && state.currentNeedle) {
+      drawNeedle(state.currentNeedle)
+    }
   }
 
   // ── Drop a single needle ──────────────────────────────────────────────────
@@ -127,6 +139,57 @@ export function createBuffonPage(): Page {
     if (crosses) state.crosses++
 
     drawNeedle(needle)
+  }
+
+  // ── Animate dropping a single needle ──────────────────────────────────────
+  function startNeedleAnimation(): void {
+    if (state.animating) return
+    const cx    = Math.random() * CANVAS_W
+    const finalCy = Math.random() * CANVAS_H
+    const finalAngle = Math.random() * Math.PI
+    const crosses = doesCross(finalCy, finalAngle)
+
+    const initialAngle = Math.random() * Math.PI * 2 // full rotation for spin
+    state.currentNeedle = { cx, cy: finalCy - 80, angle: initialAngle, crosses, scale: 3.0 }
+    state.animationStartY = finalCy - 80
+    state.animationEndY = finalCy
+    state.animationStartTime = performance.now()
+    state.initialAngle = initialAngle
+    state.animating = true
+    animateNeedle(finalAngle)
+  }
+
+  function animateNeedle(finalAngle: number): void {
+    if (!state.animating || !state.currentNeedle) return
+
+    const elapsed = performance.now() - state.animationStartTime
+    const duration = 1000 // ms, slightly longer for more dramatic effect
+    const progress = Math.min(elapsed / duration, 1)
+    const easeProgress = Math.pow(progress, 3) // ease in cubic - starts slow, ends fast (gravity)
+
+    state.currentNeedle.cy = state.animationStartY + (state.animationEndY - state.animationStartY) * easeProgress
+    state.currentNeedle.scale = 2.0 - (2.0 - 1.0) * easeProgress
+
+    // Interpolate angle, allowing for shortest rotation
+    const angleDiff = ((finalAngle - state.initialAngle + Math.PI * 3) % (Math.PI * 2)) - Math.PI
+    state.currentNeedle.angle = state.initialAngle + angleDiff * easeProgress
+
+    drawBackground_and_needles()
+
+    if (progress < 1) {
+      requestAnimationFrame(() => animateNeedle(finalAngle))
+    } else {
+      // Animation complete
+      state.currentNeedle.angle = finalAngle
+      state.currentNeedle.scale = 1.0
+      state.needles.push(state.currentNeedle)
+      state.total++
+      if (state.currentNeedle.crosses) state.crosses++
+      state.animating = false
+      state.currentNeedle = null
+      updateStats()
+      btnStep.disabled = false // re-enable after animation
+    }
   }
 
   // ── Stats ─────────────────────────────────────────────────────────────────
@@ -176,6 +239,8 @@ export function createBuffonPage(): Page {
   function reset(): void {
     state.running = false
     if (state.rafId !== null) { cancelAnimationFrame(state.rafId); state.rafId = null }
+    state.animating = false
+    state.currentNeedle = null
     state.needles = []
     state.crosses = 0
     state.total   = 0
@@ -281,11 +346,10 @@ export function createBuffonPage(): Page {
     })
 
     btnStep.addEventListener('click', () => {
-      if (!state.running) {
-        dropNeedle()
-        updateStats()
+      if (!state.running && !state.animating) {
+        startNeedleAnimation()
         btnReset.disabled = false
-        btnStep.disabled  = false
+        btnStep.disabled  = true // disable during animation
       }
     })
 
@@ -297,6 +361,7 @@ export function createBuffonPage(): Page {
   function cleanup(): void {
     state.running = false
     if (state.rafId !== null) cancelAnimationFrame(state.rafId)
+    state.animating = false
   }
 
   return { render, cleanup }
