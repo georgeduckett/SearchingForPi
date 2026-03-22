@@ -196,7 +196,7 @@ export function createCoinTossPage(): Page {
         ctx.strokeRect(5, rowY - rowHeight / 2 + 4, CANVAS_W - 10, rowHeight - 8)
       }
 
-      ctx.fillStyle = C_TEXT
+      ctx.fillStyle = '#ffffff'
       ctx.font = '12px monospace'
       ctx.textAlign = 'left'
       ctx.fillText(`${seq.heads}/${seq.total} = ${seq.ratio.toFixed(3)}`, 10, rowY + rowHeight / 3)
