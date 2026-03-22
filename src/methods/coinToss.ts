@@ -56,12 +56,20 @@ function createEmptySequence(): Sequence {
 }
 
 function advanceSequence(seq: Sequence, maxTosses = MAX_GRID_COLS): boolean {
-  if (seq.total >= maxTosses) {
-    seq.ratio = seq.total > 0 ? seq.heads / seq.total : 0
+  const isWin = seq.heads > seq.total - seq.heads && seq.total > 0
+  if (isWin) {
+    seq.ratio = seq.heads / seq.total
     return true
   }
 
-  if (seq.heads > seq.total - seq.heads && seq.total > 0) {
+  if (seq.total >= maxTosses) {
+    // We're past visible area: finish sequence without per-frame rendering.
+    while (!(seq.heads > seq.total - seq.heads)) {
+      const isHead = Math.random() < 0.5
+      seq.tosses.push(isHead)
+      seq.total++
+      if (isHead) seq.heads++
+    }
     seq.ratio = seq.heads / seq.total
     return true
   }
@@ -73,8 +81,19 @@ function advanceSequence(seq: Sequence, maxTosses = MAX_GRID_COLS): boolean {
 
   const tails = seq.total - seq.heads
 
-  if (seq.heads > tails || seq.total >= maxTosses) {
-    seq.ratio = seq.total > 0 ? seq.heads / seq.total : 0
+  if (seq.heads > tails) {
+    seq.ratio = seq.heads / seq.total
+    return true
+  }
+
+  if (seq.total >= maxTosses) {
+    while (!(seq.heads > seq.total - seq.heads)) {
+      const queuedHead = Math.random() < 0.5
+      seq.tosses.push(queuedHead)
+      seq.total++
+      if (queuedHead) seq.heads++
+    }
+    seq.ratio = seq.heads / seq.total
     return true
   }
 
