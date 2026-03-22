@@ -15,7 +15,7 @@ const methods = [
     hash: 'leibniz',
     title: 'Leibniz Series',
     desc:
-      'The alternating series 1 − 1/3 + 1/5 − 1/7 + … converges to π/4. ' +
+      'The alternating series 1 - 1/3 + 1/5 - 1/7 + … converges to π/4. ' +
       'Simple, elegant, and agonisingly slow.',
   },
   {
