@@ -297,7 +297,10 @@ export function createLeibnizPage(): Page {
       if (!state.running) start()
     })
     btnStep.addEventListener('click', () => {
-      if (!state.running && state.termIndex < MAX_TERMS) addTerm()
+      if (!state.running && state.termIndex < MAX_TERMS) {
+        addTerm()
+        btnReset.disabled = false
+      }
     })
     btnReset.addEventListener('click', reset)
 
