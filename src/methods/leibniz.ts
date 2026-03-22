@@ -195,7 +195,7 @@ export function createLeibnizPage(): Page {
     updateStats()
     btnStart.textContent = 'Start'
     btnStart.disabled    = false
-    btnStep.disabled     = true
+    btnStep.disabled     = false
     btnReset.disabled    = true
   }
 
@@ -221,7 +221,7 @@ export function createLeibnizPage(): Page {
           </div>
           <div style="margin-top:14px" class="controls">
             <button id="lb-start" class="btn primary">Start</button>
-            <button id="lb-step"  class="btn" disabled>Step</button>
+            <button id="lb-step"  class="btn">Step</button>
             <button id="lb-reset" class="btn" disabled>Reset</button>
           </div>
         </div>
@@ -256,7 +256,7 @@ export function createLeibnizPage(): Page {
             </div>
             <div class="legend-item">
               <div class="legend-dot" style="background:${C_MINUS}"></div>
-              Negative term (-1/(2n+1))
+              Negative term (−1/(2n+1))
             </div>
             <div class="legend-item">
               <div class="legend-dot" style="background:${C_AMBER}; border-radius:2px; height:3px"></div>
@@ -266,7 +266,7 @@ export function createLeibnizPage(): Page {
 
           <div class="explanation">
             <h3>The Leibniz Formula</h3>
-            <div class="formula">π/4 = 1 - 1/3 + 1/5 - 1/7 + …</div>
+            <div class="formula">π/4 = 1 − 1/3 + 1/5 − 1/7 + …</div>
             <p>
               Discovered by Leibniz in 1676 (and by Madhava two centuries earlier),
               each term alternately overshoots and undershoots π/4. The series

@@ -40,6 +40,7 @@ export function createMonteCarloPage(): Page {
   let canvas: HTMLCanvasElement
   let ctx: CanvasRenderingContext2D
   let btnStart: HTMLButtonElement
+  let btnStep:  HTMLButtonElement
   let btnReset: HTMLButtonElement
   let elEstimate: HTMLElement
   let elTotal: HTMLElement
@@ -120,7 +121,7 @@ export function createMonteCarloPage(): Page {
       btnStart.disabled = false
       return
     }
-    addDots(Math.min(DOTS_PER_TICK, MAX_DOTS - state.total))
+    addDots(DOTS_PER_TICK)
     updateStats()
     state.rafId = requestAnimationFrame(tick)
   }
@@ -167,6 +168,7 @@ export function createMonteCarloPage(): Page {
           </div>
           <div style="margin-top:14px" class="controls">
             <button id="mc-start" class="btn primary">Start</button>
+            <button id="mc-step"  class="btn">Add 10</button>
             <button id="mc-reset" class="btn" disabled>Reset</button>
           </div>
         </div>
@@ -188,13 +190,24 @@ export function createMonteCarloPage(): Page {
             <div class="stat-sub">of ${MAX_DOTS.toLocaleString()} total</div>
           </div>
 
+          <div class="legend">
+            <div class="legend-item">
+              <div class="legend-dot" style="background:${C_INSIDE}"></div>
+              Inside circle
+            </div>
+            <div class="legend-item">
+              <div class="legend-dot" style="background:${C_OUTSIDE}"></div>
+              Outside circle
+            </div>
+          </div>
+
           <div class="explanation">
             <h3>How it works</h3>
             <p>
               We scatter random points inside a unit square that contains an
               inscribed circle of radius ½.
             </p>
-            <div class="formula">π ≈ 4 x (inside / total)</div>
+            <div class="formula">π ≈ 4 × (inside / total)</div>
             <p>
               Because the area of the circle is πr² and the square is (2r)²,
               the probability of a random point landing inside the circle is
@@ -213,6 +226,7 @@ export function createMonteCarloPage(): Page {
     // Grab element refs
     canvas     = page.querySelector<HTMLCanvasElement>('#mc-canvas')!
     btnStart   = page.querySelector<HTMLButtonElement>('#mc-start')!
+    btnStep    = page.querySelector<HTMLButtonElement>('#mc-step')!
     btnReset   = page.querySelector<HTMLButtonElement>('#mc-reset')!
     elEstimate = page.querySelector('#mc-estimate')!
     elTotal    = page.querySelector('#mc-total')!
@@ -225,6 +239,13 @@ export function createMonteCarloPage(): Page {
     btnStart.addEventListener('click', () => {
       if (state.total >= MAX_DOTS) reset()
       start()
+    })
+    btnStep.addEventListener('click', () => {
+      if (!state.running && state.total < MAX_DOTS) {
+        addDots(10)
+        updateStats()
+        btnReset.disabled = false
+      }
     })
     btnReset.addEventListener('click', reset)
 

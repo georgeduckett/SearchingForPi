@@ -183,7 +183,7 @@ export function createBuffonPage(): Page {
     updateStats()
     btnStart.textContent = 'Start'
     btnStart.disabled    = false
-    btnStep.disabled     = true
+    btnStep.disabled     = false
     btnReset.disabled    = true
   }
 
@@ -209,7 +209,7 @@ export function createBuffonPage(): Page {
           </div>
           <div style="margin-top:14px" class="controls">
             <button id="bf-start" class="btn primary">Start</button>
-            <button id="bf-step"  class="btn" disabled>Drop one</button>
+            <button id="bf-step"  class="btn">Drop one</button>
             <button id="bf-reset" class="btn" disabled>Reset</button>
           </div>
         </div>
