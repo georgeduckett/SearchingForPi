@@ -34,6 +34,14 @@ const methods = [
       'Toss coins until heads exceed tails. The average ratio of heads to total tosses ' +
       'converges to π/4 in a surprising mathematical twist.',
   },
+  {
+    index: '05',
+    hash: 'bouncing-boxes',
+    title: 'Bouncing Boxes',
+    desc:
+      'Two boxes with mass ratio 100^k collide elastically with a wall. The number of ' +
+      'collisions between them encodes the digits of π in a remarkable way.',
+  },
 ]
 
 // ─── Page ───────────────────────────────────────────────────────────────────

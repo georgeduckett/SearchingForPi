@@ -5,6 +5,7 @@ import { createMonteCarloPage } from './methods/monteCarlo'
 import { createLeibnizPage }    from './methods/leibniz'
 import { createBuffonPage }     from './methods/buffon'
 import { createCoinTossPage }   from './methods/coinToss'
+import { createBouncingBoxesPage } from './methods/bouncingBoxes'
 
 // ─── Register pages ───────────────────────────────────────────────────────────
 registerPage('home',        createHomePage)
@@ -12,6 +13,7 @@ registerPage('monte-carlo', createMonteCarloPage)
 registerPage('leibniz',     createLeibnizPage)
 registerPage('buffon',      createBuffonPage)
 registerPage('coin-toss',   createCoinTossPage)
+registerPage('bouncing-boxes', createBouncingBoxesPage)
 
 // ─── Mobile nav drawer ────────────────────────────────────────────────────────
 const sidebar   = document.getElementById('sidebar')!
