@@ -130,14 +130,31 @@ export function createCoinTossPage(): Page {
     ctx.fillStyle = C_BG
     ctx.fillRect(0, 0, CANVAS_W, CANVAS_H)
 
-    drawSequenceGrid()
     drawGraph()
+    drawSequenceGrid()
   }
 
   function drawGraph(): void {
     const n = state.sequences.length
     if (n === 0) return
 
+    // Draw target line and text first
+    const targetScale = Math.max(0, Math.min(1, (Math.PI / 4 - 0.6) / 0.3))
+    const targetY = CANVAS_H - (targetScale * CANVAS_H)
+    ctx.strokeStyle = C_TARGET
+    ctx.lineWidth = 2
+    ctx.setLineDash([5, 5])
+    ctx.beginPath()
+    ctx.moveTo(0, targetY)
+    ctx.lineTo(CANVAS_W, targetY)
+    ctx.stroke()
+    ctx.setLineDash([])
+
+    ctx.fillStyle = C_TEXT
+    ctx.font = '12px monospace'
+    ctx.fillText(`π/4 ${(Math.PI/4).toFixed(2)}`, CANVAS_W - 70, targetY - 5)
+
+    // Then draw running estimate graph
     ctx.strokeStyle = C_RATIO
     ctx.lineWidth = 2
     ctx.beginPath()
@@ -160,21 +177,6 @@ export function createCoinTossPage(): Page {
     ctx.beginPath()
     ctx.arc(lastX, lastY, 4, 0, Math.PI * 2)
     ctx.fill()
-
-    const targetScale = Math.max(0, Math.min(1, (Math.PI / 4 - 0.6) / 0.3))
-    const targetY = CANVAS_H - (targetScale * CANVAS_H)
-    ctx.strokeStyle = C_TARGET
-    ctx.lineWidth = 2
-    ctx.setLineDash([5, 5])
-    ctx.beginPath()
-    ctx.moveTo(0, targetY)
-    ctx.lineTo(CANVAS_W, targetY)
-    ctx.stroke()
-    ctx.setLineDash([])
-
-    ctx.fillStyle = C_TEXT
-    ctx.font = '12px monospace'
-    ctx.fillText('π/4 target', CANVAS_W - 100, targetY - 5)
   }
 
   function drawSequenceGrid(): void {
@@ -218,8 +220,7 @@ export function createCoinTossPage(): Page {
       ctx.fillStyle = '#ffffff'
       ctx.font = '10px monospace'
       ctx.textAlign = 'left'
-      const pi4 = (4 * seq.ratio).toFixed(2)
-      ctx.fillText(`${seq.heads}/${seq.total} x 4 = ${pi4}`, 10, rowY - rowHeight / 4)
+      ctx.fillText(`${seq.heads}/${seq.total} = ${seq.ratio.toFixed(2)}`, 10, rowY - rowHeight / 4)
     }
   }
 
