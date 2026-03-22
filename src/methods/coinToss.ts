@@ -29,8 +29,8 @@ interface State {
   rafId: number | null
   sequenceBatch: Sequence[]
   currentSequence: Sequence | null
-  sequencesToAdd: number
-  addAnimating: boolean
+  autoAdding: boolean
+  autoRafId: number | null
 }
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
@@ -94,7 +94,7 @@ function fmt(n: number, digits = 6): string {
 
 // ─── Page Factory ─────────────────────────────────────────────────────────────
 export function createCoinTossPage(): Page {
-  const state: State = { sequences: [], sumRatios: 0, running: false, rafId: null, sequenceBatch: [], currentSequence: null, sequencesToAdd: 0, addAnimating: false }
+  const state: State = { sequences: [], sumRatios: 0, running: false, rafId: null, sequenceBatch: [], currentSequence: null, autoAdding: false, autoRafId: null }
   let canvas: HTMLCanvasElement
   let ctx: CanvasRenderingContext2D
   let btnStart: HTMLButtonElement
@@ -155,8 +155,7 @@ export function createCoinTossPage(): Page {
 
     ctx.fillStyle = C_TEXT
     ctx.font = '12px monospace'
-    ctx.fillText('π/4 target', 10, targetY - 5)
-    ctx.fillText('Running average ratio (0.6-0.9)', 10, 20)
+    ctx.fillText('π/4 target', CANVAS_W - 100, targetY - 5)
   }
 
   function drawSequenceGrid(): void {
@@ -215,12 +214,28 @@ export function createCoinTossPage(): Page {
 
   const STEP_FRAME_DELAY = 80
 
+  function stopAutoAdd(): void {
+    state.autoAdding = false
+    if (state.autoRafId !== null) {
+      clearTimeout(state.autoRafId)
+      state.autoRafId = null
+    }
+    btnStep.textContent = 'Auto'
+    btnStart.disabled = false
+  }
+
   function animateStep(): void {
-    if (state.sequencesToAdd <= 0 || state.addAnimating === false) {
-      state.addAnimating = false
+    if (!state.autoAdding) {
       state.currentSequence = null
       btnStep.disabled = false
       btnStart.disabled = false
+      return
+    }
+
+    if (state.sequences.length >= MAX_SEQUENCES) {
+      stopAutoAdd()
+      btnStart.textContent = 'Done'
+      btnStart.disabled = true
       return
     }
 
@@ -241,22 +256,13 @@ export function createCoinTossPage(): Page {
           state.sequenceBatch.shift()
         }
       }
-
       state.currentSequence = null
-      state.sequencesToAdd--
       updateStats()
-      if (state.sequencesToAdd > 0) {
-        setTimeout(() => requestAnimationFrame(animateStep), STEP_FRAME_DELAY)
-      } else {
-        state.addAnimating = false
-        btnStep.disabled = false
-        btnStart.disabled = false
-      }
-      return
     }
 
-    // continue current sequence
-    setTimeout(() => requestAnimationFrame(animateStep), STEP_FRAME_DELAY)
+    state.autoRafId = window.setTimeout(() => {
+      requestAnimationFrame(animateStep)
+    }, STEP_FRAME_DELAY)
   }
 
   // ── Stats ──────────────────────────────────────────────────────────────────
@@ -290,7 +296,7 @@ export function createCoinTossPage(): Page {
   }
 
   function start(): void {
-    if (state.addAnimating) return
+    if (state.autoAdding) return
     state.running = true
     btnStart.disabled = true
     btnStart.textContent = 'Running…'
@@ -302,7 +308,7 @@ export function createCoinTossPage(): Page {
   function stop(): void {
     state.running = false
     if (state.rafId !== null) cancelAnimationFrame(state.rafId)
-    state.addAnimating = false
+    stopAutoAdd()
   }
 
   function reset(): void {
@@ -311,13 +317,14 @@ export function createCoinTossPage(): Page {
     state.sumRatios = 0
     state.sequenceBatch = []
     state.currentSequence = null
-    state.sequencesToAdd = 0
-    state.addAnimating = false
+    state.autoAdding = false
+    state.autoRafId = null
     draw()
     updateStats()
     btnStart.textContent = 'Start'
     btnStart.disabled = false
     btnStep.disabled = false
+    btnStep.textContent = 'Auto'
     btnReset.disabled = true
   }
 
@@ -343,7 +350,7 @@ export function createCoinTossPage(): Page {
           </div>
           <div style="margin-top:14px" class="controls">
             <button id="ct-start" class="btn primary">Start</button>
-            <button id="ct-step"  class="btn">Add 10</button>
+            <button id="ct-step"  class="btn">Auto</button>
             <button id="ct-reset" class="btn" disabled>Reset</button>
           </div>
         </div>
@@ -383,8 +390,8 @@ export function createCoinTossPage(): Page {
               to total flips approaches π/4.
             </p>
             <p>
-              Use <em>Add 10</em> to run 10 sequences at a time, or <em>Start</em>
-              to run continuously.
+              Press <em>Auto</em> to start or pause continuous sequence generation,
+              or use <em>Start</em> for faster graph-only run.
             </p>
           </div>
         </div>
@@ -409,14 +416,22 @@ export function createCoinTossPage(): Page {
       start()
     })
     btnStep.addEventListener('click', () => {
-      if (state.running || state.addAnimating) return
+      if (state.running) return
 
-      state.sequencesToAdd = 10
-      state.addAnimating = true
-      btnStep.disabled = true
+      if (state.autoAdding) {
+        stopAutoAdd()
+        return
+      }
+
+      if (state.sequences.length >= MAX_SEQUENCES) {
+        reset()
+        return
+      }
+
+      state.autoAdding = true
+      btnStep.textContent = 'Pause'
       btnStart.disabled = true
       btnReset.disabled = false
-
       state.currentSequence = createEmptySequence()
       animateStep()
     })
