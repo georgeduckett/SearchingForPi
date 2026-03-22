@@ -188,24 +188,13 @@ export function createMonteCarloPage(): Page {
             <div class="stat-sub">of ${MAX_DOTS.toLocaleString()} total</div>
           </div>
 
-          <div class="legend">
-            <div class="legend-item">
-              <div class="legend-dot" style="background:${C_INSIDE}"></div>
-              Inside circle
-            </div>
-            <div class="legend-item">
-              <div class="legend-dot" style="background:${C_OUTSIDE}"></div>
-              Outside circle
-            </div>
-          </div>
-
           <div class="explanation">
             <h3>How it works</h3>
             <p>
               We scatter random points inside a unit square that contains an
               inscribed circle of radius ½.
             </p>
-            <div class="formula">π ≈ 4 × (inside / total)</div>
+            <div class="formula">π ≈ 4 x (inside / total)</div>
             <p>
               Because the area of the circle is πr² and the square is (2r)²,
               the probability of a random point landing inside the circle is
