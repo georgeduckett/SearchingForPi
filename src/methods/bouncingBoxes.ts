@@ -55,6 +55,8 @@ export function createBouncingBoxesPage(): Page {
   let elK: HTMLSelectElement
   let elHits: HTMLElement
   let elPiApprox: HTMLElement
+  let elStartBtn: HTMLButtonElement
+  let elResetBtn: HTMLButtonElement
 
   // ── Draw ───────────────────────────────────────────────────────────────────
   function draw(): void {
@@ -183,15 +185,25 @@ export function createBouncingBoxesPage(): Page {
     state.k = parseInt(elK.value)
     state.m2 = 100 ** state.k
     state.running = true
+    elK.disabled = true
     state.rafId = requestAnimationFrame(tick)
   }
 
   function stop(): void {
     state.running = false
+    elK.disabled = false
     if (state.rafId !== null) {
       cancelAnimationFrame(state.rafId)
       state.rafId = null
     }
+  }
+
+  function reset(): void {
+    stop()
+    resetState(state)
+    draw()
+    elHits.textContent = '0'
+    elPiApprox.textContent = '0.0'
   }
 
   // ── Build DOM ─────────────────────────────────────────────────────────────
@@ -215,7 +227,7 @@ export function createBouncingBoxesPage(): Page {
             <canvas id="bb-canvas" width="${CANVAS_W}" height="${CANVAS_H}"></canvas>
           </div>
           <div style="margin-top:14px" class="controls">
-            <select id="bb-k">
+            <select id="bb-k" class="control-select">
               <option value="0">k=0 (1 digit)</option>
               <option value="1">k=1 (2 digits)</option>
               <option value="2">k=2 (3 digits)</option>
@@ -223,6 +235,7 @@ export function createBouncingBoxesPage(): Page {
               <option value="4">k=4 (5 digits)</option>
             </select>
             <button id="bb-start" class="btn primary">Start</button>
+            <button id="bb-reset" class="btn">Reset</button>
           </div>
         </div>
 
@@ -259,11 +272,14 @@ export function createBouncingBoxesPage(): Page {
     elK = page.querySelector<HTMLSelectElement>('#bb-k')!
     elHits = page.querySelector('#bb-hits')!
     elPiApprox = page.querySelector('#bb-pi-approx')!
+    elStartBtn = page.querySelector<HTMLButtonElement>('#bb-start')!
+    elResetBtn = page.querySelector<HTMLButtonElement>('#bb-reset')!
 
     ctx = canvas.getContext('2d')!
     draw()
 
-    page.querySelector('#bb-start')!.addEventListener('click', start)
+    elStartBtn.addEventListener('click', start)
+    elResetBtn.addEventListener('click', reset)
 
     return page
   }

@@ -330,6 +330,32 @@ canvas {
   cursor: not-allowed;
 }
 
+/* ─── Select ────────────────────────────────────────────────────────────────── */
+.control-select {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 9px 18px;
+  border-radius: var(--radius);
+  border: 1px solid var(--border-bright);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  background: transparent;
+  color: var(--text-secondary);
+}
+
+.control-select:hover {
+  background: var(--bg-raised);
+  color: var(--text-primary);
+  border-color: var(--text-muted);
+}
+
+.control-select:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
 /* ─── Legend ────────────────────────────────────────────────────────────────── */
 .legend {
   display: flex;
