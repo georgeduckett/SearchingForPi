@@ -81,39 +81,80 @@ export function createBouncingBoxesPage(): Page {
   }
 
   // ── Physics ────────────────────────────────────────────────────────────────
+  function getTimeToCollision(): { type: 'box' | 'wall' | 'none'; time: number } {
+    const EPSILON = 1e-6
+
+    // Calculate time to box-to-box collision
+    let timeToBoxCollision = Infinity
+    if (state.smallBoxV > state.largeBoxV) {
+      const relVelocity = state.smallBoxV - state.largeBoxV
+      const gap = (state.largeBoxX - BOX_SIZE / 2) - (state.smallBoxX + BOX_SIZE / 2)
+      if (gap > -EPSILON) {
+        timeToBoxCollision = gap / relVelocity
+      }
+    }
+
+    // Calculate time to wall collision for small box
+    let timeToWallCollision = Infinity
+    if (state.smallBoxV < 0) {
+      const distToWall = (state.smallBoxX - BOX_SIZE / 2) - (WALL_X + 5)
+      if (distToWall > -EPSILON) {
+        timeToWallCollision = distToWall / -state.smallBoxV
+      }
+    }
+
+    // Return the earliest collision
+    if (timeToBoxCollision < timeToWallCollision && timeToBoxCollision < Infinity) {
+      return { type: 'box', time: timeToBoxCollision }
+    } else if (timeToWallCollision < Infinity) {
+      return { type: 'wall', time: timeToWallCollision }
+    }
+    return { type: 'none', time: Infinity }
+  }
+
   function updatePhysics(timestamp: number): void {
     const elapsedTimeMS = Math.min(timestamp - state.time, 100)
     state.time = timestamp
+    let timeRemaining = elapsedTimeMS / 1000 // Convert to seconds
 
-    // TODO: Work out where the collision will happen and take it into account to prevent tunnelling at high speeds. (Move the boxes up to the collision point, then away from each other the remaining amount of time)
+    // Loop through collisions until time is consumed or no more collisions
+    while (timeRemaining > 1e-6) {
+      const collision = getTimeToCollision()
 
-    // Update positions
-    state.smallBoxX += state.smallBoxV * elapsedTimeMS / 1000
-    state.largeBoxX += state.largeBoxV * elapsedTimeMS / 1000
+      // If no collision will happen, just move for remaining time and exit
+      if (collision.time >= timeRemaining) {
+        state.smallBoxX += state.smallBoxV * timeRemaining
+        state.largeBoxX += state.largeBoxV * timeRemaining
+        break
+      }
 
-    // Box collision
-    if (state.largeBoxX- BOX_SIZE/2 <= state.smallBoxX + BOX_SIZE/2 && state.largeBoxV < state.smallBoxV) {
-      // Elastic collision
-      const m1 = M1
-      const m2 = state.m2
-      const v1 = state.smallBoxV
-      const v2 = state.largeBoxV
+      // Move to collision point
+      state.smallBoxX += state.smallBoxV * collision.time
+      state.largeBoxX += state.largeBoxV * collision.time
+      timeRemaining -= collision.time
 
-      const newV1 = ((m1 - m2) / (m1 + m2)) * v1 + (2 * m2 / (m1 + m2)) * v2
-      const newV2 = (2 * m1 / (m1 + m2)) * v1 + ((m2 - m1) / (m1 + m2)) * v2
+      // Resolve collision
+      if (collision.type === 'box') {
+        // Elastic collision between boxes
+        const m1 = M1
+        const m2 = state.m2
+        const v1 = state.smallBoxV
+        const v2 = state.largeBoxV
 
-      state.smallBoxV = newV1
-      state.largeBoxV = newV2
-      state.collisions++
+        const newV1 = ((m1 - m2) / (m1 + m2)) * v1 + (2 * m2 / (m1 + m2)) * v2
+        const newV2 = (2 * m1 / (m1 + m2)) * v1 + ((m2 - m1) / (m1 + m2)) * v2
+
+        state.smallBoxV = newV1
+        state.largeBoxV = newV2
+        state.collisions++
+      } else if (collision.type === 'wall') {
+        // Wall collision (elastic)
+        state.smallBoxV = -state.smallBoxV
+        state.collisions++
+      }
     }
-    
-    // Wall collision for the small box
-    if (state.smallBoxX - BOX_SIZE / 2 <= WALL_X + 5 && state.smallBoxV < 0) {
-      state.smallBoxV = -state.smallBoxV
-      state.collisions++
-    }
 
-    // Stop if the large one is moving away from the small one and the small one isn't moving towards the wall.
+    // Stop if the large one is moving away and small one isn't approaching wall
     if (state.largeBoxV > state.smallBoxV && state.smallBoxV >= 0 && state.largeBoxX - state.smallBoxX > 5 * BOX_SIZE) {
       state.running = false
     }
