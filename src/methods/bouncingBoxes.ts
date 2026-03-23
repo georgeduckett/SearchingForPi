@@ -15,7 +15,7 @@ const C_BG      = '#13161f'
 const C_WALL    = '#4a5068'
 const C_BOX1    = '#4a9eff'
 const C_BOX2    = '#c8922a'
-const C_TEXT    = '#4a5068'
+const C_TEXT    = '#ffffff'
 
 // ─── State ───────────────────────────────────────────────────────────────────
 interface State {
@@ -64,8 +64,12 @@ export function createBouncingBoxesPage(): Page {
     ctx.fillRect(0, 0, CANVAS_W, CANVAS_H)
 
     // Wall
-    ctx.fillStyle = C_WALL
-    ctx.fillRect(WALL_X - 5, 0, 10, CANVAS_H)
+    ctx.strokeStyle = C_WALL
+    ctx.lineWidth = 1
+    ctx.beginPath()
+    ctx.moveTo(WALL_X, 0)
+    ctx.lineTo(WALL_X, CANVAS_H)
+    ctx.stroke()
 
     // Boxes
     ctx.fillStyle = C_BOX1
@@ -77,7 +81,7 @@ export function createBouncingBoxesPage(): Page {
     // Labels
     ctx.fillStyle = C_TEXT
     ctx.font = '12px monospace'
-    ctx.fillText('Wall', WALL_X - 20, CANVAS_H - 10)
+    ctx.fillText('Wall', WALL_X - 50, CANVAS_H - 10)
     ctx.fillText('Box 1 (m=1)', state.smallBoxX - 30, CANVAS_H / 2 + 40)
     ctx.fillText(`Box 2 (m=${state.m2})`, state.largeBoxX - 30, CANVAS_H / 2 + 55)
   }
@@ -172,7 +176,7 @@ export function createBouncingBoxesPage(): Page {
 
     elHits.textContent = state.collisions.toString()
     const piApprox = state.collisions / (10 ** state.k)
-    elPiApprox.textContent = piApprox.toFixed(state.k + 1)
+    elPiApprox.textContent = piApprox.toFixed(state.k)
 
     if (state.running) {
       state.rafId = requestAnimationFrame(tick)
@@ -186,12 +190,14 @@ export function createBouncingBoxesPage(): Page {
     state.m2 = 100 ** state.k
     state.running = true
     elK.disabled = true
+    elStartBtn.textContent = 'Running…'
     state.rafId = requestAnimationFrame(tick)
   }
 
   function stop(): void {
     state.running = false
     elK.disabled = false
+    elStartBtn.textContent = 'Start'
     if (state.rafId !== null) {
       cancelAnimationFrame(state.rafId)
       state.rafId = null
@@ -203,7 +209,14 @@ export function createBouncingBoxesPage(): Page {
     resetState(state)
     draw()
     elHits.textContent = '0'
-    elPiApprox.textContent = '0.0'
+    elPiApprox.textContent = '0'
+  }
+
+  function onKChange(): void {
+    if (state.running) return
+    state.k = parseInt(elK.value)
+    state.m2 = 100 ** state.k
+    draw()
   }
 
   // ── Build DOM ─────────────────────────────────────────────────────────────
@@ -280,6 +293,7 @@ export function createBouncingBoxesPage(): Page {
 
     elStartBtn.addEventListener('click', start)
     elResetBtn.addEventListener('click', reset)
+    elK.addEventListener('change', onKChange)
 
     return page
   }
