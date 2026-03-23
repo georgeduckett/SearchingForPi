@@ -57,6 +57,49 @@ export function createBouncingBoxesPage(): Page {
   let elPiApprox: HTMLElement
   let elStartBtn: HTMLButtonElement
   let elResetBtn: HTMLButtonElement
+  let audioContext: AudioContext | null = null
+  let currentOsc: OscillatorNode | null = null
+  let soundTimeout: number | null = null
+
+  // ── Sound ──────────────────────────────────────────────────────────────────
+  function playCollisionSound(): void {
+    if (!audioContext) {
+      audioContext = new (window.AudioContext || (window as any).webkitAudioContext)()
+    }
+
+    // Stop existing sound if any
+    if (currentOsc) {
+      currentOsc.stop()
+      currentOsc = null
+    }
+    if (soundTimeout) {
+      clearTimeout(soundTimeout)
+      soundTimeout = null
+    }
+
+    const now = audioContext.currentTime
+    const osc = audioContext.createOscillator()
+    const gain = audioContext.createGain()
+
+    osc.connect(gain)
+    gain.connect(audioContext.destination)
+
+    osc.frequency.setValueAtTime(1400, now)
+    osc.frequency.exponentialRampToValueAtTime(800, now + 0.04)
+    osc.type = 'sine'
+
+    gain.gain.setValueAtTime(0.15, now)
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.04)
+
+    currentOsc = osc
+    osc.start(now)
+    osc.stop(now + 0.04)
+
+    soundTimeout = setTimeout(() => {
+      currentOsc = null
+      soundTimeout = null
+    }, 80)
+  }
 
   // ── Draw ───────────────────────────────────────────────────────────────────
   function draw(): void {
@@ -153,10 +196,12 @@ export function createBouncingBoxesPage(): Page {
         state.smallBoxV = newV1
         state.largeBoxV = newV2
         state.collisions++
+        playCollisionSound()
       } else if (collision.type === 'wall') {
         // Wall collision (elastic)
         state.smallBoxV = -state.smallBoxV
         state.collisions++
+        playCollisionSound()
       }
     }
 
