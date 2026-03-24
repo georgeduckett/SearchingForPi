@@ -23,6 +23,7 @@ interface State {
   points: Point[]
   center: { x: number, y: number } | null
   avgRadius: number
+  perimeter: number
   isDrawing: boolean
   segmentLength: number // Maximum distance between points when drawing
 }
@@ -42,6 +43,7 @@ export function createDrawCirclePage(): Page {
     points: [],
     center: null,
     avgRadius: 0,
+    perimeter: 0,
     isDrawing: false,
     segmentLength: 50
   }
@@ -50,6 +52,7 @@ export function createDrawCirclePage(): Page {
   let ctx: CanvasRenderingContext2D
   let btnClear: HTMLButtonElement
   let elPoints: HTMLElement
+  let elPerimeter: HTMLElement
   let elRadius: HTMLElement
   let elApprox: HTMLElement
   let elError: HTMLElement
@@ -175,6 +178,7 @@ export function createDrawCirclePage(): Page {
   function updateStats(): void {
     if (state.center === null) {
       elPoints.textContent = '0 points'
+      elPerimeter.textContent = '—'
       elRadius.textContent = '—'
       elApprox.textContent = '—'
       elError.textContent = '—'
@@ -182,31 +186,27 @@ export function createDrawCirclePage(): Page {
     }
 
     elPoints.textContent = `${state.points.length} points`
-    elRadius.textContent = `${fmt(state.avgRadius)} px`
 
-    // Calculate π approximation: perimeter / (2 * radius)
-    // Perimeter is sum of all segment lengths
+    // Calculate perimeter: sum of all segment lengths
     let perimeter = 0
     for (let i = 0; i < state.points.length; i++) {
       const next = state.points[(i + 1) % state.points.length]
       perimeter += distance(state.points[i], next)
     }
+    state.perimeter = perimeter
+    elPerimeter.textContent = `${fmt(perimeter, 4)}`
 
+    elRadius.textContent = `${fmt(state.avgRadius, 4)}`
+
+    // Calculate π approximation: perimeter / (2 * radius)
     const piApprox = state.avgRadius > 0 ? perimeter / (2 * state.avgRadius) : 0
     const error = Math.abs(piApprox - Math.PI)
     const errorPct = (error / Math.PI) * 100
 
     elApprox.textContent = fmt(piApprox, 8)
 
-    if (errorPct > 10) {
-      elError.innerHTML = `Error: ${fmt(errorPct, 2)}% <span style="color:var(--text-muted)">(draw more!)</span>`
-    } else if (errorPct > 1) {
-      elError.innerHTML = `Error: <span style="color:${C_DRAWN}">${fmt(errorPct, 2)}%</span>`
-    } else if (errorPct > 0.1) {
-      elError.innerHTML = `Error: <span style="color:#4ecb71">${fmt(errorPct, 2)}%</span>`
-    } else {
-      elError.innerHTML = `Error: <span style="color:#4ecb71">Excellent! ${fmt(errorPct, 3)}%</span>`
-    }
+    elError.textContent    = `Error: ${fmt(error, 8)}`
+    elError.className      = 'stat-error ' + (errorPct < 1 ? 'improving' : 'neutral')
   }
 
   // ── Get canvas coordinates from mouse event ─────────────────────────────────
@@ -226,6 +226,7 @@ export function createDrawCirclePage(): Page {
     state.points = []
     state.center = null
     state.avgRadius = 0
+    state.perimeter = 0
     state.isDrawing = true
     lastDrawPoint = coords
     state.points.push({ ...coords, angle: 0 })
@@ -303,6 +304,7 @@ export function createDrawCirclePage(): Page {
     state.points = []
     state.center = null
     state.avgRadius = 0
+    state.perimeter = 0
     state.isDrawing = false
     lastDrawPoint = null
     updateStats()
@@ -344,8 +346,20 @@ export function createDrawCirclePage(): Page {
         <!-- Stats + info -->
         <div class="stats-panel">
           <div class="stat-card">
+            <div class="stat-label">π approximation</div>
+            <div class="stat-value large" id="draw-approx" style="color:${C_APPROX}">—</div>
+            <div class="stat-error neutral" id="draw-error">—</div>
+          </div>
+
+          <div class="stat-card">
             <div class="stat-label">Points drawn</div>
-            <div class="stat-value large" id="draw-points">0 points</div>
+            <div class="stat-value" id="draw-points">0 points</div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-label">Perimeter (C)</div>
+            <div class="stat-value" id="draw-perimeter" style="color:${C_DRAWN}">—</div>
+            <div class="stat-sub">Sum of all line segments</div>
           </div>
 
           <div class="stat-card">
@@ -354,28 +368,23 @@ export function createDrawCirclePage(): Page {
             <div class="stat-sub">Calculated from average point to first point</div>
           </div>
 
-          <div class="stat-card">
-            <div class="stat-label">π approximation</div>
-            <div class="stat-value" id="draw-approx" style="color:${C_APPROX}">—</div>
-            <div class="stat-sub" id="draw-error">—</div>
-          </div>
 
           <div class="legend">
             <div class="legend-item">
               <div class="legend-dot" style="background:${C_DRAWN}"></div>
-              Your drawn circle (straight lines)
+              Your circle (using straight lines)
             </div>
             <div class="legend-item">
               <div class="legend-dot" style="background:${C_PERFECT};border:1px dashed"></div>
-              Perfect circle reference
-            </div>
-            <div class="legend-item">
-              <div class="legend-dot" style="background:${C_RADIUS}"></div>
-              Radius from center
+              Perfect circle (same center/radius)
             </div>
             <div class="legend-item">
               <div class="legend-dot" style="background:${C_CENTER}"></div>
               Center (average of all points)
+            </div>
+            <div class="legend-item">
+              <div class="legend-dot" style="background:${C_RADIUS}"></div>
+              Radius (from center to first point)
             </div>
           </div>
 
@@ -402,6 +411,7 @@ export function createDrawCirclePage(): Page {
     ctx = canvas.getContext('2d')!
     btnClear = page.querySelector<HTMLButtonElement>('#draw-clear')!
     elPoints = page.querySelector('#draw-points')!
+    elPerimeter = page.querySelector('#draw-perimeter')!
     elRadius = page.querySelector('#draw-radius')!
     elApprox = page.querySelector('#draw-approx')!
     elError = page.querySelector('#draw-error')!
