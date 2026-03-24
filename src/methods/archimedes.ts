@@ -27,7 +27,7 @@ function fmt(n: number, digits = 10): string {
   return n.toFixed(digits)
 }
 
-function calculateBounds(sides: number, diameter = 1): { lower: number, upper: number } {
+function calculateBounds(sides: number): { lower: number, upper: number } {
   // For a circle with diameter 1:
   // Inscribed polygon perimeter = sides * sin(π/sides)
   // Circumscribed polygon perimeter = sides * tan(π/sides)

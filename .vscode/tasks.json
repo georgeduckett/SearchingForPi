@@ -14,10 +14,9 @@
     },
     {
       "label": "Start Vite dev server",
-      "type": "npm",
-      "script": "dev",
+      "type": "shell",
+      "command": "npx tsc --noEmit && npm run dev",
       "isBackground": true,
-      "dependsOn": ["TypeScript Check"],
       "problemMatcher": {
         "pattern": {
           "regexp": "^()$"
