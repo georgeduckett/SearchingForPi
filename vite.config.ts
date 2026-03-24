@@ -1,7 +1,7 @@
 import { defineConfig } from 'vite'
 
 export default defineConfig({
-  base: '/SearchingForPi/',
+  base: '/searchingforpi/',
   build: {
     outDir: 'dist',
   },
