@@ -6,6 +6,7 @@ import { createLeibnizPage }    from './methods/leibniz'
 import { createBuffonPage }     from './methods/buffon'
 import { createCoinTossPage }   from './methods/coinToss'
 import { createBouncingBoxesPage } from './methods/bouncingBoxes'
+import { createArchimedesPage } from './methods/archimedes'
 
 // ─── Register pages ───────────────────────────────────────────────────────────
 registerPage('home',        createHomePage)
@@ -14,6 +15,7 @@ registerPage('leibniz',     createLeibnizPage)
 registerPage('buffon',      createBuffonPage)
 registerPage('coin-toss',   createCoinTossPage)
 registerPage('bouncing-boxes', createBouncingBoxesPage)
+registerPage('archimedes',  createArchimedesPage)
 
 // ─── Mobile nav drawer ────────────────────────────────────────────────────────
 const sidebar   = document.getElementById('sidebar')!

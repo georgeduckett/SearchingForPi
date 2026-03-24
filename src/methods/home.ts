@@ -42,6 +42,14 @@ const methods = [
       'Two boxes with mass ratio 100^k collide elastically with a wall. The number of ' +
       'collisions between them encodes the digits of π in a remarkable way.',
   },
+  {
+    index: '06',
+    hash: 'archimedes',
+    title: "Archimedes' Polygons",
+    desc:
+      'Squeeze π between inscribed and circumscribed regular polygons doubling in sides. ' +
+      'Archimedes used just 96 sides to achieve remarkable precision in 250 BCE.',
+  },
 ]
 
 // ─── Page ───────────────────────────────────────────────────────────────────
