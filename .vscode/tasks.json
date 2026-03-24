@@ -2,10 +2,22 @@
   "version": "2.0.0",
   "tasks": [
     {
+      "label": "TypeScript Check",
+      "type": "shell",
+      "command": "npx tsc --noEmit",
+      "group": "build",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      },
+      "problemMatcher": "$tsc"
+    },
+    {
       "label": "Start Vite dev server",
       "type": "npm",
       "script": "dev",
       "isBackground": true,
+      "dependsOn": ["TypeScript Check"],
       "problemMatcher": {
         "pattern": {
           "regexp": "^()$"
