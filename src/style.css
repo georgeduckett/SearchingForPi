@@ -26,6 +26,36 @@
   --radius:         6px;
 }
 
+/* ─── Light theme overrides ─────────────────────────────────────────────────── */
+body.theme-light {
+  --bg-deep:        #f2f4f8;
+  --bg-surface:     #ffffff;
+  --bg-raised:      #f8fafc;
+  --border:         #d7dbe4;
+  --border-bright:  #c1c7d4;
+
+  --text-primary:   #1b1f29;
+  --text-secondary: #56616f;
+  --text-muted:     #7a8695;
+
+  --amber:          #a87314;
+  --amber-bright:   #c2852f;
+  --amber-dim:      #7f5f26;
+  --amber-glow:     rgba(194, 145, 64, 0.15);
+
+  --inside:         #3c79d9;
+  --outside:        #d15456;
+  --needle:         #a87314;
+}
+
+body.theme-light .nav-link:hover {
+  background: var(--bg-raised);
+}
+
+body.theme-light .btn {
+  border-color: var(--border);
+}
+
 /* ─── Reset & Base ──────────────────────────────────────────────────────────── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -145,6 +175,15 @@ html, body {
 .sidebar-footer {
   padding: 16px 20px;
   border-top: 1px solid var(--border);
+}
+
+.theme-switcher {
+  padding: 0 20px 16px;
+}
+
+.theme-switcher .btn {
+  width: 100%;
+  justify-content: center;
 }
 
 .true-pi {

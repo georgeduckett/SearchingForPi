@@ -51,5 +51,43 @@ document.querySelectorAll('.nav-link').forEach(link => {
   })
 })
 
+// ─── Theme toggle (light/dark, persisted) ────────────────────────────────────
+const themeToggle = document.getElementById('theme-toggle')
+const THEME_KEY = 'theme-preference'
+
+type Theme = 'dark' | 'light'
+
+function applyTheme(theme: Theme): void {
+  document.body.classList.toggle('theme-light', theme === 'light')
+  document.body.classList.toggle('theme-dark', theme === 'dark')
+  if (themeToggle) {
+    themeToggle.textContent = theme === 'light' ? '☾ Dark Mode' : '☀️ Light Mode'
+    themeToggle.setAttribute('aria-pressed', String(theme === 'light'))
+  }
+}
+
+function getStoredTheme(): Theme | null {
+  const stored = localStorage.getItem(THEME_KEY)
+  if (stored === 'light' || stored === 'dark') return stored
+  return null
+}
+
+function detectPreferredTheme(): Theme {
+  return window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches
+    ? 'light'
+    : 'dark'
+}
+
+const initialTheme = getStoredTheme() ?? detectPreferredTheme()
+applyTheme(initialTheme)
+
+if (themeToggle) {
+  themeToggle.addEventListener('click', () => {
+    const nextTheme: Theme = document.body.classList.contains('theme-light') ? 'dark' : 'light'
+    localStorage.setItem(THEME_KEY, nextTheme)
+    applyTheme(nextTheme)
+  })
+}
+
 // ─── Boot the router ──────────────────────────────────────────────────────────
 initRouter()
