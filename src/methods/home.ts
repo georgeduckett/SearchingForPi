@@ -50,6 +50,14 @@ const methods = [
       'Squeeze π between inscribed and circumscribed regular polygons doubling in sides. ' +
       'Archimedes used just 96 sides to achieve remarkable precision in 250 BCE.',
   },
+  {
+    index: '07',
+    hash: 'draw-circle',
+    title: 'Draw a Circle',
+    desc:
+      'Draw your own circle by clicking and dragging. The circumference divided by ' +
+      'the diameter approaches π — hands-on understanding of π\'s geometric meaning.',
+  },
 ]
 
 // ─── Page ───────────────────────────────────────────────────────────────────
