@@ -8,6 +8,13 @@ import { createCoinTossPage }   from './methods/coinToss'
 import { createBouncingBoxesPage } from './methods/bouncingBoxes'
 import { createArchimedesPage } from './methods/archimedes'
 import { createDrawCirclePage } from './methods/drawCircle'
+import { createGasMoleculesPage } from './methods/gasMolecules'
+import { createRiemannPage } from './methods/riemann'
+import { createBaselPage } from './methods/basel'
+import { createWallisPage } from './methods/wallis'
+import { createCoprimalityPage } from './methods/coprimality'
+import { createGaltonPage } from './methods/galton'
+import { createCirclePackingPage } from './methods/circlePacking'
 
 // ─── Register pages ───────────────────────────────────────────────────────────
 registerPage('home',        createHomePage)
@@ -18,6 +25,13 @@ registerPage('coin-toss',   createCoinTossPage)
 registerPage('bouncing-boxes', createBouncingBoxesPage)
 registerPage('archimedes',  createArchimedesPage)
 registerPage('draw-circle', createDrawCirclePage)
+registerPage('gas-molecules', createGasMoleculesPage)
+registerPage('riemann', createRiemannPage)
+registerPage('basel', createBaselPage)
+registerPage('wallis', createWallisPage)
+registerPage('coprimality', createCoprimalityPage)
+registerPage('galton', createGaltonPage)
+registerPage('circle-packing', createCirclePackingPage)
 
 // ─── Mobile nav drawer ────────────────────────────────────────────────────────
 const sidebar   = document.getElementById('sidebar')!

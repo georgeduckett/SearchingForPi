@@ -1,108 +1,150 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>π — Ways to Calculate Pi</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=JetBrains+Mono:wght@300;400;500&display=swap"
-      rel="stylesheet"
-    />
-    <link rel="stylesheet" href="/src/style.css" />
-  </head>
-  <body>
-    <div id="app">
-      <!-- Mobile top bar (hidden on desktop) -->
-      <div id="mobile-topbar">
-        <button id="hamburger" aria-label="Open navigation" aria-expanded="false">
-          <span></span><span></span><span></span>
-        </button>
-        <span class="mobile-title"><span class="mobile-pi">π</span> Searching for Pi</span>
-      </div>
+ <head>
+ <meta charset="UTF-8" />
+ <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+ <title>π — Ways to Calculate Pi</title>
+ <link rel="preconnect" href="https://fonts.googleapis.com" />
+ <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+ <link
+ href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=JetBrains+Mono:wght@300;400;500&display=swap"
+ rel="stylesheet"
+ />
+ <link rel="stylesheet" href="/src/style.css" />
+ </head>
+ <body>
+ <div id="app">
+ <!-- Mobile top bar (hidden on desktop) -->
+ <div id="mobile-topbar">
+ <button id="hamburger" aria-label="Open navigation" aria-expanded="false">
+ <span></span><span></span><span></span>
+ </button>
+ <span class="mobile-title"><span class="mobile-pi">π</span> Searching for Pi</span>
+ </div>
 
-      <!-- Overlay backdrop for mobile nav drawer -->
-      <div id="nav-overlay" aria-hidden="true"></div>
+ <!-- Overlay backdrop for mobile nav drawer -->
+ <div id="nav-overlay" aria-hidden="true"></div>
 
-      <!-- Sidebar navigation -->
-      <nav id="sidebar" aria-label="Methods">
-        <div class="sidebar-header">
-          <span class="pi-symbol">π</span>
-          <div class="sidebar-title">
-            <h1>Ways to Calculate Pi</h1>
-            <p>An interactive exploration</p>
-          </div>
-        </div>
+ <!-- Sidebar navigation -->
+ <nav id="sidebar" aria-label="Methods">
+ <div class="sidebar-header">
+ <span class="pi-symbol">π</span>
+ <div class="sidebar-title">
+ <h1>Ways to Calculate Pi</h1>
+ <p>An interactive exploration</p>
+ </div>
+ </div>
 
-        <ul class="nav-list" id="nav-list">
-          <li>
-            <a href="#home" class="nav-link" data-page="home">
-              <span class="nav-index">00</span>
-              <span class="nav-label">Introduction</span>
-            </a>
-          </li>
-          <li>
-            <a href="#monte-carlo" class="nav-link" data-page="monte-carlo">
-              <span class="nav-index">01</span>
-              <span class="nav-label">Monte Carlo</span>
-            </a>
-          </li>
-          <li>
-            <a href="#leibniz" class="nav-link" data-page="leibniz">
-              <span class="nav-index">02</span>
-              <span class="nav-label">Leibniz Series</span>
-            </a>
-          </li>
-          <li>
-            <a href="#buffon" class="nav-link" data-page="buffon">
-              <span class="nav-index">03</span>
-              <span class="nav-label">Buffon's Needle</span>
-            </a>
-          </li>
-          <li>
-            <a href="#coin-toss" class="nav-link" data-page="coin-toss">
-              <span class="nav-index">04</span>
-              <span class="nav-label">Coin Toss Sequences</span>
-            </a>
-          </li>
-          <li>
-            <a href="#bouncing-boxes" class="nav-link" data-page="bouncing-boxes">
-              <span class="nav-index">05</span>
-              <span class="nav-label">Bouncing Boxes</span>
-            </a>
-          </li>
-          <li>
-            <a href="#archimedes" class="nav-link" data-page="archimedes">
-              <span class="nav-index">06</span>
-              <span class="nav-label">Archimedes' Polygons</span>
-            </a>
-          </li>
-          <li>
-            <a href="#draw-circle" class="nav-link" data-page="draw-circle">
-              <span class="nav-index">07</span>
-              <span class="nav-label">Draw a Circle</span>
-            </a>
-          </li>
-        </ul>
+ <ul class="nav-list" id="nav-list">
+ <li>
+ <a href="#home" class="nav-link" data-page="home">
+ <span class="nav-index">00</span>
+ <span class="nav-label">Introduction</span>
+ </a>
+ </li>
+ <li>
+ <a href="#monte-carlo" class="nav-link" data-page="monte-carlo">
+ <span class="nav-index">01</span>
+ <span class="nav-label">Monte Carlo</span>
+ </a>
+ </li>
+ <li>
+ <a href="#leibniz" class="nav-link" data-page="leibniz">
+ <span class="nav-index">02</span>
+ <span class="nav-label">Leibniz Series</span>
+ </a>
+ </li>
+ <li>
+ <a href="#buffon" class="nav-link" data-page="buffon">
+ <span class="nav-index">03</span>
+ <span class="nav-label">Buffon's Needle</span>
+ </a>
+ </li>
+ <li>
+ <a href="#coin-toss" class="nav-link" data-page="coin-toss">
+ <span class="nav-index">04</span>
+ <span class="nav-label">Coin Toss Sequences</span>
+ </a>
+ </li>
+ <li>
+ <a href="#bouncing-boxes" class="nav-link" data-page="bouncing-boxes">
+ <span class="nav-index">05</span>
+ <span class="nav-label">Bouncing Boxes</span>
+ </a>
+ </li>
+ <li>
+ <a href="#archimedes" class="nav-link" data-page="archimedes">
+ <span class="nav-index">06</span>
+ <span class="nav-label">Archimedes' Polygons</span>
+ </a>
+ </li>
+ <li>
+ <a href="#draw-circle" class="nav-link" data-page="draw-circle">
+ <span class="nav-index">07</span>
+ <span class="nav-label">Draw a Circle</span>
+ </a>
+ </li>
+ <li>
+ <a href="#riemann" class="nav-link" data-page="riemann">
+ <span class="nav-index">08</span>
+ <span class="nav-label">Riemann Integral</span>
+ </a>
+ </li>
+ <li>
+ <a href="#basel" class="nav-link" data-page="basel">
+ <span class="nav-index">09</span>
+ <span class="nav-label">Basel Problem</span>
+ </a>
+ </li>
+ <li>
+ <a href="#wallis" class="nav-link" data-page="wallis">
+ <span class="nav-index">10</span>
+ <span class="nav-label">Wallis Product</span>
+ </a>
+ </li>
+ <li>
+ <a href="#coprimality" class="nav-link" data-page="coprimality">
+ <span class="nav-index">11</span>
+ <span class="nav-label">Coprimality</span>
+ </a>
+ </li>
+ <li>
+ <a href="#galton" class="nav-link" data-page="galton">
+ <span class="nav-index">12</span>
+ <span class="nav-label">Galton Board</span>
+ </a>
+ </li>
+ <li>
+ <a href="#circle-packing" class="nav-link" data-page="circle-packing">
+ <span class="nav-index">13</span>
+ <span class="nav-label">Circle Packing</span>
+ </a>
+ </li>
+ <li>
+ <a href="#gas-molecules" class="nav-link" data-page="gas-molecules">
+ <span class="nav-index">14</span>
+ <span class="nav-label">Gas Molecules</span>
+ </a>
+ </li>
+ </ul>
 
-        <div class="theme-switcher">
-          <button id="theme-toggle" class="btn" type="button" aria-label="Toggle dark mode">
-            🌙 Dark Mode
-          </button>
-        </div>
+ <div class="theme-switcher">
+ <button id="theme-toggle" class="btn" type="button" aria-label="Toggle dark mode">
+ 🌙 Dark Mode
+ </button>
+ </div>
 
-        <div class="sidebar-footer">
-          <span class="true-pi">π ≈ 3.14159265358979…</span>
-        </div>
-      </nav>
+ <div class="sidebar-footer">
+ <span class="true-pi">π ≈ 3.14159265358979…</span>
+ </div>
+ </nav>
 
-      <!-- Main content area -->
-      <main id="main-content">
-        <div id="page-container"></div>
-      </main>
-    </div>
+ <!-- Main content area -->
+ <main id="main-content">
+ <div id="page-container"></div>
+ </main>
+ </div>
 
-    <script type="module" src="/src/main.ts"></script>
-  </body>
+ <script type="module" src="/src/main.ts"></script>
+ </body>
 </html>

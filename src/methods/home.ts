@@ -58,6 +58,62 @@ const methods = [
       'Draw your own circle by clicking and dragging. The circumference divided by ' +
       'the diameter approaches π — hands-on understanding of π\'s geometric meaning.',
   },
+  {
+    index: '08',
+    hash: 'riemann',
+    title: 'Riemann Integral',
+    desc:
+      'The area under the curve y = 4/(1+x²) from 0 to 1 equals π exactly. ' +
+      'Watch rectangles progressively fill this area.',
+  },
+  {
+    index: '09',
+    hash: 'basel',
+    title: 'Basel Problem',
+    desc:
+      'Euler proved that the sum of 1/n² equals π²/6. Visualize the sum as ' +
+      'stacking squares of decreasing area converging to this remarkable result.',
+  },
+  {
+    index: '10',
+    hash: 'wallis',
+    title: 'Wallis Product',
+    desc:
+      'An elegant infinite product (2/1 × 2/3) × (4/3 × 4/5) × ... converges to π/2. ' +
+      'Watch the product oscillate and settle toward π.',
+  },
+  {
+    index: '11',
+    hash: 'coprimality',
+    title: 'Coprimality',
+    desc:
+      'Two random integers are coprime with probability 6/π² (about 60.79%). ' +
+      'Generate pairs and estimate π from the coprime ratio.',
+  },
+  {
+    index: '12',
+    hash: 'galton',
+    title: 'Galton Board',
+    desc:
+      'Balls falling through pegs form a binomial distribution. Through Stirlings ' +
+      'approximation, the distribution shape connects to π.',
+  },
+  {
+    index: '13',
+    hash: 'circle-packing',
+    title: 'Circle Packing',
+    desc:
+      'Randomly pack circles into a square. The covered area relates to π through ' +
+      'the sum of squared radii.',
+  },
+  {
+    index: '14',
+    hash: 'gas-molecules',
+    title: 'Gas Molecules',
+    desc:
+      'Simulate ideal gas particles bouncing in a container. The Maxwell-Boltzmann ' +
+      'speed distribution connects to π through statistical mechanics.',
+  },
 ]
 
 // ─── Page ───────────────────────────────────────────────────────────────────
