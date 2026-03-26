@@ -155,6 +155,7 @@ export function createCoprimalityPage(): Page {
   function start(): void {
     state.running = true
     btnStart.disabled = true
+    btnReset.disabled = false
     btnStart.textContent = 'Running…'
     state.rafId = requestAnimationFrame(tick)
   }

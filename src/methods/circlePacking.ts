@@ -190,6 +190,7 @@ export function createCirclePackingPage(): Page {
     state.running = true
     state.rejected = 0
     btnStart.disabled = true
+    btnReset.disabled = false
     btnStart.textContent = 'Running…'
     state.rafId = requestAnimationFrame(tick)
   }

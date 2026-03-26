@@ -293,6 +293,7 @@ export function createGaltonPage(): Page {
     state.running = true
     state.dropping = true
     btnStart.disabled = true
+    btnReset.disabled = false
     btnStart.textContent = 'Running…'
     state.rafId = requestAnimationFrame(tick)
   }

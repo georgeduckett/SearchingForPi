@@ -132,6 +132,7 @@ export function createRiemannPage(): Page {
   function start(): void {
     state.running = true
     btnStart.disabled = true
+    btnReset.disabled = false
     btnStart.textContent = 'Running…'
     state.intervalId = setInterval(() => addRects(5), 100)
   }

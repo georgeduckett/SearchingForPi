@@ -3,7 +3,7 @@ import { fmt, queryRequired } from '../utils'
 import { C_BG, C_INSIDE, C_OUTSIDE, C_AMBER, C_TEXT_MUTED, CANVAS_SIZE } from '../colors'
 
 // ─── Constants ───────────────────────────────────────────────────────────────
-const MAX_TERMS = 100
+const MAX_FACTORS = 200
 
 // Method-specific colors
 const C_OVER = C_INSIDE
@@ -11,7 +11,7 @@ const C_UNDER = C_OUTSIDE
 
 // ─── State ───────────────────────────────────────────────────────────────────
 interface State {
-  terms: number
+  factors: number // Number of factors computed (each term-pair has 2 factors)
   product: number
   running: boolean
   intervalId: ReturnType<typeof setInterval> | null
@@ -19,16 +19,30 @@ interface State {
 
 // ─── Page Factory ─────────────────────────────────────────────────────────────
 export function createWallisPage(): Page {
-  const state: State = { terms: 0, product: 1, running: false, intervalId: null }
+  const state: State = { factors: 0, product: 1, running: false, intervalId: null }
   let canvas: HTMLCanvasElement
   let ctx: CanvasRenderingContext2D
   let btnStart: HTMLButtonElement
   let btnStep: HTMLButtonElement
   let btnReset: HTMLButtonElement
   let elEstimate: HTMLElement
-  let elTerms: HTMLElement
+  let elFactors: HTMLElement
   let elProduct: HTMLElement
   let elError: HTMLElement
+
+  // ── Get the n-th factor value (1-indexed) ────────────────────────────────────
+  // Odd factors: (2k+2)/(2k+1) > 1, where k = (n-1)/2
+  // Even factors: (2k+2)/(2k+3) < 1, where k = (n-2)/2
+  function getFactor(n: number): number {
+    const k = Math.floor((n - 1) / 2)
+    if (n % 2 === 1) {
+      // Odd factor: (2(k+1))/(2(k+1)-1) = (2k+2)/(2k+1)
+      return (2 * (k + 1)) / (2 * (k + 1) - 1)
+    } else {
+      // Even factor: (2k+2)/(2k+3)
+      return (2 * (k + 1)) / (2 * (k + 1) + 1)
+    }
+  }
 
   // ── Draw the product visualization ─────────────────────────────────────────
   function draw(): void {
@@ -71,23 +85,20 @@ export function createWallisPage(): Page {
     ctx.font = '11px "JetBrains Mono", monospace'
     ctx.fillText('π/2 ≈ 1.5708', W - pad - 80, piY - 5)
 
-    // Draw bars showing alternation
-    if (state.terms > 0) {
-      const barW = Math.min(8, plotW / MAX_TERMS)
+    // Draw bars showing deviation at each factor step
+    if (state.factors > 0) {
+      const barW = Math.min(4, plotW / MAX_FACTORS)
       let currentProduct = 1
 
-      for (let n = 1; n <= state.terms; n++) {
-        const term1 = (2 * n) / (2 * n - 1)
-        const term2 = (2 * n) / (2 * n + 1)
-        currentProduct *= term1 * term2
-
-        const x = pad + (n / MAX_TERMS) * plotW
+      for (let n = 1; n <= state.factors; n++) {
+        currentProduct *= getFactor(n)
+        const x = pad + (n / MAX_FACTORS) * plotW
         const deviation = currentProduct - target
         const isOver = currentProduct > target
 
         // Draw bar showing deviation from target
         const barY = piY
-        const barH = Math.abs(deviation) * scale * 2 // Amplify for visibility
+        const barH = Math.abs(deviation) * scale * 3 // Amplify for visibility
 
         ctx.fillStyle = isOver ? C_OVER : C_UNDER
         ctx.globalAlpha = 0.7
@@ -101,8 +112,8 @@ export function createWallisPage(): Page {
     }
 
     // Current product indicator
-    if (state.terms > 0) {
-      const x = pad + (state.terms / MAX_TERMS) * plotW
+    if (state.factors > 0) {
+      const x = pad + (state.factors / MAX_FACTORS) * plotW
       ctx.strokeStyle = '#fff'
       ctx.lineWidth = 2
       ctx.beginPath()
@@ -138,22 +149,19 @@ export function createWallisPage(): Page {
     const error = Math.abs(piEstimate - Math.PI)
 
     elEstimate.textContent = fmt(piEstimate)
-    elTerms.textContent = state.terms.toLocaleString()
+    elFactors.textContent = state.factors.toLocaleString()
     elProduct.textContent = fmt(state.product)
     elError.textContent = `Error: ${fmt(error)}`
     elError.className = 'stat-error ' + (error < 0.1 ? 'improving' : 'neutral')
   }
 
-  function addTerm(): void {
-    state.terms++
-    const n = state.terms
-    const term1 = (2 * n) / (2 * n - 1)
-    const term2 = (2 * n) / (2 * n + 1)
-    state.product *= term1 * term2
+  function addFactor(): void {
+    state.factors++
+    state.product *= getFactor(state.factors)
 
     draw()
     updateStats()
-    if (state.terms >= MAX_TERMS) {
+    if (state.factors >= MAX_FACTORS) {
       stop()
     }
   }
@@ -161,8 +169,9 @@ export function createWallisPage(): Page {
   function start(): void {
     state.running = true
     btnStart.disabled = true
+    btnReset.disabled = false
     btnStart.textContent = 'Running…'
-    state.intervalId = setInterval(addTerm, 80)
+    state.intervalId = setInterval(addFactor, 50)
   }
 
   function stop(): void {
@@ -171,13 +180,13 @@ export function createWallisPage(): Page {
       clearInterval(state.intervalId)
       state.intervalId = null
     }
-    btnStart.disabled = state.terms >= MAX_TERMS
-    btnStart.textContent = state.terms >= MAX_TERMS ? 'Done' : 'Start'
+    btnStart.disabled = state.factors >= MAX_FACTORS
+    btnStart.textContent = state.factors >= MAX_FACTORS ? 'Done' : 'Start'
   }
 
   function reset(): void {
     stop()
-    state.terms = 0
+    state.factors = 0
     state.product = 1
     draw()
     updateStats()
@@ -207,7 +216,7 @@ export function createWallisPage(): Page {
           </div>
           <div style="margin-top:14px" class="controls">
             <button id="wa-start" class="btn primary">Start</button>
-            <button id="wa-step" class="btn">Add Term</button>
+            <button id="wa-step" class="btn">Add Factor</button>
             <button id="wa-reset" class="btn" disabled>Reset</button>
           </div>
         </div>
@@ -226,9 +235,9 @@ export function createWallisPage(): Page {
           </div>
 
           <div class="stat-card">
-            <div class="stat-label">Terms computed</div>
-            <div class="stat-value" id="wa-terms">0</div>
-            <div class="stat-sub">of ${MAX_TERMS} max</div>
+            <div class="stat-label">Factors computed</div>
+            <div class="stat-value" id="wa-factors">0</div>
+            <div class="stat-sub">of ${MAX_FACTORS} max</div>
           </div>
 
           <div class="legend">
@@ -248,14 +257,16 @@ export function createWallisPage(): Page {
 
           <div class="explanation">
             <h3>How it works</h3>
-            <div class="formula">π/2 = ∏(2n/(2n-1) × 2n/(2n+1))</div>
+            <div class="formula">π/2 = (2/1)·(2/3)·(4/3)·(4/5)·(6/5)·(6/7)·…</div>
             <p>
               Discovered by John Wallis in 1655, this infinite product
               represents π/2 as an elegant alternating product of fractions.
             </p>
             <p>
-              Each term multiplies by (2n/(2n-1)) × (2n/(2n+1)), which
-              oscillates above and below π/2 while slowly converging.
+              Each odd-numbered factor (2n/(2n-1)) is greater than 1 and
+              temporarily pushes the product above π/2. Each even-numbered
+              factor (2n/(2n+1)) brings it back below. This oscillation
+              gradually dampens as the product converges.
             </p>
           </div>
         </div>
@@ -267,7 +278,7 @@ export function createWallisPage(): Page {
     btnStep = queryRequired(page, '#wa-step', HTMLButtonElement)
     btnReset = queryRequired(page, '#wa-reset', HTMLButtonElement)
     elEstimate = queryRequired(page, '#wa-estimate')
-    elTerms = queryRequired(page, '#wa-terms')
+    elFactors = queryRequired(page, '#wa-factors')
     elProduct = queryRequired(page, '#wa-product')
     elError = queryRequired(page, '#wa-error')
 
@@ -280,7 +291,7 @@ export function createWallisPage(): Page {
     })
     btnStep.addEventListener('click', () => {
       if (!state.running) {
-        addTerm()
+        addFactor()
         btnReset.disabled = false
       }
     })
