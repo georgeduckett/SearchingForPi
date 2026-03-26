@@ -34,7 +34,7 @@ interface State {
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 function resetState(state: State): void {
-  state.k = 1
+  state.k = 0
   state.m2 = 100 ** state.k
   state.smallBoxX = INITIAL_X1
   state.smallBoxV = 0
@@ -195,10 +195,18 @@ export function createBouncingBoxesPage(): Page {
       }
     }
 
-    if (state.largeBoxV > state.smallBoxV && state.smallBoxV >= 0 && state.largeBoxX - state.smallBoxX > 5 * BOX_SIZE && state.smallBoxX - BOX_SIZE / 2 > WALL_X + 5 * BOX_SIZE) {
+    if (isSimulationComplete()) {
       stop()
     }
   }
+
+  function isSimulationComplete(): boolean {
+    const boxesSeparated = state.largeBoxV > state.smallBoxV && state.smallBoxV >= 0
+    const gapLargeEnough = state.largeBoxX - state.smallBoxX > 5 * BOX_SIZE
+    const smallBoxAwayFromWall = state.smallBoxX - BOX_SIZE / 2 > WALL_X + 5 * BOX_SIZE
+    return boxesSeparated && gapLargeEnough && smallBoxAwayFromWall
+  }
+
 
   // ── Animation ──────────────────────────────────────────────────────────────
   function tick(timestamp: number): void {
