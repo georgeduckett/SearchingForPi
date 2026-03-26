@@ -310,7 +310,7 @@ export function createGasMoleculesPage(): Page {
 
     page.innerHTML = `
       <header class="page-header">
-        <span class="page-index">Method 07</span>
+        <span class="page-index">Method 14</span>
         <h2 class="page-title">Gas Molecules</h2>
         <p class="page-subtitle">
           Maxwell-Boltzmann speed distribution relates to π.
