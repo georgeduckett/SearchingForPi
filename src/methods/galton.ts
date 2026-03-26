@@ -47,9 +47,10 @@ export function createGaltonPage(): Page {
   let elError: HTMLElement
 
   // Physics constants
-  const GRAVITY = 0.3
-  const BOUNCE = 0.5
-  const SPREAD = 0.15
+  const GRAVITY = 0.25
+  const RESTITUTION = 0.6 // Coefficient of restitution for bounces
+  const FRICTION = 0.99 // Velocity damping per frame
+  const PEG_DAMPING = 0.65 // Energy loss on peg collision
 
   // Layout
   const PEG_START_Y = 50
@@ -196,11 +197,12 @@ export function createGaltonPage(): Page {
   // ── Drop a new ball ──────────────────────────────────────────────────────────
   function dropBall(): void {
     const centerX = canvas.width / 2
+    // Randomness comes from initial position/velocity - like a real Galton board
     state.balls.push({
-      x: centerX + (Math.random() - 0.5) * 10,
-      y: 20,
-      vx: 0,
-      vy: 0,
+      x: centerX + (Math.random() - 0.5) * 8,
+      y: 15 + Math.random() * 10,
+      vx: (Math.random() - 0.5) * 0.3,
+      vy: Math.random() * 0.5,
       active: true,
       bin: null
     })
@@ -221,6 +223,10 @@ export function createGaltonPage(): Page {
       // Apply gravity
       ball.vy += GRAVITY
 
+      // Apply air friction
+      ball.vx *= FRICTION
+      ball.vy *= FRICTION
+
       // Update position
       ball.x += ball.vx
       ball.y += ball.vy
@@ -237,15 +243,22 @@ export function createGaltonPage(): Page {
           const dy = ball.y - pegY
           const dist = Math.sqrt(dx * dx + dy * dy)
 
-          if (dist < BALL_RADIUS + PEG_RADIUS) {
-            // Bounce off peg
-            const angle = Math.atan2(dy, dx)
-            ball.x = pegX + Math.cos(angle) * (BALL_RADIUS + PEG_RADIUS + 1)
-            ball.y = pegY + Math.sin(angle) * (BALL_RADIUS + PEG_RADIUS + 1)
+          if (dist < BALL_RADIUS + PEG_RADIUS && dist > 0) {
+            // Physics-based reflection using collision normal
+            const nx = dx / dist // Normal vector x
+            const ny = dy / dist // Normal vector y
 
-            // Random deflection
-            ball.vx = (Math.random() > 0.5 ? 1 : -1) * SPREAD * (2 + Math.random() * 2)
-            ball.vy = Math.abs(ball.vy) * BOUNCE * 0.5
+            // Position correction - push ball out of peg
+            ball.x = pegX + nx * (BALL_RADIUS + PEG_RADIUS + 1)
+            ball.y = pegY + ny * (BALL_RADIUS + PEG_RADIUS + 1)
+
+            // Reflect velocity: v' = v - 2(v·n)n
+            const dotProduct = ball.vx * nx + ball.vy * ny
+            ball.vx = (ball.vx - 2 * dotProduct * nx) * RESTITUTION * PEG_DAMPING
+            ball.vy = (ball.vy - 2 * dotProduct * ny) * RESTITUTION * PEG_DAMPING
+
+            // Ensure downward motion continues
+            ball.vy = Math.max(ball.vy, GRAVITY * 0.5)
           }
         }
       }
