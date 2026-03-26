@@ -1,12 +1,54 @@
 import type { Page } from '../router'
 import { fmt, queryRequired } from '../utils'
-import { C_BG, C_GRID, C_INSIDE, C_AMBER, CANVAS_SIZE } from '../colors'
+import { C_BG, C_GRID, C_INSIDE, C_AMBER, CANVAS_SIZE, PREVIEW_SIZE, C_OUTSIDE } from '../colors'
 const MAX_ITERATIONS = 9
 
 // ─── Colours (using shared with method-specific) ─────────────────────────────
 const C_POLYGON_INNER = C_INSIDE
 const C_POLYGON_OUTER = '#ff9f69'
 const C_CIRCLE = C_AMBER
+
+// ─── Preview Renderer ────────────────────────────────────────────────────────
+export function drawPreview(ctx: CanvasRenderingContext2D, time: number): void {
+  const s = PREVIEW_SIZE
+  const cx = s / 2
+  const cy = s / 2
+  const r = s / 2 - 10
+
+  ctx.fillStyle = C_BG
+  ctx.fillRect(0, 0, s, s)
+
+  const sides = 6 + Math.floor(time * 0.2) % 4 * 2
+  ctx.strokeStyle = C_INSIDE
+  ctx.lineWidth = 1.5
+  ctx.beginPath()
+  for (let i = 0; i <= sides; i++) {
+    const angle = (i / sides) * Math.PI * 2 - Math.PI / 2
+    const x = cx + r * Math.cos(angle)
+    const y = cy + r * Math.sin(angle)
+    if (i === 0) ctx.moveTo(x, y)
+    else ctx.lineTo(x, y)
+  }
+  ctx.stroke()
+
+  const r2 = r / Math.cos(Math.PI / sides)
+  ctx.strokeStyle = C_OUTSIDE
+  ctx.beginPath()
+  for (let i = 0; i <= sides; i++) {
+    const angle = (i / sides) * Math.PI * 2 - Math.PI / 2
+    const x = cx + r2 * Math.cos(angle)
+    const y = cy + r2 * Math.sin(angle)
+    if (i === 0) ctx.moveTo(x, y)
+    else ctx.lineTo(x, y)
+  }
+  ctx.stroke()
+
+  ctx.strokeStyle = C_AMBER
+  ctx.lineWidth = 1
+  ctx.beginPath()
+  ctx.arc(cx, cy, r, 0, Math.PI * 2)
+  ctx.stroke()
+}
 
 // ─── State ───────────────────────────────────────────────────────────────────
 interface State {

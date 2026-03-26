@@ -1,6 +1,6 @@
 import type { Page } from '../router'
 import { queryRequired } from '../utils'
-import { C_BG, C_GRID, C_INSIDE, C_OUTSIDE, C_AMBER, C_TEXT_MUTED, C_BORDER } from '../colors'
+import { C_BG, C_GRID, C_INSIDE, C_OUTSIDE, C_AMBER, C_TEXT_MUTED, C_BORDER, PREVIEW_SIZE } from '../colors'
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 const CANVAS_W = 560
@@ -13,6 +13,33 @@ const C_PLUS = C_INSIDE
 const C_MINUS = C_OUTSIDE
 const C_TEXT = C_TEXT_MUTED
 const C_ZERO = C_BORDER
+
+// ─── Preview Renderer ────────────────────────────────────────────────────────
+export function drawPreview(ctx: CanvasRenderingContext2D, time: number): void {
+  const s = PREVIEW_SIZE
+  ctx.fillStyle = C_BG
+  ctx.fillRect(0, 0, s, s)
+
+  const terms = 10
+  const barW = (s - 20) / terms
+  for (let i = 0; i < terms; i++) {
+    const sign = i % 2 === 0 ? 1 : -1
+    const term = sign / (2 * i + 1)
+    const h = Math.abs(term) * (s - 30) * 2
+    ctx.fillStyle = i % 2 === 0 ? C_INSIDE : C_OUTSIDE
+    ctx.globalAlpha = 0.7 + 0.15 * Math.sin(time * 0.5 + i * 0.3)
+    ctx.fillRect(10 + i * barW, s / 2 - h / 2, barW - 2, h)
+  }
+  ctx.globalAlpha = 1
+
+  const pi4 = (s - 30) * (Math.PI / 4)
+  ctx.strokeStyle = C_AMBER
+  ctx.lineWidth = 2
+  ctx.beginPath()
+  ctx.moveTo(10, s / 2 - pi4 / 2)
+  ctx.lineTo(s - 10, s / 2 - pi4 / 2)
+  ctx.stroke()
+}
 
 // ─── State ───────────────────────────────────────────────────────────────────
 interface State {

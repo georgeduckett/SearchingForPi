@@ -21,5 +21,6 @@ export const C_INSIDE = '#4a9eff' // Points inside circle / positive values
 export const C_OUTSIDE = '#ff6b6b' // Points outside / negative values
 export const C_SUCCESS = '#4ecb71' // Success / radius / good values
 
-// Canvas size constant (shared across most visualizations)
+// Canvas size constants
 export const CANVAS_SIZE = 560
+export const PREVIEW_SIZE = 140

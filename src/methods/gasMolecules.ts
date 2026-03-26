@@ -1,6 +1,6 @@
 import type { Page } from '../router'
 import { fmt, queryRequired } from '../utils'
-import { C_BG, C_INSIDE, C_AMBER, CANVAS_SIZE } from '../colors'
+import { C_BG, C_INSIDE, C_AMBER, C_BORDER, CANVAS_SIZE, PREVIEW_SIZE } from '../colors'
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 const MAX_PARTICLES = 200
@@ -10,6 +10,30 @@ const TICKS_PER_FRAME = 2
 // ─── Colors ──────────────────────────────────────────────────────────────────
 const C_PARTICLE = C_INSIDE
 const C_WALL = C_AMBER
+
+// ─── Preview Renderer ────────────────────────────────────────────────────────
+export function drawPreview(ctx: CanvasRenderingContext2D, time: number): void {
+  const s = PREVIEW_SIZE
+  ctx.fillStyle = C_BG
+  ctx.fillRect(0, 0, s, s)
+
+  ctx.strokeStyle = C_BORDER
+  ctx.lineWidth = 1
+  ctx.strokeRect(5, 5, s - 10, s - 10)
+
+  ctx.fillStyle = C_INSIDE
+  for (let i = 0; i < 15; i++) {
+    const angle = time * 0.5 + i * 0.7
+    const speed = 0.3 + (i % 3) * 0.15
+    const x = 15 + Math.sin(angle * speed + i) * 50 + (i % 5) * 22
+    const y = 15 + Math.cos(angle * speed * 0.7 + i * 2) * 50 + Math.floor(i / 5) * 35
+    ctx.globalAlpha = 0.8
+    ctx.beginPath()
+    ctx.arc(Math.min(s - 15, Math.max(15, x)), Math.min(s - 15, Math.max(15, y)), 4, 0, Math.PI * 2)
+    ctx.fill()
+  }
+  ctx.globalAlpha = 1
+}
 
 // ─── State ───────────────────────────────────────────────────────────────────
 interface Particle {

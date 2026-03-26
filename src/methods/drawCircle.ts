@@ -1,6 +1,6 @@
 import type { Page } from '../router'
 import { fmt, distance, getCanvasCoords, queryRequired } from '../utils'
-import { C_BG, C_GRID, C_INSIDE, C_AMBER, C_SUCCESS, C_TEXT_MUTED, C_BORDER, C_TEXT_PRIMARY, CANVAS_SIZE } from '../colors'
+import { C_BG, C_GRID, C_INSIDE, C_AMBER, C_SUCCESS, C_TEXT_MUTED, C_BORDER, C_TEXT_PRIMARY, CANVAS_SIZE, PREVIEW_SIZE, C_AMBER_BRIGHT } from '../colors'
 
 // ─── Colours (method-specific) ──────────────────────────────────────────────
 const C_DRAWN = C_INSIDE
@@ -8,6 +8,32 @@ const C_APPROX = C_AMBER
 const C_CENTER = C_TEXT_PRIMARY
 const C_RADIUS = C_SUCCESS
 const C_PERFECT = C_BORDER
+
+// ─── Preview Renderer ────────────────────────────────────────────────────────
+export function drawPreview(ctx: CanvasRenderingContext2D, time: number): void {
+  const s = PREVIEW_SIZE
+  ctx.fillStyle = C_BG
+  ctx.fillRect(0, 0, s, s)
+
+  const progress = (time * 0.25) % 1
+  const r = s / 2 - 15
+  ctx.strokeStyle = C_AMBER
+  ctx.lineWidth = 2
+  ctx.beginPath()
+  ctx.arc(s / 2, s / 2, r, 0, progress * Math.PI * 2)
+  ctx.stroke()
+
+  const angle = progress * Math.PI * 2
+  ctx.fillStyle = C_AMBER_BRIGHT
+  ctx.beginPath()
+  ctx.arc(s / 2 + r * Math.cos(angle), s / 2 + r * Math.sin(angle), 4, 0, Math.PI * 2)
+  ctx.fill()
+
+  ctx.fillStyle = C_TEXT_MUTED
+  ctx.font = '12px monospace'
+  ctx.textAlign = 'center'
+  ctx.fillText('π = C/d', s / 2, s - 8)
+}
 
 // ─── State ───────────────────────────────────────────────────────────────────
 interface Point {

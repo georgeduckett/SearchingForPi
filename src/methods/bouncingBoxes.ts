@@ -1,6 +1,6 @@
 import type { Page } from '../router'
 import { queryRequired } from '../utils'
-import { C_BG, C_TEXT_MUTED, C_INSIDE, C_AMBER, C_TEXT_PRIMARY } from '../colors'
+import { C_BG, C_TEXT_MUTED, C_INSIDE, C_AMBER, C_TEXT_PRIMARY, PREVIEW_SIZE } from '../colors'
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 const CANVAS_W = 810
@@ -17,6 +17,31 @@ const C_WALL = C_TEXT_MUTED
 const C_BOX1 = C_INSIDE
 const C_BOX2 = C_AMBER
 const C_TEXT = C_TEXT_PRIMARY
+
+// ─── Preview Renderer ────────────────────────────────────────────────────────
+export function drawPreview(ctx: CanvasRenderingContext2D, time: number): void {
+  const s = PREVIEW_SIZE
+  ctx.fillStyle = C_BG
+  ctx.fillRect(0, 0, s, s)
+
+  // Wall
+  ctx.strokeStyle = C_TEXT_MUTED
+  ctx.lineWidth = 2
+  ctx.beginPath()
+  ctx.moveTo(10, 0)
+  ctx.lineTo(10, s)
+  ctx.stroke()
+
+  // Small box bouncing
+  const x1 = 10 + Math.abs(Math.sin(time * 0.8)) * 40
+  ctx.fillStyle = C_INSIDE
+  ctx.fillRect(x1, s / 2 - 10, 20, 20)
+
+  // Large box
+  const x2 = 65 + Math.abs(Math.sin(time * 0.6)) * 30
+  ctx.fillStyle = C_AMBER
+  ctx.fillRect(x2, s / 2 - 10, 20, 20)
+}
 
 // ─── State ───────────────────────────────────────────────────────────────────
 interface State {

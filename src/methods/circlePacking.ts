@@ -1,12 +1,35 @@
 import type { Page } from '../router'
 import { fmt, queryRequired } from '../utils'
-import { C_BG, C_INSIDE, C_TEXT_MUTED, CANVAS_SIZE } from '../colors'
+import { C_BG, C_INSIDE, C_TEXT_MUTED, CANVAS_SIZE, PREVIEW_SIZE } from '../colors'
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 const MAX_CIRCLES = 500
 const MIN_RADIUS = 8
 const MAX_RADIUS = 25
 const ATTEMPTS_PER_CIRCLE = 100
+
+// ─── Preview Renderer ────────────────────────────────────────────────────────
+export function drawPreview(ctx: CanvasRenderingContext2D, _time: number): void {
+  const s = PREVIEW_SIZE
+  ctx.fillStyle = C_BG
+  ctx.fillRect(0, 0, s, s)
+
+  for (let i = 0; i < 20; i++) {
+    const x = 15 + (Math.sin(i * 2.3) * 0.5 + 0.5) * (s - 30)
+    const y = 15 + (Math.cos(i * 1.9) * 0.5 + 0.5) * (s - 30)
+    const r = 5 + (Math.sin(i * 3.1) * 0.5 + 0.5) * 12
+    ctx.strokeStyle = C_INSIDE
+    ctx.lineWidth = 1
+    ctx.globalAlpha = 0.6
+    ctx.beginPath()
+    ctx.arc(x, y, r, 0, Math.PI * 2)
+    ctx.stroke()
+    ctx.fillStyle = C_INSIDE
+    ctx.globalAlpha = 0.2
+    ctx.fill()
+  }
+  ctx.globalAlpha = 1
+}
 
 // ─── State ───────────────────────────────────────────────────────────────────
 interface Circle {

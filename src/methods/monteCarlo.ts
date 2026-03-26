@@ -1,6 +1,6 @@
 import type { Page } from '../router'
 import { fmt, queryRequired } from '../utils'
-import { C_BG, C_GRID, C_INSIDE, C_OUTSIDE, C_AMBER, CANVAS_SIZE } from '../colors'
+import { C_BG, C_GRID, C_INSIDE, C_OUTSIDE, C_AMBER, CANVAS_SIZE, PREVIEW_SIZE } from '../colors'
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 const DOTS_PER_TICK = 30
@@ -8,6 +8,36 @@ const MAX_DOTS = 20_000
 
 // ─── Colours (using shared with method-specific) ─────────────────────────────
 const C_CIRCLE = C_AMBER
+
+// ─── Preview Renderer ────────────────────────────────────────────────────────
+export function drawPreview(ctx: CanvasRenderingContext2D, _time: number): void {
+  const s = PREVIEW_SIZE
+  ctx.fillStyle = C_BG
+  ctx.fillRect(0, 0, s, s)
+
+  // Circle outline
+  ctx.strokeStyle = C_AMBER
+  ctx.lineWidth = 1
+  ctx.beginPath()
+  ctx.arc(s / 2, s / 2, s / 2 - 4, 0, Math.PI * 2)
+  ctx.stroke()
+
+  // Dots with stable pseudo-random positions
+  for (let i = 0; i < 60; i++) {
+    const x = 4 + (Math.sin(i * 1.1) * 0.5 + 0.5) * (s - 8)
+    const y = 4 + (Math.cos(i * 1.3) * 0.5 + 0.5) * (s - 8)
+    const r = s / 2 - 4
+    const dx = x - s / 2
+    const dy = y - s / 2
+    const inside = dx * dx + dy * dy <= r * r
+    ctx.fillStyle = inside ? C_INSIDE : C_OUTSIDE
+    ctx.globalAlpha = 0.7
+    ctx.beginPath()
+    ctx.arc(x, y, 1.5, 0, Math.PI * 2)
+    ctx.fill()
+  }
+  ctx.globalAlpha = 1
+}
 
 // ─── State ───────────────────────────────────────────────────────────────────
 interface State {

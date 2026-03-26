@@ -1,9 +1,32 @@
 import type { Page } from '../router'
 import { fmt, queryRequired } from '../utils'
-import { C_BG, C_INSIDE, C_AMBER, C_TEXT_MUTED, CANVAS_SIZE } from '../colors'
+import { C_BG, C_INSIDE, C_AMBER, C_TEXT_MUTED, CANVAS_SIZE, PREVIEW_SIZE } from '../colors'
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 const MAX_TERMS = 50
+
+// ─── Preview Renderer ────────────────────────────────────────────────────────
+export function drawPreview(ctx: CanvasRenderingContext2D, _time: number): void {
+  const s = PREVIEW_SIZE
+  ctx.fillStyle = C_BG
+  ctx.fillRect(0, 0, s, s)
+
+  let y = s - 10
+  ctx.fillStyle = C_INSIDE
+  for (let n = 1; n <= 6; n++) {
+    const size = Math.sqrt(1 / (n * n)) * (s - 20)
+    const x = (s - size) / 2
+    ctx.globalAlpha = 1 - n * 0.1
+    ctx.fillRect(x, y - size, size, size)
+    y -= size + 2
+  }
+  ctx.globalAlpha = 1
+
+  ctx.fillStyle = C_AMBER
+  ctx.font = '11px monospace'
+  ctx.textAlign = 'center'
+  ctx.fillText('Σ 1/n² = π²/6', s / 2, 15)
+}
 
 // ─── State ───────────────────────────────────────────────────────────────────
 interface State {

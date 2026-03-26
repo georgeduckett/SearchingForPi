@@ -1,6 +1,6 @@
 import type { Page } from '../router'
 import { fmt, queryRequired } from '../utils'
-import { C_BG, C_INSIDE, C_AMBER, C_TEXT_MUTED } from '../colors'
+import { C_BG, C_INSIDE, C_AMBER, C_TEXT_MUTED, C_OUTSIDE, PREVIEW_SIZE } from '../colors'
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 const CANVAS_W = 560
@@ -14,6 +14,27 @@ const MAX_GRID_ROWS = 10
 const C_RATIO = C_INSIDE
 const C_TARGET = C_AMBER
 const C_TEXT = C_TEXT_MUTED
+
+// ─── Preview Renderer ────────────────────────────────────────────────────────
+export function drawPreview(ctx: CanvasRenderingContext2D, _time: number): void {
+  const s = PREVIEW_SIZE
+  ctx.fillStyle = C_BG
+  ctx.fillRect(0, 0, s, s)
+
+  for (let i = 0; i < 8; i++) {
+    const x = 15 + (i % 4) * 30
+    const y = 25 + Math.floor(i / 4) * 50
+    const heads = Math.sin(i * 5.7) > 0
+    ctx.fillStyle = heads ? C_INSIDE : C_OUTSIDE
+    ctx.beginPath()
+    ctx.arc(x, y, 10, 0, Math.PI * 2)
+    ctx.fill()
+    ctx.fillStyle = C_BG
+    ctx.font = 'bold 10px monospace'
+    ctx.textAlign = 'center'
+    ctx.fillText(heads ? 'H' : 'T', x, y + 4)
+  }
+}
 
 // ─── State ───────────────────────────────────────────────────────────────────
 interface Sequence {

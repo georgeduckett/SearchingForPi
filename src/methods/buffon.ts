@@ -1,6 +1,6 @@
 import type { Page } from '../router'
 import { queryRequired } from '../utils'
-import { C_BG, C_BORDER, C_TEXT_MUTED, C_AMBER, C_AMBER_BRIGHT } from '../colors'
+import { C_BG, C_BORDER, C_TEXT_MUTED, C_AMBER, C_AMBER_BRIGHT, PREVIEW_SIZE } from '../colors'
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 const CANVAS_W = 560
@@ -16,6 +16,40 @@ const C_LINE_LBL = '#3d4460'
 const C_CROSS = C_AMBER
 const C_NO_CROSS = C_TEXT_MUTED
 const C_CROSS_DOT = C_AMBER_BRIGHT
+
+// ─── Preview Renderer ────────────────────────────────────────────────────────
+export function drawPreview(ctx: CanvasRenderingContext2D, _time: number): void {
+  const s = PREVIEW_SIZE
+  ctx.fillStyle = C_BG
+  ctx.fillRect(0, 0, s, s)
+
+  ctx.strokeStyle = C_BORDER
+  ctx.lineWidth = 1
+  for (let y = 20; y < s; y += 25) {
+    ctx.beginPath()
+    ctx.moveTo(0, y)
+    ctx.lineTo(s, y)
+    ctx.stroke()
+  }
+
+  for (let i = 0; i < 12; i++) {
+    const cx = (Math.sin(i * 2.1) * 0.5 + 0.5) * s
+    const cy = 10 + (Math.cos(i * 1.7) * 0.5 + 0.5) * (s - 20)
+    const angle = (Math.sin(i * 3.3) * 0.5 + 0.5) * Math.PI
+    const len = 20
+    const dx = (len / 2) * Math.cos(angle)
+    const dy = (len / 2) * Math.sin(angle)
+    const crosses = Math.floor(cy / 25) !== Math.floor((cy + dy) / 25) || Math.floor(cy / 25) !== Math.floor((cy - dy) / 25)
+    ctx.strokeStyle = crosses ? C_AMBER : C_TEXT_MUTED
+    ctx.lineWidth = crosses ? 1.5 : 1
+    ctx.globalAlpha = crosses ? 1 : 0.5
+    ctx.beginPath()
+    ctx.moveTo(cx - dx, cy - dy)
+    ctx.lineTo(cx + dx, cy + dy)
+    ctx.stroke()
+  }
+  ctx.globalAlpha = 1
+}
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 interface Needle {
