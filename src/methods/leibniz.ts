@@ -28,16 +28,20 @@ export function drawPreview(ctx: CanvasRenderingContext2D, time: number): void {
     const h = Math.abs(term) * (s - 30) * 2
     ctx.fillStyle = i % 2 === 0 ? C_INSIDE : C_OUTSIDE
     ctx.globalAlpha = 0.7 + 0.15 * Math.sin(time * 0.5 + i * 0.3)
-    ctx.fillRect(10 + i * barW, s / 2 - h / 2, barW - 2, h)
+    // Alternate bars above/below the center line
+   if (sign > 0) {
+    ctx.fillRect(10 + i * barW, s / 2 - h, barW - 2, h)
+   } else {
+    ctx.fillRect(10 + i * barW, s / 2, barW - 2, h)
+   }
   }
   ctx.globalAlpha = 1
 
-  const pi4 = (s - 30) * (Math.PI / 4)
   ctx.strokeStyle = C_AMBER
   ctx.lineWidth = 2
   ctx.beginPath()
-  ctx.moveTo(10, s / 2 - pi4 / 2)
-  ctx.lineTo(s - 10, s / 2 - pi4 / 2)
+  ctx.moveTo(10, s / 2)
+  ctx.lineTo(s - 10, s / 2)
   ctx.stroke()
 }
 
