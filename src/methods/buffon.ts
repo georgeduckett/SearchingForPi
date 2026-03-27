@@ -39,7 +39,7 @@ export function drawPreview(ctx: CanvasRenderingContext2D, _time: number): void 
     const len = 20
     const dx = (len / 2) * Math.cos(angle)
     const dy = (len / 2) * Math.sin(angle)
-    const crosses = Math.floor(cy / 25) !== Math.floor((cy + dy) / 25) || Math.floor(cy / 25) !== Math.floor((cy - dy) / 25)
+    const crosses = Math.floor((cy - 20) / 25) !== Math.floor((cy + dy - 20) / 25) || Math.floor((cy - 20) / 25) !== Math.floor((cy - dy - 20) / 25)
     ctx.strokeStyle = crosses ? C_AMBER : C_TEXT_MUTED
     ctx.lineWidth = crosses ? 1.5 : 1
     ctx.globalAlpha = crosses ? 1 : 0.5
