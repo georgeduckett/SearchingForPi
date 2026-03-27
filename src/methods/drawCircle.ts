@@ -15,19 +15,73 @@ export function drawPreview(ctx: CanvasRenderingContext2D, time: number): void {
   ctx.fillStyle = C_BG
   ctx.fillRect(0, 0, s, s)
 
-  const progress = (time * 0.25) % 1
+  const progress = (time * 0.3) % 1
+  const cx = s / 2
+  const cy = s / 2
   const r = s / 2 - 15
+
+  // Draw circle using line segments (12 segments total)
+  const totalSegments = 12
+  const segmentsToDraw = Math.floor(progress * (totalSegments + 1))
+  const segmentProgress = (progress * (totalSegments + 1)) % 1
+
   ctx.strokeStyle = C_AMBER
-  ctx.lineWidth = 2
+  ctx.lineWidth = 2.5
+  ctx.lineCap = 'round'
+  ctx.lineJoin = 'round'
   ctx.beginPath()
-  ctx.arc(s / 2, s / 2, r, 0, progress * Math.PI * 2)
+
+  for (let i = 0; i <= segmentsToDraw && i < totalSegments; i++) {
+    const startAngle = (i / totalSegments) * Math.PI * 2
+    const endAngle = ((i + 1) / totalSegments) * Math.PI * 2
+    const x1 = cx + r * Math.cos(startAngle)
+    const y1 = cy + r * Math.sin(startAngle)
+    const x2 = cx + r * Math.cos(endAngle)
+    const y2 = cy + r * Math.sin(endAngle)
+
+    if (i === 0) {
+      ctx.moveTo(x1, y1)
+    }
+    ctx.lineTo(x2, y2)
+  }
+
+  // Draw partial segment for current progress
+  if (segmentsToDraw < totalSegments) {
+    const currentAngle = (segmentsToDraw / totalSegments) * Math.PI * 2
+    const nextAngle = ((segmentsToDraw + 1) / totalSegments) * Math.PI * 2
+    const partialAngle = currentAngle + (nextAngle - currentAngle) * segmentProgress
+
+    const startX = cx + r * Math.cos(currentAngle)
+    const startY = cy + r * Math.sin(currentAngle)
+    const endX = cx + r * Math.cos(partialAngle)
+    const endY = cy + r * Math.sin(partialAngle)
+
+    if (segmentsToDraw === 0) {
+      ctx.moveTo(startX, startY)
+    }
+    ctx.lineTo(endX, endY)
+  }
+
   ctx.stroke()
 
-  const angle = progress * Math.PI * 2
+  // Draw the current drawing point
+  const pointAngle = segmentsToDraw < totalSegments
+    ? (segmentsToDraw / totalSegments) * Math.PI * 2 + (1 / totalSegments) * Math.PI * 2 * segmentProgress
+    : (segmentsToDraw / totalSegments) * Math.PI * 2
+
   ctx.fillStyle = C_AMBER_BRIGHT
   ctx.beginPath()
-  ctx.arc(s / 2 + r * Math.cos(angle), s / 2 + r * Math.sin(angle), 4, 0, Math.PI * 2)
+  ctx.arc(cx + r * Math.cos(pointAngle), cy + r * Math.sin(pointAngle), 4, 0, Math.PI * 2)
   ctx.fill()
+
+  // Draw segment dots at vertices
+  ctx.fillStyle = C_DRAWN
+  for (let i = 0; i < segmentsToDraw && i < totalSegments; i++) {
+    const angle = (i / totalSegments) * Math.PI * 2
+    ctx.beginPath()
+    ctx.arc(cx + r * Math.cos(angle), cy + r * Math.sin(angle), 2.5, 0, Math.PI * 2)
+    ctx.fill()
+  }
 
   ctx.fillStyle = C_TEXT_MUTED
   ctx.font = '12px monospace'
