@@ -117,12 +117,9 @@ export function createBaselPage(): Page {
     ctx.fillStyle = C_BG
     ctx.fillRect(0, 0, W, H)
 
-    // Constants for visualization
+    // Calculate scale so all squares fit
     const limit = Math.PI * Math.PI / 6
-    const padding = 60
-    const maxSquareSize = Math.min(W, H) * 0.45
-
-    // Scale factor: the first square (1/1² = 1) takes maxSquareSize
+    const maxSquareSize = Math.min(W, H) * 0.5
     const scaleFactor = maxSquareSize
 
     // Calculate total height of all squares shown
@@ -133,90 +130,51 @@ export function createBaselPage(): Page {
       totalHeight += size
     }
 
-    // Center the stack vertically
-    const baseY = H - padding
-    let y = baseY
+    // Center vertically
+    let y = (H - totalHeight) / 2
 
-    // Draw π²/6 limit indicator on the right
-    const limitHeight = limit * scaleFactor * 0.6 // Approximate visual height
-    const limitY = baseY - limitHeight
-
-    ctx.strokeStyle = C_AMBER
-    ctx.lineWidth = 2
-    ctx.setLineDash([8, 6])
-    ctx.beginPath()
-    ctx.moveTo(W - padding + 10, baseY)
-    ctx.lineTo(W - padding + 10, limitY)
-    ctx.stroke()
-    ctx.setLineDash([])
-
-    // Limit label
-    ctx.fillStyle = C_AMBER
-    ctx.font = '12px "JetBrains Mono", monospace'
-    ctx.textAlign = 'right'
-    ctx.fillText('π²/6', W - padding + 30, limitY + 4)
-    ctx.font = '10px "JetBrains Mono", monospace'
-    ctx.fillText('≈ 1.645', W - padding + 30, limitY + 18)
-
-    // Draw stacked squares (from bottom to top)
-    for (let n = state.terms; n >= 1; n--) {
+    // Draw each square from top to bottom
+    for (let n = 1; n <= state.terms; n++) {
       const term = 1 / (n * n)
       const size = Math.sqrt(term) * scaleFactor
       const x = (W - size) / 2
 
       // Fade effect: older terms slightly faded
-      const alpha = 0.95 - (n - 1) * 0.015
+      const alpha = 0.9 - (n - 1) * 0.05
 
       // Color gradient: blue to cyan based on term number
-      const hue = 200 + (n - 1) * 5
+      const hue = 200 + (n - 1) * 8
       ctx.fillStyle = `hsla(${hue}, 70%, 55%, ${alpha})`
-      ctx.fillRect(x, y - size, size, size)
+      ctx.fillRect(x, y, size, size)
 
-      // Subtle border
-      ctx.strokeStyle = `hsla(${hue}, 60%, 45%, ${alpha * 0.5})`
-      ctx.lineWidth = 1
-      ctx.strokeRect(x, y - size, size, size)
-
-      y -= size
+      y += size
     }
 
-    // Draw baseline
-    ctx.strokeStyle = C_TEXT_MUTED
-    ctx.lineWidth = 1.5
+    // Draw limit indicator on the right
+    const sumHeight = limit * scaleFactor * 0.95
+    const limitY = H / 2 - sumHeight / 2
+
+    ctx.strokeStyle = C_AMBER
+    ctx.lineWidth = 2
+    ctx.setLineDash([4, 4])
     ctx.beginPath()
-    ctx.moveTo(padding, baseY)
-    ctx.lineTo(W - padding, baseY)
+    ctx.moveTo(W - 18, limitY)
+    ctx.lineTo(W - 18, limitY + sumHeight)
     ctx.stroke()
+    ctx.setLineDash([])
 
-    // Current sum indicator on the left
-    if (state.terms > 0) {
-      const sumHeight = state.sum * scaleFactor * 0.6
-      ctx.fillStyle = C_INSIDE
-      ctx.globalAlpha = 0.6
-      ctx.fillRect(padding - 25, baseY - sumHeight, 15, sumHeight)
-      ctx.globalAlpha = 1
-
-      ctx.strokeStyle = C_INSIDE
-      ctx.lineWidth = 2
-      ctx.strokeRect(padding - 25, baseY - sumHeight, 15, sumHeight)
-
-      // Sum label
-      ctx.fillStyle = C_TEXT_MUTED
-      ctx.font = '10px "JetBrains Mono", monospace'
-      ctx.textAlign = 'center'
-      ctx.fillText('Σ', padding - 17, baseY + 15)
-    }
-
-    // Term count label
-    ctx.fillStyle = C_TEXT_MUTED
-    ctx.font = '11px "JetBrains Mono", monospace'
-    ctx.textAlign = 'center'
-    ctx.fillText(`n = 1 to ${state.terms}`, W / 2, baseY + 25)
-
-    // Formula at top
+    // Formula text at top
     ctx.fillStyle = C_AMBER
-    ctx.font = '14px "JetBrains Mono", monospace'
-    ctx.fillText('∑ 1/n² = π²/6', W / 2, 30)
+    ctx.font = '12px "JetBrains Mono", monospace'
+    ctx.textAlign = 'center'
+    ctx.fillText('Σ 1/n² → π²/6', W / 2, 20)
+
+    // Show n=value indicator at bottom
+    if (state.terms > 0) {
+      ctx.fillStyle = C_TEXT_MUTED
+      ctx.font = '11px "JetBrains Mono", monospace'
+      ctx.fillText(`n=${state.terms}`, W / 2, H - 10)
+    }
   }
 
   // ── Update stats display ────────────────────────────────────────────────────
