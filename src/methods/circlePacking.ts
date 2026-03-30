@@ -9,28 +9,31 @@ const MAX_RADIUS = 25
 const ATTEMPTS_PER_CIRCLE = 100
 
 // ─── Preview Renderer ────────────────────────────────────────────────────────
-let previewCircles: { x: number; y: number; r: number }[] | null = null
-let previewLastRegen = -1
+let previewCircles: { x: number; y: number; r: number }[] = []
+let previewCycleStart = -1
 
 export function drawPreview(ctx: CanvasRenderingContext2D, time: number): void {
   const s = PREVIEW_SIZE
   const padding = 8
   const minR = 4
   const maxR = 10
+  const cycleDuration = 8 // seconds for full animation cycle
+  const maxCircles = 20
 
-  // Regenerate circles every 3 seconds
-  const regenIndex = Math.floor(time / 3)
-  if (regenIndex !== previewLastRegen || !previewCircles) {
-    previewLastRegen = regenIndex
+  // Start new cycle every cycleDuration seconds
+  const currentCycle = Math.floor(time / cycleDuration)
+  if (currentCycle !== previewCycleStart) {
+    previewCycleStart = currentCycle
+    previewCircles = []
+
+    // Pre-generate all circles for this cycle
     const tempCircles: { x: number; y: number; r: number }[] = []
-
-    // Try to place circles using collision detection
-    for (let attempt = 0; attempt < 150 && tempCircles.length < 25; attempt++) {
+    for (let attempt = 0; attempt < 200 && tempCircles.length < maxCircles; attempt++) {
       const r = minR + Math.random() * (maxR - minR)
       const x = padding + r + Math.random() * (s - 2 * padding - 2 * r)
       const y = padding + r + Math.random() * (s - 2 * padding - 2 * r)
 
-      // Check for overlap with existing circles
+      // Check for overlap
       let overlaps = false
       for (const c of tempCircles) {
         const dx = x - c.x
@@ -46,25 +49,36 @@ export function drawPreview(ctx: CanvasRenderingContext2D, time: number): void {
         tempCircles.push({ x, y, r })
       }
     }
-
     previewCircles = tempCircles
   }
+
+  // Calculate how many circles to show based on time in cycle
+  const timeInCycle = time % cycleDuration
+  const circleAddInterval = cycleDuration / maxCircles
+  const circlesToShow = Math.min(
+    Math.floor(timeInCycle / circleAddInterval),
+    previewCircles.length
+  )
 
   // Draw background
   ctx.fillStyle = C_BG
   ctx.fillRect(0, 0, s, s)
 
-  // Draw packed circles
-  for (const circle of previewCircles) {
+  // Draw circles progressively
+  for (let i = 0; i < circlesToShow; i++) {
+    const circle = previewCircles[i]
+    const timeSinceAdded = timeInCycle - (i + 1) * circleAddInterval
+    const fadeInProgress = Math.min(1, timeSinceAdded * 4) // Quick fade over 0.25 seconds
+
     ctx.fillStyle = C_INSIDE
-    ctx.globalAlpha = 0.3
+    ctx.globalAlpha = 0.2 + 0.1 * fadeInProgress
     ctx.beginPath()
     ctx.arc(circle.x, circle.y, circle.r, 0, Math.PI * 2)
     ctx.fill()
 
     ctx.strokeStyle = C_INSIDE
     ctx.lineWidth = 1
-    ctx.globalAlpha = 0.8
+    ctx.globalAlpha = 0.5 + 0.3 * fadeInProgress
     ctx.stroke()
   }
 
