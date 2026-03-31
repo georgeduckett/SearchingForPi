@@ -53,23 +53,6 @@ interface State {
 }
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
-function simulateSequence(maxTosses?: number): Sequence {
-  const tosses: boolean[] = []
-  let heads = 0
-  let total = 0
-  while (heads <= total - heads) {
-    if (maxTosses !== undefined && total >= maxTosses) {
-      break
-    }
-    const isHead = Math.random() < 0.5
-    tosses.push(isHead)
-    total++
-    if (isHead) heads++
-  }
-  const ratio = total > 0 ? heads / total : 0
-  return { tosses, heads, total, ratio }
-}
-
 function createEmptySequence(): Sequence {
   return { tosses: [], heads: 0, total: 0, ratio: 0 }
 }
@@ -244,18 +227,6 @@ export function createCoinTossPage(): Page {
       ctx.textAlign = 'left'
       ctx.fillText(`${seq.heads}/${seq.total} = ${seq.ratio.toFixed(2)}`, 10, rowY - rowHeight / 4)
     }
-  }
-
-  function addOneSequence(): void {
-    if (state.sequences.length >= MAX_SEQUENCES) return
-    const seq = simulateSequence()
-    state.sequences.push(seq)
-    state.sumRatios += seq.ratio
-    state.sequenceBatch.push(seq)
-    if (state.sequenceBatch.length > MAX_GRID_ROWS) {
-      state.sequenceBatch.shift()
-    }
-    updateStats()
   }
 
   const STEP_FRAME_DELAY = 80
@@ -460,7 +431,25 @@ export function createCoinTossPage(): Page {
         return
       }
 
-      addOneSequence()
+      if (!state.currentSequence) {
+        state.currentSequence = createEmptySequence()
+      }
+
+      const complete = advanceSequence(state.currentSequence, MAX_GRID_COLS)
+      draw()
+
+      if (complete) {
+        const completed = state.currentSequence
+        state.sequences.push(completed)
+        state.sumRatios += completed.ratio
+        state.sequenceBatch.push(completed)
+        if (state.sequenceBatch.length > MAX_GRID_ROWS) {
+          state.sequenceBatch.shift()
+        }
+        state.currentSequence = null
+        updateStats()
+      }
+
       btnReset.disabled = false
     })
     btnReset.addEventListener('click', reset)
