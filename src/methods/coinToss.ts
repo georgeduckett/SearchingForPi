@@ -262,7 +262,6 @@ export function createCoinTossPage(): Page {
 
   function animateStep(): void {
     if (!state.autoAdding) {
-      state.currentSequence = null
       btnStep.disabled = false
       btnStart.disabled = false
       btnStart.textContent = 'Start'
@@ -324,7 +323,9 @@ export function createCoinTossPage(): Page {
     btnStart.textContent = 'Pause'
     btnStep.disabled = true
     btnReset.disabled = false
-    state.currentSequence = createEmptySequence()
+    if (!state.currentSequence) {
+      state.currentSequence = createEmptySequence()
+    }
     animateStep()
   }
 
