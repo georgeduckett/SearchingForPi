@@ -50,6 +50,9 @@ interface State {
   currentSequence: Sequence | null
   autoAdding: boolean
   autoRafId: ReturnType<typeof setTimeout> | null
+  newCoinIndex: number | null
+  highlightTimeout: ReturnType<typeof setTimeout> | null
+  highlightComplete: boolean
 }
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
@@ -116,7 +119,10 @@ export function createCoinTossPage(): Page {
     sequenceBatch: [],
     currentSequence: null,
     autoAdding: false,
-    autoRafId: null
+    autoRafId: null,
+    newCoinIndex: null,
+    highlightTimeout: null,
+    highlightComplete: false
   }
 
   let canvas: HTMLCanvasElement
@@ -203,11 +209,18 @@ export function createCoinTossPage(): Page {
       for (let j = 0; j < Math.min(tosses.length, MAX_GRID_COLS); j++) {
         const x = (j * (CANVAS_W / MAX_GRID_COLS)) + 15
         const isHead = tosses[j]
+        const isNew = !finished && j === state.newCoinIndex
         ctx.fillStyle = isHead ? C_RATIO : '#888'
         ctx.globalAlpha = finished ? 1 : 0.8
         ctx.beginPath()
         ctx.arc(x, rowY, 10, 0, Math.PI * 2)
         ctx.fill()
+
+        if (isNew) {
+          ctx.strokeStyle = 'white'
+          ctx.lineWidth = 2
+          ctx.stroke()
+        }
 
         ctx.fillStyle = 'white'
         ctx.font = '12px monospace'
@@ -237,6 +250,11 @@ export function createCoinTossPage(): Page {
       clearTimeout(state.autoRafId)
       state.autoRafId = null
     }
+    if (state.highlightTimeout !== null) {
+      clearTimeout(state.highlightTimeout)
+      state.highlightTimeout = null
+    }
+    state.newCoinIndex = null
     btnStep.textContent = 'Show'
     btnStart.disabled = false
     btnStart.textContent = 'Start'
@@ -318,6 +336,8 @@ export function createCoinTossPage(): Page {
     state.currentSequence = null
     state.autoAdding = false
     state.autoRafId = null
+    state.newCoinIndex = null
+    state.highlightTimeout = null
     draw()
     updateStats()
     btnStart.textContent = 'Start'
@@ -431,23 +451,59 @@ export function createCoinTossPage(): Page {
         return
       }
 
+      // If there's a pending highlight, finalize it immediately
+      if (state.highlightTimeout) {
+        clearTimeout(state.highlightTimeout)
+        state.highlightTimeout = null
+        if (state.highlightComplete && state.currentSequence) {
+          state.sequenceBatch.push(state.currentSequence)
+          if (state.sequenceBatch.length > MAX_GRID_ROWS) {
+            state.sequenceBatch.shift()
+          }
+          state.currentSequence = null
+        }
+        state.newCoinIndex = null
+        state.highlightComplete = false
+        draw()
+      }
+
       if (!state.currentSequence) {
         state.currentSequence = createEmptySequence()
       }
 
+      const prevLength = state.currentSequence.tosses.length
       const complete = advanceSequence(state.currentSequence, MAX_GRID_COLS)
+      if (state.currentSequence.tosses.length > prevLength) {
+        state.newCoinIndex = state.currentSequence.tosses.length - 1
+      }
       draw()
 
       if (complete) {
         const completed = state.currentSequence
         state.sequences.push(completed)
         state.sumRatios += completed.ratio
-        state.sequenceBatch.push(completed)
-        if (state.sequenceBatch.length > MAX_GRID_ROWS) {
-          state.sequenceBatch.shift()
-        }
-        state.currentSequence = null
         updateStats()
+        state.highlightComplete = true
+        // Keep currentSequence for highlight, add to batch after delay
+        state.highlightTimeout = setTimeout(() => {
+          state.highlightTimeout = null
+          state.highlightComplete = false
+          state.newCoinIndex = null
+          state.sequenceBatch.push(completed)
+          if (state.sequenceBatch.length > MAX_GRID_ROWS) {
+            state.sequenceBatch.shift()
+          }
+          state.currentSequence = null
+          draw()
+        }, 300)
+      } else {
+        state.highlightComplete = false
+        // Clear highlight after a brief delay
+        state.highlightTimeout = setTimeout(() => {
+          state.highlightTimeout = null
+          state.newCoinIndex = null
+          draw()
+        }, 300)
       }
 
       btnReset.disabled = false
