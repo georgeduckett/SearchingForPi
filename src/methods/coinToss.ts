@@ -255,6 +255,7 @@ export function createCoinTossPage(): Page {
       state.highlightTimeout = null
     }
     state.newCoinIndex = null
+    btnStep.disabled = false
     btnStep.textContent = 'Show'
     btnStart.disabled = false
     btnStart.textContent = 'Start'
