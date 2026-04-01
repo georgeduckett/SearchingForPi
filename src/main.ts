@@ -1,45 +1,10 @@
 import './style.css'
 import { initRouter, registerPage } from './router'
-import { allPages } from './pages'
-import { createHomePage } from './methods/home'
-import { createMonteCarloPage } from './methods/monteCarlo'
-import { createLeibnizPage } from './methods/leibniz'
-import { createBuffonPage } from './methods/buffon'
-import { createCoinTossPage } from './methods/coinToss'
-import { createBouncingBoxesPage } from './methods/bouncingBoxes'
-import { createArchimedesPage } from './methods/archimedes'
-import { createDrawCirclePage } from './methods/drawCircle'
-import { createGasMoleculesPage } from './methods/gasMolecules'
-import { createRiemannPage } from './methods/riemann'
-import { createBaselPage } from './methods/basel'
-import { createWallisPage } from './methods/wallis'
-import { createCoprimalityPage } from './methods/coprimality'
-import { createGaltonPage } from './methods/galton'
-import { createCirclePackingPage } from './methods/circlePacking'
+import { allPages, pageFactories } from './methods/definitions'
 
 // ─── Register pages ───────────────────────────────────────────────────────────
-// Page factories mapped by hash
-const pageFactories: Record<string, () => { render: () => HTMLElement; cleanup: () => void }> = {
- home: createHomePage,
- 'monte-carlo': createMonteCarloPage,
- leibniz: createLeibnizPage,
- buffon: createBuffonPage,
- 'coin-toss': createCoinTossPage,
- 'bouncing-boxes': createBouncingBoxesPage,
- archimedes: createArchimedesPage,
- 'draw-circle': createDrawCirclePage,
- 'gas-molecules': createGasMoleculesPage,
- riemann: createRiemannPage,
- basel: createBaselPage,
- wallis: createWallisPage,
- coprimality: createCoprimalityPage,
- galton: createGaltonPage,
- 'circle-packing': createCirclePackingPage,
-}
-
-// Register all pages
 for (const [hash, factory] of Object.entries(pageFactories)) {
- registerPage(hash, factory)
+  registerPage(hash, factory)
 }
 
 // ─── Build sidebar navigation from pages data ─────────────────────────────────
