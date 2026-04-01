@@ -345,50 +345,6 @@ export function lerpColor(color1: string, color2: string, t: number): string {
 // ─── Drawing Helpers ────────────────────────────────────────────────────────
 
 /**
- * Draws multiple dots at once with a consistent style.
- */
-export function drawDots(
-  ctx: CanvasRenderingContext2D,
-  dots: Array<{ x: number; y: number; color: string }>,
-  radius = 1.5,
-  alpha = 0.7
-): void {
-  ctx.globalAlpha = alpha
-  for (const dot of dots) {
-    ctx.fillStyle = dot.color
-    ctx.beginPath()
-    ctx.arc(dot.x, dot.y, radius, 0, Math.PI * 2)
-    ctx.fill()
-  }
-  ctx.globalAlpha = 1
-}
-
-/**
- * Draws a rectangle with optional fill and stroke.
- */
-export function drawRect(
-  ctx: CanvasRenderingContext2D,
-  x: number,
-  y: number,
-  width: number,
-  height: number,
-  options: { fill?: string; stroke?: string; lineWidth?: number; alpha?: number } = {}
-): void {
-  const { fill, stroke, lineWidth = 1, alpha = 1 } = options
-  ctx.globalAlpha = alpha
-  if (fill) {
-    ctx.fillStyle = fill
-    ctx.fillRect(x, y, width, height)
-  }
-  if (stroke) {
-    ctx.strokeStyle = stroke
-    ctx.lineWidth = lineWidth
-    ctx.strokeRect(x, y, width, height)
-  }
-  ctx.globalAlpha = 1
-}
-
-/**
  * Draws a dashed line.
  */
 export function drawDashedLine(
@@ -409,24 +365,4 @@ export function drawDashedLine(
   ctx.lineTo(x2, y2)
   ctx.stroke()
   ctx.setLineDash([])
-}
-
-/**
- * Draws a filled arc (pie slice).
- */
-export function drawArc(
-  ctx: CanvasRenderingContext2D,
-  cx: number,
-  cy: number,
-  radius: number,
-  startAngle: number,
-  endAngle: number,
-  color: string
-): void {
-  ctx.fillStyle = color
-  ctx.beginPath()
-  ctx.moveTo(cx, cy)
-  ctx.arc(cx, cy, radius, startAngle, endAngle)
-  ctx.closePath()
-  ctx.fill()
 }

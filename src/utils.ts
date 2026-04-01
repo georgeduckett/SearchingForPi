@@ -79,32 +79,3 @@ export function isCoprime(a: number, b: number): boolean {
   return gcd(a, b) === 1
 }
 
-/**
- * Calculate the least common multiple of two numbers.
- */
-export function lcm(a: number, b: number): number {
-  return Math.abs(a * b) / gcd(a, b)
-}
-
-/**
- * Generate a random integer in a range (inclusive).
- */
-export function randomInt(min: number, max: number): number {
-  return Math.floor(Math.random() * (max - min + 1)) + min
-}
-
-/**
- * Calculate the error between a value and π.
- */
-export function piError(value: number): number {
-  return Math.abs(value - Math.PI)
-}
-
-/**
- * Format an error value with appropriate precision.
- */
-export function formatError(err: number): string {
-  if (err < 0.000001) return err.toExponential(2)
-  if (err < 0.001) return err.toFixed(8)
-  return err.toFixed(6)
-}
