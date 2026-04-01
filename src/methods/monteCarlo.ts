@@ -1,42 +1,32 @@
 import type { Page } from '../router'
 import { fmt, queryRequired } from '../utils'
-import { C_BG, C_GRID, C_INSIDE, C_OUTSIDE, C_AMBER, CANVAS_SIZE, PREVIEW_SIZE } from '../colors'
+import { C_INSIDE, C_OUTSIDE, C_AMBER, CANVAS_SIZE, PREVIEW_SIZE } from '../colors'
+import { clearCanvas, drawGrid, drawCircle, isInsideCircle } from './base/canvas'
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 const DOTS_PER_TICK = 30
 const MAX_DOTS = 20_000
 
-// ─── Colours (using shared with method-specific) ─────────────────────────────
-const C_CIRCLE = C_AMBER
-
 // ─── Preview Renderer ────────────────────────────────────────────────────────
 export function drawPreview(ctx: CanvasRenderingContext2D, _time: number): void {
-  const s = PREVIEW_SIZE
-  ctx.fillStyle = C_BG
-  ctx.fillRect(0, 0, s, s)
+const s = PREVIEW_SIZE
+clearCanvas(ctx, s, s)
 
-  // Circle outline
-  ctx.strokeStyle = C_AMBER
-  ctx.lineWidth = 1
-  ctx.beginPath()
-  ctx.arc(s / 2, s / 2, s / 2 - 4, 0, Math.PI * 2)
-  ctx.stroke()
+// Circle outline
+drawCircle(ctx, s / 2, s / 2, s / 2 - 4, C_AMBER, 1)
 
-  // Dots with stable pseudo-random positions
-  for (let i = 0; i < 60; i++) {
-    const x = 4 + (Math.sin(i * 1.1) * 0.5 + 0.5) * (s - 8)
-    const y = 4 + (Math.cos(i * 1.3) * 0.5 + 0.5) * (s - 8)
-    const r = s / 2 - 4
-    const dx = x - s / 2
-    const dy = y - s / 2
-    const inside = dx * dx + dy * dy <= r * r
-    ctx.fillStyle = inside ? C_INSIDE : C_OUTSIDE
-    ctx.globalAlpha = 0.7
-    ctx.beginPath()
-    ctx.arc(x, y, 1.5, 0, Math.PI * 2)
-    ctx.fill()
-  }
-  ctx.globalAlpha = 1
+// Dots with stable pseudo-random positions
+for (let i = 0; i < 60; i++) {
+const x = 4 + (Math.sin(i * 1.1) * 0.5 + 0.5) * (s - 8)
+const y = 4 + (Math.cos(i * 1.3) * 0.5 + 0.5) * (s - 8)
+const inside = isInsideCircle(x, y, s / 2, s / 2, s / 2 - 4)
+ctx.fillStyle = inside ? C_INSIDE : C_OUTSIDE
+ctx.globalAlpha = 0.7
+ctx.beginPath()
+ctx.arc(x, y, 1.5, 0, Math.PI * 2)
+ctx.fill()
+}
+ctx.globalAlpha = 1
 }
 
 // ─── State ───────────────────────────────────────────────────────────────────
@@ -68,25 +58,9 @@ export function createMonteCarloPage(): Page {
   // ── Draw the static background (grid + circle outline) ───────────────────
   function drawBackground(): void {
     const s = CANVAS_SIZE
-    ctx.fillStyle = C_BG
-    ctx.fillRect(0, 0, s, s)
-
-    // Faint grid
-    ctx.strokeStyle = C_GRID
-    ctx.lineWidth = 1
-    for (let x = 0; x <= s; x += s / 8) {
-      ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, s); ctx.stroke()
-    }
-    for (let y = 0; y <= s; y += s / 8) {
-      ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(s, y); ctx.stroke()
-    }
-
-    // Circle outline
-    ctx.strokeStyle = C_CIRCLE
-    ctx.lineWidth = 1.5
-    ctx.beginPath()
-    ctx.arc(s / 2, s / 2, s / 2, 0, Math.PI * 2)
-    ctx.stroke()
+    clearCanvas(ctx, s, s)
+    drawGrid(ctx, s, s)
+    drawCircle(ctx, s / 2, s / 2, s / 2, C_AMBER, 1.5)
   }
 
   // ── Add a batch of random dots and draw them ──────────────────────────────
@@ -96,9 +70,7 @@ export function createMonteCarloPage(): Page {
     for (let i = 0; i < count; i++) {
       const x = Math.random() * s
       const y = Math.random() * s
-      const dx = x - r
-      const dy = y - r
-      const isInside = dx * dx + dy * dy <= r * r
+      const isInside = isInsideCircle(x, y, r, r, r)
       if (isInside) state.inside++
       state.total++
 
@@ -111,11 +83,7 @@ export function createMonteCarloPage(): Page {
     ctx.globalAlpha = 1
 
     // Re-draw circle on top so it stays crisp
-    ctx.strokeStyle = C_CIRCLE
-    ctx.lineWidth = 1.5
-    ctx.beginPath()
-    ctx.arc(s / 2, s / 2, s / 2, 0, Math.PI * 2)
-    ctx.stroke()
+    drawCircle(ctx, s / 2, s / 2, s / 2, C_AMBER, 1.5)
   }
 
   // ── Update the stats panel ────────────────────────────────────────────────

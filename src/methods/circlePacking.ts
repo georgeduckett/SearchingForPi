@@ -1,6 +1,7 @@
 import type { Page } from '../router'
 import { fmt, queryRequired } from '../utils'
 import { C_BG, C_INSIDE, C_TEXT_MUTED, CANVAS_SIZE, PREVIEW_SIZE } from '../colors'
+import { clearCanvas } from './base/canvas'
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 const MAX_CIRCLES = 500
@@ -13,18 +14,20 @@ let previewCircles: { x: number; y: number; r: number }[] = []
 let previewCycleStart = -1
 
 export function drawPreview(ctx: CanvasRenderingContext2D, time: number): void {
-  const s = PREVIEW_SIZE
-  const padding = 8
-  const minR = 4
-  const maxR = 10
-  const cycleDuration = 8 // seconds for full animation cycle
-  const maxCircles = 20
+const s = PREVIEW_SIZE
+clearCanvas(ctx, s, s)
 
-  // Start new cycle every cycleDuration seconds
-  const currentCycle = Math.floor(time / cycleDuration)
-  if (currentCycle !== previewCycleStart) {
-    previewCycleStart = currentCycle
-    previewCircles = []
+const padding = 8
+const minR = 4
+const maxR = 10
+const cycleDuration = 8 // seconds for full animation cycle
+const maxCircles = 20
+
+// Start new cycle every cycleDuration seconds
+const currentCycle = Math.floor(time / cycleDuration)
+if (currentCycle !== previewCycleStart) {
+previewCycleStart = currentCycle
+previewCircles = []
 
     // Pre-generate all circles for this cycle
     const tempCircles: { x: number; y: number; r: number }[] = []

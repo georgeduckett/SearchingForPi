@@ -1,6 +1,7 @@
 import type { Page } from '../router'
 import { fmt, queryRequired } from '../utils'
 import { C_BG, C_INSIDE, C_AMBER, C_TEXT_MUTED, C_OUTSIDE, PREVIEW_SIZE } from '../colors'
+import { clearCanvas } from './base/canvas'
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 const CANVAS_W = 560
@@ -16,9 +17,8 @@ const C_TEXT = C_TEXT_MUTED
 
 // ─── Preview Renderer ────────────────────────────────────────────────────────
 export function drawPreview(ctx: CanvasRenderingContext2D, time: number): void {
-  const s = PREVIEW_SIZE
-  ctx.fillStyle = C_BG
-  ctx.fillRect(0, 0, s, s)
+const s = PREVIEW_SIZE
+clearCanvas(ctx, s, s)
 
   // Generate all valid coin toss sequences up to 8 coins
   // A valid sequence ends when heads > tails, and at no point before did heads > tails

@@ -1,6 +1,8 @@
 import type { Page } from '../router'
 import { fmt, queryRequired } from '../utils'
-import { C_BG, C_GRID, C_INSIDE, C_AMBER, CANVAS_SIZE, PREVIEW_SIZE, C_OUTSIDE } from '../colors'
+import { C_INSIDE, C_AMBER, CANVAS_SIZE, PREVIEW_SIZE, C_OUTSIDE } from '../colors'
+import { clearCanvas, drawGrid, drawCircle, drawRegularPolygon } from './base/canvas'
+
 const MAX_ITERATIONS = 9
 
 // ─── Colours (using shared with method-specific) ─────────────────────────────
@@ -10,44 +12,20 @@ const C_CIRCLE = C_AMBER
 
 // ─── Preview Renderer ────────────────────────────────────────────────────────
 export function drawPreview(ctx: CanvasRenderingContext2D, time: number): void {
-  const s = PREVIEW_SIZE
-  const cx = s / 2
-  const cy = s / 2
-  const r = s / 2 - 10
+const s = PREVIEW_SIZE
+const cx = s / 2
+const cy = s / 2
+const r = s / 2 - 10
 
-  ctx.fillStyle = C_BG
-  ctx.fillRect(0, 0, s, s)
+clearCanvas(ctx, s, s)
 
-  const sides = 6 + Math.floor(time * 0.2) % 4 * 2
-  ctx.strokeStyle = C_INSIDE
-  ctx.lineWidth = 1.5
-  ctx.beginPath()
-  for (let i = 0; i <= sides; i++) {
-    const angle = (i / sides) * Math.PI * 2 - Math.PI / 2
-    const x = cx + r * Math.cos(angle)
-    const y = cy + r * Math.sin(angle)
-    if (i === 0) ctx.moveTo(x, y)
-    else ctx.lineTo(x, y)
-  }
-  ctx.stroke()
+const sides = 6 + Math.floor(time * 0.2) % 4 * 2
+drawRegularPolygon(ctx, cx, cy, r, sides, C_INSIDE, 1.5)
 
-  const r2 = r / Math.cos(Math.PI / sides)
-  ctx.strokeStyle = C_OUTSIDE
-  ctx.beginPath()
-  for (let i = 0; i <= sides; i++) {
-    const angle = (i / sides) * Math.PI * 2 - Math.PI / 2
-    const x = cx + r2 * Math.cos(angle)
-    const y = cy + r2 * Math.sin(angle)
-    if (i === 0) ctx.moveTo(x, y)
-    else ctx.lineTo(x, y)
-  }
-  ctx.stroke()
+const r2 = r / Math.cos(Math.PI / sides)
+drawRegularPolygon(ctx, cx, cy, r2, sides, C_OUTSIDE, 1.5)
 
-  ctx.strokeStyle = C_AMBER
-  ctx.lineWidth = 1
-  ctx.beginPath()
-  ctx.arc(cx, cy, r, 0, Math.PI * 2)
-  ctx.stroke()
+drawCircle(ctx, cx, cy, r, C_AMBER, 1)
 }
 
 // ─── State ───────────────────────────────────────────────────────────────────
@@ -108,19 +86,9 @@ export function createArchimedesPage(): Page {
     const centerY = s / 2
     const radius = Math.min(centerX, centerY) - 40
 
-    ctx.fillStyle = C_BG
-    ctx.fillRect(0, 0, s, s)
-
-    // Draw grid
-    ctx.strokeStyle = C_GRID
-    ctx.lineWidth = 1
-    for (let x = 0; x <= s; x += s / 8) {
-      ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, s); ctx.stroke()
-    }
-    for (let y = 0; y <= s; y += s / 8) {
-      ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(s, y); ctx.stroke()
-    }
-
+    clearCanvas(ctx, s, s)
+    drawGrid(ctx, s, s)
+  
     // Draw unit circle
     ctx.strokeStyle = C_CIRCLE
     ctx.lineWidth = 2

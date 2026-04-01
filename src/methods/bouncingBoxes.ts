@@ -1,6 +1,7 @@
 import type { Page } from '../router'
 import { queryRequired } from '../utils'
 import { C_BG, C_TEXT_MUTED, C_INSIDE, C_AMBER, C_TEXT_PRIMARY, PREVIEW_SIZE } from '../colors'
+import { clearCanvas } from './base/canvas'
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 const CANVAS_W = 810
@@ -20,9 +21,8 @@ const C_TEXT = C_TEXT_PRIMARY
 
 // ─── Preview Renderer ────────────────────────────────────────────────────────
 export function drawPreview(ctx: CanvasRenderingContext2D, time: number): void {
-  const s = PREVIEW_SIZE
-  ctx.fillStyle = C_BG
-  ctx.fillRect(0, 0, s, s)
+const s = PREVIEW_SIZE
+clearCanvas(ctx, s, s)
 
   // Wall
   ctx.strokeStyle = C_TEXT_MUTED

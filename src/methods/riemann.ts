@@ -1,27 +1,27 @@
 import type { Page } from '../router'
 import { fmt, queryRequired } from '../utils'
 import { C_BG, C_GRID, C_INSIDE, C_AMBER, C_TEXT_MUTED, CANVAS_SIZE, PREVIEW_SIZE } from '../colors'
+import { clearCanvas } from './base/canvas'
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 const MAX_RECTS = 200
 
 // ─── Preview Renderer ────────────────────────────────────────────────────────
 export function drawPreview(ctx: CanvasRenderingContext2D, _time: number): void {
-  const s = PREVIEW_SIZE
-  ctx.fillStyle = C_BG
-  ctx.fillRect(0, 0, s, s)
+const s = PREVIEW_SIZE
+clearCanvas(ctx, s, s)
 
-  ctx.strokeStyle = C_AMBER
-  ctx.lineWidth = 1.5
-  ctx.beginPath()
-  for (let x = 0; x <= s - 10; x++) {
-    const nx = x / (s - 10)
-    const y = 4 / (1 + nx * nx)
-    const py = s - 10 - (y / 4) * (s - 20)
-    if (x === 0) ctx.moveTo(x + 10, py)
-    else ctx.lineTo(x + 10, py)
-  }
-  ctx.stroke()
+ctx.strokeStyle = C_AMBER
+ctx.lineWidth = 1.5
+ctx.beginPath()
+for (let x = 0; x <= s - 10; x++) {
+const nx = x / (s - 10)
+const y = 4 / (1 + nx * nx)
+const py = s - 10 - (y / 4) * (s - 20)
+if (x === 0) ctx.moveTo(x + 10, py)
+else ctx.lineTo(x + 10, py)
+}
+ctx.stroke()
 
   ctx.fillStyle = C_INSIDE
   ctx.globalAlpha = 0.5

@@ -1,6 +1,7 @@
 import type { Page } from '../router'
 import { queryRequired } from '../utils'
 import { C_BG, C_BORDER, C_TEXT_MUTED, C_AMBER, C_AMBER_BRIGHT, PREVIEW_SIZE } from '../colors'
+import { clearCanvas, drawLine } from './base/canvas'
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 const CANVAS_W = 560
@@ -19,18 +20,12 @@ const C_CROSS_DOT = C_AMBER_BRIGHT
 
 // ─── Preview Renderer ────────────────────────────────────────────────────────
 export function drawPreview(ctx: CanvasRenderingContext2D, _time: number): void {
-  const s = PREVIEW_SIZE
-  ctx.fillStyle = C_BG
-  ctx.fillRect(0, 0, s, s)
+const s = PREVIEW_SIZE
+clearCanvas(ctx, s, s)
 
-  ctx.strokeStyle = C_BORDER
-  ctx.lineWidth = 1
-  for (let y = 20; y < s; y += 25) {
-    ctx.beginPath()
-    ctx.moveTo(0, y)
-    ctx.lineTo(s, y)
-    ctx.stroke()
-  }
+for (let y = 20; y < s; y += 25) {
+drawLine(ctx, 0, y, s, y, C_BORDER, 1)
+}
 
   for (let i = 0; i < 12; i++) {
     const cx = (Math.sin(i * 2.1) * 0.5 + 0.5) * s

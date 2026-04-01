@@ -1,6 +1,7 @@
 import type { Page } from '../router'
 import { fmt, distance, getCanvasCoords, queryRequired } from '../utils'
 import { C_BG, C_GRID, C_INSIDE, C_AMBER, C_SUCCESS, C_TEXT_MUTED, C_BORDER, C_TEXT_PRIMARY, CANVAS_SIZE, PREVIEW_SIZE, C_AMBER_BRIGHT } from '../colors'
+import { clearCanvas } from './base/canvas'
 
 // ─── Colours (method-specific) ──────────────────────────────────────────────
 const C_DRAWN = C_INSIDE
@@ -11,9 +12,8 @@ const C_PERFECT = C_BORDER
 
 // ─── Preview Renderer ────────────────────────────────────────────────────────
 export function drawPreview(ctx: CanvasRenderingContext2D, time: number): void {
-  const s = PREVIEW_SIZE
-  ctx.fillStyle = C_BG
-  ctx.fillRect(0, 0, s, s)
+const s = PREVIEW_SIZE
+clearCanvas(ctx, s, s)
 
   const progress = (time * 0.3) % 1
   const cx = s / 2

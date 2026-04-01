@@ -1,6 +1,7 @@
 import type { Page } from '../router'
 import { queryRequired } from '../utils'
 import { C_BG, C_GRID, C_INSIDE, C_OUTSIDE, C_AMBER, C_TEXT_MUTED, C_BORDER, PREVIEW_SIZE } from '../colors'
+import { clearCanvas, drawLine } from './base/canvas'
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 const CANVAS_W = 560
@@ -16,33 +17,27 @@ const C_ZERO = C_BORDER
 
 // ─── Preview Renderer ────────────────────────────────────────────────────────
 export function drawPreview(ctx: CanvasRenderingContext2D, time: number): void {
-  const s = PREVIEW_SIZE
-  ctx.fillStyle = C_BG
-  ctx.fillRect(0, 0, s, s)
+const s = PREVIEW_SIZE
+clearCanvas(ctx, s, s)
 
-  const terms = 10
-  const barW = (s - 20) / terms
-  for (let i = 0; i < terms; i++) {
-    const sign = i % 2 === 0 ? 1 : -1
-    const term = sign / (2 * i + 1)
-    const h = Math.abs(term) * (s - 30) * 2
-    ctx.fillStyle = i % 2 === 0 ? C_INSIDE : C_OUTSIDE
-    ctx.globalAlpha = 0.7 + 0.15 * Math.sin(time * 0.5 + i * 0.3)
-    // Alternate bars above/below the center line
-   if (sign > 0) {
-    ctx.fillRect(10 + i * barW, s / 2 - h, barW - 2, h)
-   } else {
-    ctx.fillRect(10 + i * barW, s / 2, barW - 2, h)
-   }
-  }
-  ctx.globalAlpha = 1
+const terms = 10
+const barW = (s - 20) / terms
+for (let i = 0; i < terms; i++) {
+const sign = i % 2 === 0 ? 1 : -1
+const term = sign / (2 * i + 1)
+const h = Math.abs(term) * (s - 30) * 2
+ctx.fillStyle = i % 2 === 0 ? C_INSIDE : C_OUTSIDE
+ctx.globalAlpha = 0.7 + 0.15 * Math.sin(time * 0.5 + i * 0.3)
+// Alternate bars above/below the center line
+if (sign > 0) {
+ctx.fillRect(10 + i * barW, s / 2 - h, barW - 2, h)
+} else {
+ctx.fillRect(10 + i * barW, s / 2, barW - 2, h)
+}
+}
+ctx.globalAlpha = 1
 
-  ctx.strokeStyle = C_AMBER
-  ctx.lineWidth = 2
-  ctx.beginPath()
-  ctx.moveTo(10, s / 2)
-  ctx.lineTo(s - 10, s / 2)
-  ctx.stroke()
+drawLine(ctx, 10, s / 2, s - 10, s / 2, C_AMBER, 2)
 }
 
 // ─── State ───────────────────────────────────────────────────────────────────
