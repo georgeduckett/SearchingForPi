@@ -273,7 +273,7 @@ export function createWallisPage(): Page {
 
           <div class="explanation">
             <h3>How it works</h3>
-            <div class="formula">π/2 = (2/1)·(2/3)·(4/3)·(4/5)·(6/5)·(6/7)·…</div>
+            <div class="formula">π/2 = (2/1)·(2/3)·(4/3)·…</div>
             <p>
               Discovered by John Wallis in 1655, this infinite product
               represents π/2 as an elegant alternating product of fractions.
