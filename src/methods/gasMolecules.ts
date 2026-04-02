@@ -1,6 +1,7 @@
 import type { Page } from '../router'
-import { fmt, queryRequired } from '../utils'
+import { fmt, queryRequired, getCanvasContext2D } from '../utils'
 import { C_BG, C_INSIDE, C_AMBER, C_BORDER, CANVAS_SIZE, PREVIEW_SIZE } from '../colors'
+import { getMethodIndex } from './definitions'
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 const MAX_PARTICLES = 200
@@ -395,7 +396,7 @@ export function createGasMoleculesPage(): Page {
 
     page.innerHTML = `
       <header class="page-header">
-        <span class="page-index">Method 14</span>
+        <span class="page-index">Method ${getMethodIndex('gas-molecules')}</span>
         <h2 class="page-title">Gas Molecules</h2>
         <p class="page-subtitle">
           Maxwell-Boltzmann speed distribution relates to π.
@@ -481,7 +482,7 @@ export function createGasMoleculesPage(): Page {
 
     const tempVal = queryRequired(page, '#gm-temp-val')
 
-    ctx = canvas.getContext('2d')!
+    ctx = getCanvasContext2D(canvas)
     draw()
     updateStats()
 

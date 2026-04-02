@@ -1,7 +1,8 @@
 import type { Page } from '../router'
-import { fmt, queryRequired } from '../utils'
+import { fmt, queryRequired, getCanvasContext2D } from '../utils'
 import { C_BG, C_INSIDE, C_OUTSIDE, C_AMBER, C_TEXT_MUTED, CANVAS_SIZE, PREVIEW_SIZE } from '../colors'
 import { clearCanvas, drawDashedLine, drawText } from './base/canvas'
+import { getMethodIndex } from './definitions'
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 const MAX_FACTORS = 200
@@ -217,7 +218,7 @@ export function createWallisPage(): Page {
 
     page.innerHTML = `
       <header class="page-header">
-        <span class="page-index">Method 10</span>
+        <span class="page-index">Method ${getMethodIndex('wallis')}</span>
         <h2 class="page-title">Wallis Product</h2>
         <p class="page-subtitle">
           An infinite product that converges to π/2.
@@ -297,7 +298,7 @@ export function createWallisPage(): Page {
     elProduct = queryRequired(page, '#wa-product')
     elError = queryRequired(page, '#wa-error')
 
-    ctx = canvas.getContext('2d')!
+    ctx = getCanvasContext2D(canvas)
     draw()
     updateStats()
 

@@ -1,7 +1,8 @@
 import type { Page } from '../router'
-import { fmt, queryRequired } from '../utils'
+import { fmt, queryRequired, getCanvasContext2D } from '../utils'
 import { C_BG, C_INSIDE, C_OUTSIDE, C_AMBER, C_TEXT_MUTED, CANVAS_SIZE, PREVIEW_SIZE } from '../colors'
 import { clearCanvas } from './base/canvas'
+import { getMethodIndex } from './definitions'
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 const ROWS = 12
@@ -378,7 +379,7 @@ export function createGaltonPage(): Page {
 
     page.innerHTML = `
       <header class="page-header">
-        <span class="page-index">Method 12</span>
+        <span class="page-index">Method ${getMethodIndex('galton')}</span>
         <h2 class="page-title">Galton Board</h2>
         <p class="page-subtitle">
           The normal distribution connects to π through Stirling's formula.
@@ -453,7 +454,7 @@ export function createGaltonPage(): Page {
     elPeak = queryRequired(page, '#gb-peak')
     elError = queryRequired(page, '#gb-error')
 
-    ctx = canvas.getContext('2d')!
+    ctx = getCanvasContext2D(canvas)
     draw()
     updateStats()
 

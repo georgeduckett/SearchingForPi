@@ -1,7 +1,8 @@
 import type { Page } from '../router'
-import { queryRequired } from '../utils'
+import { queryRequired, getCanvasContext2D } from '../utils'
 import { C_BG, C_TEXT_MUTED, C_INSIDE, C_AMBER, C_TEXT_PRIMARY, PREVIEW_SIZE } from '../colors'
 import { clearCanvas } from './base/canvas'
+import { getMethodIndex } from './definitions'
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 const CANVAS_W = 810
@@ -58,6 +59,21 @@ interface State {
 }
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
+function createInitialState(): State {
+  return {
+    k: 0,
+    m2: 100 ** 0,
+    smallBoxX: INITIAL_X1,
+    smallBoxV: 0,
+    largeBoxX: INITIAL_X2,
+    largeBoxV: -V0,
+    collisions: 0,
+    running: false,
+    rafId: null,
+    time: 0,
+  }
+}
+
 function resetState(state: State): void {
   state.k = 0
   state.m2 = 100 ** state.k
@@ -73,8 +89,7 @@ function resetState(state: State): void {
 
 // ─── Page Factory ─────────────────────────────────────────────────────────────
 export function createBouncingBoxesPage(): Page {
-  const state: State = {} as State
-  resetState(state)
+  const state: State = createInitialState()
 
   let canvas: HTMLCanvasElement
   let ctx: CanvasRenderingContext2D
@@ -292,7 +307,7 @@ export function createBouncingBoxesPage(): Page {
 
     page.innerHTML = `
       <header class="page-header">
-        <span class="page-index">Method 05</span>
+        <span class="page-index">Method ${getMethodIndex('bouncing-boxes')}</span>
         <h2 class="page-title">Bouncing Boxes</h2>
         <p class="page-subtitle">
           Elastic collisions between two masses reveal π's digits.
@@ -351,7 +366,7 @@ export function createBouncingBoxesPage(): Page {
     elStartBtn = queryRequired(page, '#bb-start', HTMLButtonElement)
     elResetBtn = queryRequired(page, '#bb-reset', HTMLButtonElement)
 
-    ctx = canvas.getContext('2d')!
+    ctx = getCanvasContext2D(canvas)
     draw()
 
     elStartBtn.addEventListener('click', start)

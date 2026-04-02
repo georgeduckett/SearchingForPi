@@ -79,3 +79,14 @@ export function isCoprime(a: number, b: number): boolean {
   return gcd(a, b) === 1
 }
 
+/**
+ * Get the 2D rendering context from a canvas, throwing a descriptive error if unavailable.
+ */
+export function getCanvasContext2D(canvas: HTMLCanvasElement): CanvasRenderingContext2D {
+  const ctx = canvas.getContext('2d')
+  if (!ctx) {
+    throw new Error('Could not get 2D rendering context from canvas')
+  }
+  return ctx
+}
+

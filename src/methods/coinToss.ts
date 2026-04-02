@@ -1,7 +1,8 @@
 import type { Page } from '../router'
-import { fmt, queryRequired } from '../utils'
+import { fmt, queryRequired, getCanvasContext2D } from '../utils'
 import { C_BG, C_INSIDE, C_AMBER, C_TEXT_MUTED, C_OUTSIDE, PREVIEW_SIZE } from '../colors'
 import { clearCanvas } from './base/canvas'
+import { getMethodIndex } from './definitions'
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 const CANVAS_W = 560
@@ -435,7 +436,7 @@ export function createCoinTossPage(): Page {
 
     page.innerHTML = `
       <header class="page-header">
-        <span class="page-index">Method 04</span>
+        <span class="page-index">Method ${getMethodIndex('coin-toss')}</span>
         <h2 class="page-title">Coin Toss Sequences</h2>
         <p class="page-subtitle">
           Toss coins until heads exceed tails — the ratio reveals π/4.
@@ -508,7 +509,7 @@ export function createCoinTossPage(): Page {
     elError = queryRequired(page, '#ct-error')
     elBar = queryRequired(page, '#ct-bar')
 
-    ctx = canvas.getContext('2d')!
+    ctx = getCanvasContext2D(canvas)
     draw()
 
     btnStart.addEventListener('click', () => {

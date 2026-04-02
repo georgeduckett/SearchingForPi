@@ -1,7 +1,8 @@
 import type { Page } from '../router'
-import { fmt, queryRequired } from '../utils'
+import { fmt, queryRequired, getCanvasContext2D } from '../utils'
 import { C_INSIDE, C_OUTSIDE, C_AMBER, CANVAS_SIZE, PREVIEW_SIZE } from '../colors'
 import { clearCanvas, drawGrid, drawCircle, isInsideCircle } from './base/canvas'
+import { getMethodIndex } from './definitions'
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 const DOTS_PER_TICK = 30
@@ -139,7 +140,7 @@ export function createMonteCarloPage(): Page {
 
     page.innerHTML = `
       <header class="page-header">
-        <span class="page-index">Method 01</span>
+        <span class="page-index">Method ${getMethodIndex('monte-carlo')}</span>
         <h2 class="page-title">Monte Carlo</h2>
         <p class="page-subtitle">
           Random sampling reveals structure — and π.
@@ -219,7 +220,7 @@ export function createMonteCarloPage(): Page {
     elError = queryRequired(page, '#mc-error')
     elBar = queryRequired(page, '#mc-bar')
 
-    ctx = canvas.getContext('2d')!
+    ctx = getCanvasContext2D(canvas)
     drawBackground()
 
     btnStart.addEventListener('click', () => {

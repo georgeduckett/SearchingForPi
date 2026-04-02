@@ -1,7 +1,8 @@
 import type { Page } from '../router'
-import { queryRequired } from '../utils'
+import { queryRequired, getCanvasContext2D } from '../utils'
 import { C_BG, C_GRID, C_INSIDE, C_OUTSIDE, C_AMBER, C_TEXT_MUTED, C_BORDER, PREVIEW_SIZE } from '../colors'
 import { clearCanvas, drawLine, drawDashedLine } from './base/canvas'
+import { getMethodIndex } from './definitions'
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 const CANVAS_W = 560
@@ -228,7 +229,7 @@ export function createLeibnizPage(): Page {
 
     page.innerHTML = `
       <header class="page-header">
-        <span class="page-index">Method 02</span>
+        <span class="page-index">Method ${getMethodIndex('leibniz')}</span>
         <h2 class="page-title">Leibniz Series</h2>
         <p class="page-subtitle">
           An infinite alternating series with an unexpectedly beautiful limit.
@@ -312,7 +313,7 @@ export function createLeibnizPage(): Page {
     elCurrentTerm = queryRequired(page, '#lb-current-term')
     elError = queryRequired(page, '#lb-error')
 
-    ctx = canvas.getContext('2d')!
+    ctx = getCanvasContext2D(canvas)
     draw()
 
     btnStart.addEventListener('click', () => {

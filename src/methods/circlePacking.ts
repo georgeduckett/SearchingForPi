@@ -1,7 +1,8 @@
 import type { Page } from '../router'
-import { fmt, queryRequired } from '../utils'
+import { fmt, queryRequired, getCanvasContext2D } from '../utils'
 import { C_BG, C_INSIDE, C_TEXT_MUTED, CANVAS_SIZE, PREVIEW_SIZE } from '../colors'
 import { clearCanvas } from './base/canvas'
+import { getMethodIndex } from './definitions'
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 const MAX_CIRCLES = 500
@@ -294,7 +295,7 @@ export function createCirclePackingPage(): Page {
 
     page.innerHTML = `
       <header class="page-header">
-        <span class="page-index">Method 13</span>
+        <span class="page-index">Method ${getMethodIndex('circle-packing')}</span>
         <h2 class="page-title">Circle Packing</h2>
         <p class="page-subtitle">
           The area of circles relates to π through covered area.
@@ -369,7 +370,7 @@ export function createCirclePackingPage(): Page {
     elCovered = queryRequired(page, '#cp-covered')
     elError = queryRequired(page, '#cp-error')
 
-    ctx = canvas.getContext('2d')!
+    ctx = getCanvasContext2D(canvas)
     draw()
     updateStats()
 

@@ -1,7 +1,8 @@
 import type { Page } from '../router'
-import { fmt, queryRequired } from '../utils'
+import { fmt, queryRequired, getCanvasContext2D } from '../utils'
 import { C_INSIDE, C_AMBER, CANVAS_SIZE, PREVIEW_SIZE, C_OUTSIDE } from '../colors'
 import { clearCanvas, drawGrid, drawCircle, drawRegularPolygon } from './base/canvas'
+import { getMethodIndex } from './definitions'
 
 const MAX_ITERATIONS = 9
 
@@ -266,7 +267,7 @@ export function createArchimedesPage(): Page {
 
     page.innerHTML = `
       <header class="page-header">
-        <span class="page-index">Method 06</span>
+        <span class="page-index">Method ${getMethodIndex('archimedes')}</span>
         <h2 class="page-title">Archimedes' Polygons</h2>
         <p class="page-subtitle">
           Squeeze π between inscribed and circumscribed regular polygons.
@@ -357,7 +358,7 @@ export function createArchimedesPage(): Page {
  elEstimate = queryRequired(page, '#arch-estimate')
  elError = queryRequired(page, '#arch-error')
 
-    ctx = canvas.getContext('2d')!
+    ctx = getCanvasContext2D(canvas)
     updateStats()
     draw(6, state.lower, state.upper)
 

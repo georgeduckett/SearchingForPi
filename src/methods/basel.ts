@@ -1,7 +1,8 @@
 import type { Page } from '../router'
-import { fmt, queryRequired } from '../utils'
+import { fmt, queryRequired, getCanvasContext2D } from '../utils'
 import { C_BG, C_INSIDE, C_AMBER, C_TEXT_MUTED, CANVAS_SIZE, PREVIEW_SIZE } from '../colors'
 import { clearCanvas } from './base/canvas'
+import { getMethodIndex } from './definitions'
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 const MAX_TERMS = 50
@@ -284,7 +285,7 @@ export function createBaselPage(): Page {
 
     page.innerHTML = `
       <header class="page-header">
-        <span class="page-index">Method 09</span>
+        <span class="page-index">Method ${getMethodIndex('basel')}</span>
         <h2 class="page-title">Basel Problem</h2>
         <p class="page-subtitle">
           The sum of reciprocal squares converges to π²/6.
@@ -360,7 +361,7 @@ export function createBaselPage(): Page {
     elSum = queryRequired(page, '#ba-sum')
     elError = queryRequired(page, '#ba-error')
 
-    ctx = canvas.getContext('2d')!
+    ctx = getCanvasContext2D(canvas)
     draw()
     updateStats()
 

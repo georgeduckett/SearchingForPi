@@ -1,7 +1,8 @@
 import type { Page } from '../router'
-import { fmt, queryRequired } from '../utils'
+import { fmt, queryRequired, getCanvasContext2D } from '../utils'
 import { C_BG, C_GRID, C_INSIDE, C_AMBER, C_TEXT_MUTED, CANVAS_SIZE, PREVIEW_SIZE } from '../colors'
 import { clearCanvas } from './base/canvas'
+import { getMethodIndex } from './definitions'
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 const MAX_RECTS = 200
@@ -196,7 +197,7 @@ export function createRiemannPage(): Page {
 
     page.innerHTML = `
       <header class="page-header">
-        <span class="page-index">Method 08</span>
+        <span class="page-index">Method ${getMethodIndex('riemann')}</span>
         <h2 class="page-title">Riemann Integral</h2>
         <p class="page-subtitle">
           The area under 4/(1+x²) from 0 to 1 equals π.
@@ -265,7 +266,7 @@ export function createRiemannPage(): Page {
     elRects = queryRequired(page, '#ri-rects')
     elError = queryRequired(page, '#ri-error')
 
-    ctx = canvas.getContext('2d')!
+    ctx = getCanvasContext2D(canvas)
     draw()
     updateStats()
 

@@ -1,7 +1,8 @@
 import type { Page } from '../router'
-import { fmt, queryRequired, isCoprime } from '../utils'
+import { fmt, queryRequired, isCoprime, getCanvasContext2D } from '../utils'
 import { C_BG, C_INSIDE, C_OUTSIDE, C_TEXT_MUTED, C_AMBER, CANVAS_SIZE, PREVIEW_SIZE } from '../colors'
 import { clearCanvas } from './base/canvas'
+import { getMethodIndex } from './definitions'
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 const MAX_PAIRS = 5000
@@ -191,7 +192,7 @@ export function createCoprimalityPage(): Page {
 
     page.innerHTML = `
       <header class="page-header">
-        <span class="page-index">Method 11</span>
+        <span class="page-index">Method ${getMethodIndex('coprimality')}</span>
         <h2 class="page-title">Coprimality</h2>
         <p class="page-subtitle">
           Two random numbers are coprime with probability 6/π².
@@ -269,7 +270,7 @@ export function createCoprimalityPage(): Page {
     elCoprimeCount = queryRequired(page, '#co-coprime-count')
     elError = queryRequired(page, '#co-error')
 
-    ctx = canvas.getContext('2d')!
+    ctx = getCanvasContext2D(canvas)
     draw()
     updateStats()
 

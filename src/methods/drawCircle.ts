@@ -1,7 +1,8 @@
 import type { Page } from '../router'
-import { fmt, distance, getCanvasCoords, queryRequired } from '../utils'
+import { fmt, distance, getCanvasCoords, queryRequired, getCanvasContext2D } from '../utils'
 import { C_BG, C_GRID, C_INSIDE, C_AMBER, C_SUCCESS, C_TEXT_MUTED, C_BORDER, C_TEXT_PRIMARY, CANVAS_SIZE, PREVIEW_SIZE, C_AMBER_BRIGHT } from '../colors'
 import { clearCanvas } from './base/canvas'
+import { getMethodIndex } from './definitions'
 
 // ─── Colours (method-specific) ──────────────────────────────────────────────
 const C_DRAWN = C_INSIDE
@@ -430,7 +431,7 @@ export function createDrawCirclePage(): Page {
 
     page.innerHTML = `
       <header class="page-header">
-        <span class="page-index">Method 07</span>
+        <span class="page-index">Method ${getMethodIndex('draw-circle')}</span>
         <h2 class="page-title">Draw a Circle</h2>
         <p class="page-subtitle">
           Approximate π by manually drawing a circle and measuring its perimeter.
@@ -519,7 +520,7 @@ export function createDrawCirclePage(): Page {
 
     // Grab element refs using queryRequired for safety
     canvas = queryRequired(page, '#draw-canvas', HTMLCanvasElement)
-    ctx = canvas.getContext('2d')!
+    ctx = getCanvasContext2D(canvas)
     btnClear = queryRequired(page, '#draw-clear', HTMLButtonElement)
     elPoints = queryRequired(page, '#draw-points')
     elPerimeter = queryRequired(page, '#draw-perimeter')
