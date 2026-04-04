@@ -1,6 +1,19 @@
 import type { Page } from '../../router'
 import { queryRequired } from '../../utils'
 
+// Re-export types and functions from split modules
+export { createAnimationLoop, type AnimationOptions, type AnimationLoop } from './animation'
+export {
+  statCard,
+  statsRow,
+  statsProgressBar,
+  updateStat,
+  updateProgress,
+  legend,
+  legendItem,
+  explanation,
+} from './stats'
+
 // ─── Types ───────────────────────────────────────────────────────────────────
 
 export interface PageOptions {
@@ -153,23 +166,23 @@ export function createPageFactory<S>(
       page.className = 'page'
 
       page.innerHTML = `
-        <header class="page-header">
-          ${index ? `<span class="page-index">${index}</span>` : ''}
-          <h2 class="page-title">${title}</h2>
-          ${subtitle ? `<p class="page-subtitle">${subtitle}</p>` : ''}
-        </header>
+      <header class="page-header">
+        ${index ? `<span class="page-index">${index}</span>` : ''}
+        <h2 class="page-title">${title}</h2>
+        ${subtitle ? `<p class="page-subtitle">${subtitle}</p>` : ''}
+      </header>
 
-        <div class="visualization">
-          <canvas id="canvas" width="${canvasWidth}" height="${canvasHeight}"></canvas>
-        </div>
+      <div class="visualization">
+        <canvas id="canvas" width="${canvasWidth}" height="${canvasHeight}"></canvas>
+      </div>
 
-        <div class="controls">
-          ${controlsHtml}
-        </div>
+      <div class="controls">
+        ${controlsHtml}
+      </div>
 
-        <div class="stats-panel">
-          ${extraStats}
-        </div>
+      <div class="stats-panel">
+        ${extraStats}
+      </div>
       `
 
       return page
@@ -294,26 +307,26 @@ export function createMethodPageFactory<S>(
       page.className = 'page'
 
       page.innerHTML = `
-        <header class="page-header">
-          ${index ? `<span class="page-index">Method ${index}</span>` : ''}
-          <h2 class="page-title">${title}</h2>
-          ${subtitle ? `<p class="page-subtitle">${subtitle}</p>` : ''}
-        </header>
+      <header class="page-header">
+        ${index ? `<span class="page-index">Method ${index}</span>` : ''}
+        <h2 class="page-title">${title}</h2>
+        ${subtitle ? `<p class="page-subtitle">${subtitle}</p>` : ''}
+      </header>
 
-        <div class="viz-layout">
-          <div>
-            <div class="canvas-wrapper">
-              <canvas id="canvas" width="${canvasWidth}" height="${canvasHeight}"></canvas>
-            </div>
-            <div style="margin-top:14px" class="controls">
-              ${controls}
-            </div>
+      <div class="viz-layout">
+        <div>
+          <div class="canvas-wrapper">
+            <canvas id="canvas" width="${canvasWidth}" height="${canvasHeight}"></canvas>
           </div>
-
-          <div class="stats-panel">
-            ${statsPanel}
+          <div style="margin-top:14px" class="controls">
+            ${controls}
           </div>
         </div>
+
+        <div class="stats-panel">
+          ${statsPanel}
+        </div>
+      </div>
       `
 
       return page
@@ -350,11 +363,11 @@ export function createMethodPageFactory<S>(
       const statsPanelEl = queryRequired(document, '.stats-panel', HTMLElement)
 
       // Helper functions for querying elements
-      const $ = (selector: string): HTMLElement => 
+      const $ = (selector: string): HTMLElement =>
         document.querySelector(selector) as HTMLElement
-      const $required = (selector: string): HTMLElement => 
+      const $required = (selector: string): HTMLElement =>
         queryRequired(document, selector, HTMLElement)
-      const $id = <T extends HTMLElement>(id: string, ctor: new () => T): T => 
+      const $id = <T extends HTMLElement>(id: string, ctor: new () => T): T =>
         queryRequired(document, `#${id}`, ctor)
 
       const context: MethodPageContext<S> = {
@@ -374,168 +387,4 @@ export function createMethodPageFactory<S>(
 
     return page
   }
-}
-
-// ─── Animation Loop Helper ───────────────────────────────────────────────────
-
-export interface AnimationOptions<S> {
-  /** Called each frame with delta time in seconds */
-  update(state: S, dt: number): void
-  /** Called each frame to render */
-  draw(ctx: PageContext<S>): void
-  /** Check if animation should continue */
-  isRunning(state: S): boolean
-}
-
-/**
- * Creates a requestAnimationFrame-based animation loop.
- * Handles starting, stopping, and cleanup automatically.
- */
-export function createAnimationLoop<S>(
-  context: PageContext<S>,
-  options: AnimationOptions<S>
-): {
-  start: () => void
-  stop: () => void
-  isRunning: () => boolean
-} {
-  let animationId: number | null = null
-  let lastTime = 0
-
-  function tick(timestamp: number): void {
-    if (!options.isRunning(context.state)) {
-      animationId = null
-      return
-    }
-
-    const dt = lastTime ? (timestamp - lastTime) / 1000 : 0
-    lastTime = timestamp
-
-    options.update(context.state, dt)
-    options.draw(context)
-
-    animationId = requestAnimationFrame(tick)
-  }
-
-  return {
-    start() {
-      if (animationId === null) {
-        lastTime = 0
-        animationId = requestAnimationFrame(tick)
-      }
-    },
-    stop() {
-      if (animationId !== null) {
-        cancelAnimationFrame(animationId)
-        animationId = null
-      }
-    },
-    isRunning() {
-      return animationId !== null
-    },
-  }
-}
-
-// ─── Stats Panel Helpers ────────────────────────────────────────────────────
-
-/**
- * Creates HTML for a stats row with label and value.
- */
-export function statsRow(label: string, id: string, valueClass = 'stat-value'): string {
-  return `<div class="stat-row"><span class="stat-label">${label}</span><span class="${valueClass}" id="${id}">—</span></div>`
-}
-
-/**
- * Creates HTML for a progress bar.
- */
-export function statsProgressBar(id: string): string {
-  return `<div class="progress-bar"><div class="progress-fill" id="${id}" style="width: 0%"></div></div>`
-}
-
-/**
- * Updates a stat element's text content.
- */
-export function updateStat(id: string, value: string | number, parent: HTMLElement): void {
-  const el = parent.querySelector(`#${id}`)
-  if (el) el.textContent = String(value)
-}
-
-/**
- * Updates a progress bar's width.
- */
-export function updateProgress(id: string, percent: number, parent: HTMLElement): void {
-  const el = parent.querySelector(`#${id}`) as HTMLElement
-  if (el) el.style.width = `${Math.min(100, Math.max(0, percent))}%`
-}
-
-// ─── Stat Card Builder ──────────────────────────────────────────────────────
-
-/**
- * Creates HTML for a stat card with label, value, and optional subtext.
- */
-export function statCard(
-  label: string,
-  valueId: string,
-  options: {
-    valueClass?: string
-    subtext?: string
-    errorId?: string
-    progressId?: string
-  } = {}
-): string {
-  const { valueClass = 'stat-value', subtext, errorId, progressId } = options
-  
-  let html = `
-    <div class="stat-card">
-      <div class="stat-label">${label}</div>
-      <div class="${valueClass}" id="${valueId}">—</div>
-  `
-  
-  if (errorId) {
-    html += `<div class="stat-error neutral" id="${errorId}">Error: —</div>`
-  }
-  
-  if (progressId) {
-    html += `
-      <div class="progress-bar-wrap">
-        <div class="progress-bar-fill" id="${progressId}" style="width:0%"></div>
-      </div>
-    `
-  }
-  
-  if (subtext) {
-    html += `<div class="stat-sub">${subtext}</div>`
-  }
-  
-  html += `</div>`
-  return html
-}
-
-/**
- * Creates HTML for a legend item.
- */
-export function legendItem(color: string, text: string): string {
-  return `<div class="legend-item"><div class="legend-dot" style="background:${color}"></div>${text}</div>`
-}
-
-/**
- * Creates HTML for a legend section from an array of items.
- */
-export function legend(items: Array<{ color: string; text: string }>): string {
-  return `<div class="legend">${items.map(i => legendItem(i.color, i.text)).join('')}</div>`
-}
-
-/**
- * Creates HTML for an explanation section.
- */
-export function explanation(title: string, paragraphs: string[], formula?: string): string {
-  let html = `<div class="explanation"><h3>${title}</h3>`
-  for (const p of paragraphs) {
-    html += `<p>${p}</p>`
-  }
-  if (formula) {
-    html += `<div class="formula">${formula}</div>`
-  }
-  html += `</div>`
-  return html
 }
