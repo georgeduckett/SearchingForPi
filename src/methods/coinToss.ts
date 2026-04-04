@@ -1,8 +1,7 @@
-import type { Page } from '../router'
-import { fmt, queryRequired, getCanvasContext2D } from '../utils'
+import { fmt } from '../utils'
 import { C_BG, C_INSIDE, C_AMBER, C_TEXT_MUTED, C_OUTSIDE, PREVIEW_SIZE } from '../colors'
 import { clearCanvas } from './base/canvas'
-import { getMethodIndex } from './definitions'
+import { createMethodPageFactory, statCard, explanation } from './base/page'
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 const CANVAS_W = 560
@@ -18,8 +17,8 @@ const C_TEXT = C_TEXT_MUTED
 
 // ─── Preview Renderer ────────────────────────────────────────────────────────
 export function drawPreview(ctx: CanvasRenderingContext2D, time: number): void {
-const s = PREVIEW_SIZE
-clearCanvas(ctx, s, s)
+  const s = PREVIEW_SIZE
+  clearCanvas(ctx, s, s)
 
   // Generate all valid coin toss sequences up to 8 coins
   // A valid sequence ends when heads > tails, and at no point before did heads > tails
@@ -192,8 +191,30 @@ function estimatePi(sumRatios: number, numSequences: number): number {
 }
 
 // ─── Page Factory ─────────────────────────────────────────────────────────────
-export function createCoinTossPage(): Page {
-  const state: State = {
+export const createCoinTossPage = createMethodPageFactory<State>(
+  {
+    title: 'Coin Toss Sequences',
+    subtitle: 'Toss coins until heads exceed tails — the ratio reveals π/4.',
+    index: '04',
+    canvasWidth: CANVAS_W,
+    canvasHeight: CANVAS_H,
+    controls: `
+      <button id="ct-start" class="btn primary">Start</button>
+      <button id="ct-step" class="btn">Show</button>
+      <button id="ct-reset" class="btn" disabled>Reset</button>
+    `,
+    statsPanel: `
+      ${statCard('π estimate', 'ct-estimate', { valueClass: 'stat-value large', errorId: 'ct-error', progressId: 'ct-bar' })}
+      ${statCard('Sequences completed', 'ct-sequences', { subtext: `of ${MAX_SEQUENCES.toLocaleString()} max` })}
+      ${statCard('Average heads/total ratio', 'ct-avg-ratio')}
+      ${explanation('The Coin Toss Method', [
+        'For each sequence: toss a coin repeatedly until the number of heads exceeds the number of tails. Record the ratio of heads to total tosses.',
+        'Surprisingly, this ratio converges to π/4. The expected number of tosses until heads exceed tails is π²/8, but the ratio of heads to total flips approaches π/4.',
+        'Press <em>Start</em> to watch sequences build step-by-step, or use <em>Show</em> to add individual sequences instantly.'
+      ], 'π/4 ≈ average(heads/total)')}
+    `
+  },
+  {
     sequences: [],
     sumRatios: 0,
     sequenceBatch: [],
@@ -203,401 +224,331 @@ export function createCoinTossPage(): Page {
     newCoinIndex: null,
     highlightTimeout: null,
     highlightComplete: false
-  }
+  },
+  {
+    init(ctx) {
+      const canvasCtx = ctx.ctx
+      const $required = ctx.$required.bind(ctx)
 
-  let canvas: HTMLCanvasElement
-  let ctx: CanvasRenderingContext2D
-  let btnStart: HTMLButtonElement
-  let btnStep: HTMLButtonElement
-  let btnReset: HTMLButtonElement
-  let elEstimate: HTMLElement
-  let elSequences: HTMLElement
-  let elAvgRatio: HTMLElement
-  let elError: HTMLElement
-  let elBar: HTMLElement
+      const btnStart = $required('#ct-start') as HTMLButtonElement
+      const btnStep = $required('#ct-step') as HTMLButtonElement
+      const btnReset = $required('#ct-reset') as HTMLButtonElement
+      const elEstimate = $required('#ct-estimate')
+      const elSequences = $required('#ct-sequences')
+      const elAvgRatio = $required('#ct-avg-ratio')
+      const elError = $required('#ct-error')
+      const elBar = $required('#ct-bar')
 
-  // ── Draw ───────────────────────────────────────────────────────────────────
-  function draw(): void {
-    ctx.fillStyle = C_BG
-    ctx.fillRect(0, 0, CANVAS_W, CANVAS_H)
+      const STEP_FRAME_DELAY = 80
 
-    drawGraph()
-    drawSequenceGrid()
-  }
+      // ── Draw ─────────────────────────────────────────────────────────────────
+      function draw(): void {
+        canvasCtx.fillStyle = C_BG
+        canvasCtx.fillRect(0, 0, CANVAS_W, CANVAS_H)
 
-  function drawGraph(): void {
-    const n = state.sequences.length
-    if (n === 0) return
+        drawGraph()
+        drawSequenceGrid()
+      }
 
-    // Draw target line and text first
-    const targetScale = Math.max(0, Math.min(1, (Math.PI / 4 - 0.6) / 0.3))
-    const targetY = CANVAS_H - (targetScale * CANVAS_H)
-    ctx.strokeStyle = C_TARGET
-    ctx.lineWidth = 2
-    ctx.setLineDash([5, 5])
-    ctx.beginPath()
-    ctx.moveTo(0, targetY)
-    ctx.lineTo(CANVAS_W, targetY)
-    ctx.stroke()
-    ctx.setLineDash([])
+      function drawGraph(): void {
+        const n = ctx.state.sequences.length
+        if (n === 0) return
 
-    ctx.fillStyle = C_TEXT
-    ctx.font = '12px monospace'
-    ctx.fillText(`π/4 ${(Math.PI/4).toFixed(2)}`, CANVAS_W - 70, targetY - 5)
+        // Draw target line and text first
+        const targetScale = Math.max(0, Math.min(1, (Math.PI / 4 - 0.6) / 0.3))
+        const targetY = CANVAS_H - (targetScale * CANVAS_H)
+        canvasCtx.strokeStyle = C_TARGET
+        canvasCtx.lineWidth = 2
+        canvasCtx.setLineDash([5, 5])
+        canvasCtx.beginPath()
+        canvasCtx.moveTo(0, targetY)
+        canvasCtx.lineTo(CANVAS_W, targetY)
+        canvasCtx.stroke()
+        canvasCtx.setLineDash([])
 
-    // Then draw running estimate graph
-    ctx.strokeStyle = C_RATIO
-    ctx.lineWidth = 2
-    ctx.beginPath()
-    let cumulativeSum = 0
-    for (let i = 0; i < n; i++) {
-      cumulativeSum += state.sequences[i].ratio
-      const avg = cumulativeSum / (i + 1)
-      const x = (i / Math.max(n - 1, 1)) * CANVAS_W
-      const scale = Math.max(0, Math.min(1, (avg - 0.6) / 0.3))
-      const y = CANVAS_H - (scale * CANVAS_H)
-      if (i === 0) ctx.moveTo(x, y)
-      else ctx.lineTo(x, y)
-    }
-    ctx.stroke()
+        canvasCtx.fillStyle = C_TEXT
+        canvasCtx.font = '12px monospace'
+        canvasCtx.fillText(`π/4 ${(Math.PI/4).toFixed(2)}`, CANVAS_W - 70, targetY - 5)
 
-    const lastX = ((n - 1) / Math.max(n - 1, 1)) * CANVAS_W
-    const lastScale = Math.max(0, Math.min(1, ((cumulativeSum / n) - 0.6) / 0.3))
-    const lastY = CANVAS_H - (lastScale * CANVAS_H)
-    ctx.fillStyle = C_RATIO
-    ctx.beginPath()
-    ctx.arc(lastX, lastY, 4, 0, Math.PI * 2)
-    ctx.fill()
-  }
-
-  function drawSequenceGrid(): void {
-    const combined: Sequence[] = [...state.sequenceBatch]
-    if (state.currentSequence) combined.push(state.currentSequence)
-    if (combined.length === 0) return
-
-    const rows = Math.min(combined.length, MAX_GRID_ROWS)
-    const visible = combined.slice(-rows)
-    const rowHeight = CANVAS_H / MAX_GRID_ROWS
-
-    for (let r = 0; r < visible.length; r++) {
-      const seq = visible[r]
-      const displayRow = r
-      const rowY = displayRow * rowHeight + rowHeight / 2
-      const tosses = seq.tosses
-      const finished = seq !== state.currentSequence
-
-      for (let j = 0; j < Math.min(tosses.length, MAX_GRID_COLS); j++) {
-        const x = (j * (CANVAS_W / MAX_GRID_COLS)) + 15
-        const isHead = tosses[j]
-        const isNew = !finished && j === state.newCoinIndex
-        ctx.fillStyle = isHead ? C_RATIO : '#888'
-        ctx.globalAlpha = finished ? 1 : 0.8
-        ctx.beginPath()
-        ctx.arc(x, rowY, 10, 0, Math.PI * 2)
-        ctx.fill()
-
-        if (isNew) {
-          ctx.strokeStyle = 'white'
-          ctx.lineWidth = 2
-          ctx.stroke()
+        // Then draw running estimate graph
+        canvasCtx.strokeStyle = C_RATIO
+        canvasCtx.lineWidth = 2
+        canvasCtx.beginPath()
+        let cumulativeSum = 0
+        for (let i = 0; i < n; i++) {
+          cumulativeSum += ctx.state.sequences[i].ratio
+          const avg = cumulativeSum / (i + 1)
+          const x = (i / Math.max(n - 1, 1)) * CANVAS_W
+          const scale = Math.max(0, Math.min(1, (avg - 0.6) / 0.3))
+          const y = CANVAS_H - (scale * CANVAS_H)
+          if (i === 0) canvasCtx.moveTo(x, y)
+          else canvasCtx.lineTo(x, y)
         }
+        canvasCtx.stroke()
 
-        ctx.fillStyle = 'white'
-        ctx.font = '12px monospace'
-        ctx.textAlign = 'center'
-        ctx.fillText(isHead ? 'H' : 'T', x, rowY + 5)
+        const lastX = ((n - 1) / Math.max(n - 1, 1)) * CANVAS_W
+        const lastScale = Math.max(0, Math.min(1, ((cumulativeSum / n) - 0.6) / 0.3))
+        const lastY = CANVAS_H - (lastScale * CANVAS_H)
+        canvasCtx.fillStyle = C_RATIO
+        canvasCtx.beginPath()
+        canvasCtx.arc(lastX, lastY, 4, 0, Math.PI * 2)
+        canvasCtx.fill()
       }
 
-      ctx.globalAlpha = 1
-      if (!finished) {
-        ctx.strokeStyle = 'rgba(255,255,255,0.8)'
-        ctx.lineWidth = 2
-        ctx.strokeRect(5, rowY - rowHeight / 2 + 4, CANVAS_W - 10, rowHeight - 8)
-      }
+      function drawSequenceGrid(): void {
+        const combined: Sequence[] = [...ctx.state.sequenceBatch]
+        if (ctx.state.currentSequence) combined.push(ctx.state.currentSequence)
+        if (combined.length === 0) return
 
-      ctx.fillStyle = '#ffffff'
-      ctx.font = '10px monospace'
-      ctx.textAlign = 'left'
-      ctx.fillText(`${seq.heads}/${seq.total} = ${seq.ratio.toFixed(2)}`, 10, rowY - rowHeight / 4)
-    }
-  }
+        const rows = Math.min(combined.length, MAX_GRID_ROWS)
+        const visible = combined.slice(-rows)
+        const rowHeight = CANVAS_H / MAX_GRID_ROWS
 
-  const STEP_FRAME_DELAY = 80
+        for (let r = 0; r < visible.length; r++) {
+          const seq = visible[r]
+          const displayRow = r
+          const rowY = displayRow * rowHeight + rowHeight / 2
+          const tosses = seq.tosses
+          const finished = seq !== ctx.state.currentSequence
 
-  function stopAutoAdd(): void {
-    state.autoAdding = false
-    if (state.autoRafId !== null) {
-      clearTimeout(state.autoRafId)
-      state.autoRafId = null
-    }
-    if (state.highlightTimeout !== null) {
-      clearTimeout(state.highlightTimeout)
-      state.highlightTimeout = null
-    }
-    state.newCoinIndex = null
-    btnStep.disabled = false
-    btnStep.textContent = 'Show'
-    btnStart.disabled = false
-    btnStart.textContent = 'Start'
-  }
+          for (let j = 0; j < Math.min(tosses.length, MAX_GRID_COLS); j++) {
+            const x = (j * (CANVAS_W / MAX_GRID_COLS)) + 15
+            const isHead = tosses[j]
+            const isNew = !finished && j === ctx.state.newCoinIndex
+            canvasCtx.fillStyle = isHead ? C_RATIO : '#888'
+            canvasCtx.globalAlpha = finished ? 1 : 0.8
+            canvasCtx.beginPath()
+            canvasCtx.arc(x, rowY, 10, 0, Math.PI * 2)
+            canvasCtx.fill()
 
-  function animateStep(): void {
-    if (!state.autoAdding) {
-      btnStep.disabled = false
-      btnStart.disabled = false
-      btnStart.textContent = 'Start'
-      btnStep.textContent = 'Show'
-      return
-    }
+            if (isNew) {
+              canvasCtx.strokeStyle = 'white'
+              canvasCtx.lineWidth = 2
+              canvasCtx.stroke()
+            }
 
-    if (state.sequences.length >= MAX_SEQUENCES) {
-      stopAutoAdd()
-      btnStart.textContent = 'Done'
-      btnStart.disabled = true
-      return
-    }
-
-    if (!state.currentSequence) {
-      state.currentSequence = createEmptySequence()
-    }
-
-    const complete = advanceSequence(state.currentSequence, MAX_GRID_COLS)
-    draw()
-
-    if (complete) {
-      const completed = state.currentSequence
-      if (completed) {
-        state.sequences.push(completed)
-        state.sumRatios += completed.ratio
-        state.sequenceBatch.push(completed)
-        if (state.sequenceBatch.length > MAX_GRID_ROWS) {
-          state.sequenceBatch.shift()
-        }
-      }
-      state.currentSequence = null
-      updateStats()
-    }
-
-    state.autoRafId = setTimeout(() => {
-      requestAnimationFrame(animateStep)
-    }, STEP_FRAME_DELAY)
-  }
-
-  // ── Stats ──────────────────────────────────────────────────────────────────
-  function updateStats(): void {
-    const n = state.sequences.length
-    const pi = estimatePi(state.sumRatios, n)
-    const avgRatio = n > 0 ? state.sumRatios / n : 0
-
-    elEstimate.textContent = fmt(pi)
-    elSequences.textContent = n.toLocaleString()
-    elAvgRatio.textContent = fmt(avgRatio)
-    elError.textContent = Math.abs(pi - Math.PI).toFixed(6)
-    elBar.style.width = `${Math.min((n / MAX_SEQUENCES) * 100, 100)}%`
-
-    draw()
-  }
-
-  function startShowing(): void {
-    if (state.autoAdding) return
-    state.autoAdding = true
-    btnStart.textContent = 'Pause'
-    btnStep.disabled = true
-    btnReset.disabled = false
-    if (!state.currentSequence) {
-      state.currentSequence = createEmptySequence()
-    }
-    animateStep()
-  }
-
-  function reset(): void {
-    stopAutoAdd()
-    state.sequences = []
-    state.sumRatios = 0
-    state.sequenceBatch = []
-    state.currentSequence = null
-    state.autoAdding = false
-    state.autoRafId = null
-    state.newCoinIndex = null
-    state.highlightTimeout = null
-    draw()
-    updateStats()
-    btnStart.textContent = 'Start'
-    btnStart.disabled = false
-    btnStep.disabled = false
-    btnStep.textContent = 'Show'
-    btnReset.disabled = true
-  }
-
-  // ── Build DOM ─────────────────────────────────────────────────────────────
-  function render(): HTMLElement {
-    const page = document.createElement('div')
-    page.className = 'page'
-
-    page.innerHTML = `
-      <header class="page-header">
-        <span class="page-index">Method ${getMethodIndex('coin-toss')}</span>
-        <h2 class="page-title">Coin Toss Sequences</h2>
-        <p class="page-subtitle">
-          Toss coins until heads exceed tails — the ratio reveals π/4.
-        </p>
-      </header>
-
-      <div class="viz-layout">
-        <!-- Canvas -->
-        <div>
-          <div class="canvas-wrapper">
-            <canvas id="ct-canvas" width="${CANVAS_W}" height="${CANVAS_H}"></canvas>
-          </div>
-          <div style="margin-top:14px" class="controls">
-            <button id="ct-start" class="btn primary">Start</button>
-            <button id="ct-step" class="btn">Show</button>
-            <button id="ct-reset" class="btn" disabled>Reset</button>
-          </div>
-        </div>
-
-        <!-- Stats -->
-        <div class="stats-panel">
-          <div class="stat-card">
-            <div class="stat-label">π estimate</div>
-            <div class="stat-value large" id="ct-estimate">0.000000</div>
-            <div class="stat-error neutral" id="ct-error">—</div>
-            <div class="progress-bar-wrap">
-              <div class="progress-bar-fill" id="ct-bar" style="width:0%"></div>
-            </div>
-          </div>
-
-          <div class="stat-card">
-            <div class="stat-label">Sequences completed</div>
-            <div class="stat-value" id="ct-sequences">0</div>
-            <div class="stat-sub">of ${MAX_SEQUENCES.toLocaleString()} max</div>
-          </div>
-
-          <div class="stat-card">
-            <div class="stat-label">Average heads/total ratio</div>
-            <div class="stat-value" id="ct-avg-ratio">0.000000</div>
-          </div>
-
-          <div class="explanation">
-            <h3>The Coin Toss Method</h3>
-            <p>
-              For each sequence: toss a coin repeatedly until the number of heads
-              exceeds the number of tails. Record the ratio of heads to total tosses.
-            </p>
-            <div class="formula">π/4 ≈ average(heads/total)</div>
-            <p>
-              Surprisingly, this ratio converges to π/4. The expected number of
-              tosses until heads exceed tails is π²/8, but the ratio of heads
-              to total flips approaches π/4.
-            </p>
-            <p>
-              Press <em>Start</em> to watch sequences build step-by-step,
-              or use <em>Show</em> to add individual sequences instantly.
-            </p>
-          </div>
-        </div>
-      </div>
-    `
-
-    canvas = queryRequired(page, '#ct-canvas', HTMLCanvasElement)
-    btnStart = queryRequired(page, '#ct-start', HTMLButtonElement)
-    btnStep = queryRequired(page, '#ct-step', HTMLButtonElement)
-    btnReset = queryRequired(page, '#ct-reset', HTMLButtonElement)
-    elEstimate = queryRequired(page, '#ct-estimate')
-    elSequences = queryRequired(page, '#ct-sequences')
-    elAvgRatio = queryRequired(page, '#ct-avg-ratio')
-    elError = queryRequired(page, '#ct-error')
-    elBar = queryRequired(page, '#ct-bar')
-
-    ctx = getCanvasContext2D(canvas)
-    draw()
-
-    btnStart.addEventListener('click', () => {
-      if (state.autoAdding) {
-        stopAutoAdd()
-        return
-      }
-
-      if (state.sequences.length >= MAX_SEQUENCES) {
-        reset()
-        return
-      }
-
-      startShowing()
-    })
-    btnStep.addEventListener('click', () => {
-      if (state.autoAdding) return
-
-      if (state.sequences.length >= MAX_SEQUENCES) {
-        reset()
-        return
-      }
-
-      // If there's a pending highlight, finalize it immediately
-      if (state.highlightTimeout) {
-        clearTimeout(state.highlightTimeout)
-        state.highlightTimeout = null
-        if (state.highlightComplete && state.currentSequence) {
-          state.sequenceBatch.push(state.currentSequence)
-          if (state.sequenceBatch.length > MAX_GRID_ROWS) {
-            state.sequenceBatch.shift()
+            canvasCtx.fillStyle = 'white'
+            canvasCtx.font = '12px monospace'
+            canvasCtx.textAlign = 'center'
+            canvasCtx.fillText(isHead ? 'H' : 'T', x, rowY + 5)
           }
-          state.currentSequence = null
+
+          canvasCtx.globalAlpha = 1
+          if (!finished) {
+            canvasCtx.strokeStyle = 'rgba(255,255,255,0.8)'
+            canvasCtx.lineWidth = 2
+            canvasCtx.strokeRect(5, rowY - rowHeight / 2 + 4, CANVAS_W - 10, rowHeight - 8)
+          }
+
+          canvasCtx.fillStyle = '#ffffff'
+          canvasCtx.font = '10px monospace'
+          canvasCtx.textAlign = 'left'
+          canvasCtx.fillText(`${seq.heads}/${seq.total} = ${seq.ratio.toFixed(2)}`, 10, rowY - rowHeight / 4)
         }
-        state.newCoinIndex = null
-        state.highlightComplete = false
+      }
+
+      function stopAutoAdd(): void {
+        ctx.state.autoAdding = false
+        if (ctx.state.autoRafId !== null) {
+          clearTimeout(ctx.state.autoRafId)
+          ctx.state.autoRafId = null
+        }
+        if (ctx.state.highlightTimeout !== null) {
+          clearTimeout(ctx.state.highlightTimeout)
+          ctx.state.highlightTimeout = null
+        }
+        ctx.state.newCoinIndex = null
+        btnStep.disabled = false
+        btnStep.textContent = 'Show'
+        btnStart.disabled = false
+        btnStart.textContent = 'Start'
+      }
+
+      function animateStep(): void {
+        if (!ctx.state.autoAdding) {
+          btnStep.disabled = false
+          btnStart.disabled = false
+          btnStart.textContent = 'Start'
+          btnStep.textContent = 'Show'
+          return
+        }
+
+        if (ctx.state.sequences.length >= MAX_SEQUENCES) {
+          stopAutoAdd()
+          btnStart.textContent = 'Done'
+          btnStart.disabled = true
+          return
+        }
+
+        if (!ctx.state.currentSequence) {
+          ctx.state.currentSequence = createEmptySequence()
+        }
+
+        const complete = advanceSequence(ctx.state.currentSequence, MAX_GRID_COLS)
+        draw()
+
+        if (complete) {
+          const completed = ctx.state.currentSequence
+          if (completed) {
+            ctx.state.sequences.push(completed)
+            ctx.state.sumRatios += completed.ratio
+            ctx.state.sequenceBatch.push(completed)
+            if (ctx.state.sequenceBatch.length > MAX_GRID_ROWS) {
+              ctx.state.sequenceBatch.shift()
+            }
+          }
+          ctx.state.currentSequence = null
+          updateStats()
+        }
+
+        ctx.state.autoRafId = setTimeout(() => {
+          requestAnimationFrame(animateStep)
+        }, STEP_FRAME_DELAY)
+      }
+
+      function updateStats(): void {
+        const n = ctx.state.sequences.length
+        const pi = estimatePi(ctx.state.sumRatios, n)
+        const avgRatio = n > 0 ? ctx.state.sumRatios / n : 0
+
+        elEstimate.textContent = fmt(pi)
+        elSequences.textContent = n.toLocaleString()
+        elAvgRatio.textContent = fmt(avgRatio)
+        elError.textContent = Math.abs(pi - Math.PI).toFixed(6)
+        elBar.style.width = `${Math.min((n / MAX_SEQUENCES) * 100, 100)}%`
+
         draw()
       }
 
-      if (!state.currentSequence) {
-        state.currentSequence = createEmptySequence()
+      function startShowing(): void {
+        if (ctx.state.autoAdding) return
+        ctx.state.autoAdding = true
+        btnStart.textContent = 'Pause'
+        btnStep.disabled = true
+        btnReset.disabled = false
+        if (!ctx.state.currentSequence) {
+          ctx.state.currentSequence = createEmptySequence()
+        }
+        animateStep()
       }
 
-      const prevLength = state.currentSequence.tosses.length
-      const complete = advanceSequence(state.currentSequence, MAX_GRID_COLS)
-      if (state.currentSequence.tosses.length > prevLength) {
-        state.newCoinIndex = state.currentSequence.tosses.length - 1
+      function reset(): void {
+        stopAutoAdd()
+        ctx.state.sequences = []
+        ctx.state.sumRatios = 0
+        ctx.state.sequenceBatch = []
+        ctx.state.currentSequence = null
+        ctx.state.autoAdding = false
+        ctx.state.autoRafId = null
+        ctx.state.newCoinIndex = null
+        ctx.state.highlightTimeout = null
+        draw()
+        updateStats()
+        btnStart.textContent = 'Start'
+        btnStart.disabled = false
+        btnStep.disabled = false
+        btnStep.textContent = 'Show'
+        btnReset.disabled = true
       }
+
+      // Initial draw
       draw()
 
-      if (complete) {
-        const completed = state.currentSequence
-        state.sequences.push(completed)
-        state.sumRatios += completed.ratio
-        updateStats()
-        state.highlightComplete = true
-        // Keep currentSequence for highlight, add to batch after delay
-        state.highlightTimeout = setTimeout(() => {
-          state.highlightTimeout = null
-          state.highlightComplete = false
-          state.newCoinIndex = null
-          state.sequenceBatch.push(completed)
-          if (state.sequenceBatch.length > MAX_GRID_ROWS) {
-            state.sequenceBatch.shift()
+      // Event handlers
+      btnStart.addEventListener('click', () => {
+        if (ctx.state.autoAdding) {
+          stopAutoAdd()
+          return
+        }
+
+        if (ctx.state.sequences.length >= MAX_SEQUENCES) {
+          reset()
+          return
+        }
+
+        startShowing()
+      })
+
+      btnStep.addEventListener('click', () => {
+        if (ctx.state.autoAdding) return
+
+        if (ctx.state.sequences.length >= MAX_SEQUENCES) {
+          reset()
+          return
+        }
+
+        // If there's a pending highlight, finalize it immediately
+        if (ctx.state.highlightTimeout) {
+          clearTimeout(ctx.state.highlightTimeout)
+          ctx.state.highlightTimeout = null
+          if (ctx.state.highlightComplete && ctx.state.currentSequence) {
+            ctx.state.sequenceBatch.push(ctx.state.currentSequence)
+            if (ctx.state.sequenceBatch.length > MAX_GRID_ROWS) {
+              ctx.state.sequenceBatch.shift()
+            }
+            ctx.state.currentSequence = null
           }
-          state.currentSequence = null
+          ctx.state.newCoinIndex = null
+          ctx.state.highlightComplete = false
           draw()
-        }, 300)
-      } else {
-        state.highlightComplete = false
-        // Clear highlight after a brief delay
-        state.highlightTimeout = setTimeout(() => {
-          state.highlightTimeout = null
-          state.newCoinIndex = null
-          draw()
-        }, 300)
+        }
+
+        if (!ctx.state.currentSequence) {
+          ctx.state.currentSequence = createEmptySequence()
+        }
+
+        const prevLength = ctx.state.currentSequence.tosses.length
+        const complete = advanceSequence(ctx.state.currentSequence, MAX_GRID_COLS)
+        if (ctx.state.currentSequence.tosses.length > prevLength) {
+          ctx.state.newCoinIndex = ctx.state.currentSequence.tosses.length - 1
+        }
+        draw()
+
+        if (complete) {
+          const completed = ctx.state.currentSequence
+          ctx.state.sequences.push(completed)
+          ctx.state.sumRatios += completed.ratio
+          updateStats()
+          ctx.state.highlightComplete = true
+          // Keep currentSequence for highlight, add to batch after delay
+          ctx.state.highlightTimeout = setTimeout(() => {
+            ctx.state.highlightTimeout = null
+            ctx.state.highlightComplete = false
+            ctx.state.newCoinIndex = null
+            ctx.state.sequenceBatch.push(completed)
+            if (ctx.state.sequenceBatch.length > MAX_GRID_ROWS) {
+              ctx.state.sequenceBatch.shift()
+            }
+            ctx.state.currentSequence = null
+            draw()
+          }, 300)
+        } else {
+          ctx.state.highlightComplete = false
+          // Clear highlight after a brief delay
+          ctx.state.highlightTimeout = setTimeout(() => {
+            ctx.state.highlightTimeout = null
+            ctx.state.newCoinIndex = null
+            draw()
+          }, 300)
+        }
+
+        btnReset.disabled = false
+      })
+
+      btnReset.addEventListener('click', reset)
+    },
+
+    cleanup(ctx) {
+      // Stop any running animations
+      ctx.state.autoAdding = false
+      if (ctx.state.autoRafId !== null) {
+        clearTimeout(ctx.state.autoRafId)
+        ctx.state.autoRafId = null
       }
-
-      btnReset.disabled = false
-    })
-    btnReset.addEventListener('click', reset)
-
-    return page
+      if (ctx.state.highlightTimeout !== null) {
+        clearTimeout(ctx.state.highlightTimeout)
+        ctx.state.highlightTimeout = null
+      }
+    }
   }
-
-  function cleanup(): void {
-    stopAutoAdd()
-  }
-
-  return { render, cleanup }
-}
+)

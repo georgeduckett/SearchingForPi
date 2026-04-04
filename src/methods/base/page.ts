@@ -20,10 +20,27 @@ export interface PageOptions {
   hasStep?: boolean
   /** Whether to show reset button (default: true) */
   hasReset?: boolean
-  /** Additional control buttons */
+  /** Additional control buttons HTML */
   extraControls?: string
-  /** Additional stats elements */
+  /** Additional stats elements HTML */
   extraStats?: string
+}
+
+export interface MethodPageOptions {
+  /** Title displayed in the header */
+  title: string
+  /** Subtitle/description */
+  subtitle?: string
+  /** Index label (e.g., "01") */
+  index?: string
+  /** Canvas width (default: 560) */
+  canvasWidth?: number
+  /** Canvas height (default: 560) */
+  canvasHeight?: number
+  /** Custom controls HTML (replaces default buttons) */
+  controls?: string
+  /** Stats panel content HTML */
+  statsPanel: string
 }
 
 export interface PageContext<S> {
@@ -43,6 +60,23 @@ export interface PageContext<S> {
   statsContainer: HTMLElement
 }
 
+export interface MethodPageContext<S> {
+  /** The canvas element */
+  canvas: HTMLCanvasElement
+  /** The 2D rendering context */
+  ctx: CanvasRenderingContext2D
+  /** The page state */
+  state: S
+  /** Stats panel element */
+  statsPanel: HTMLElement
+  /** Query an element within the page by selector */
+  $(selector: string): HTMLElement
+  /** Query a required element within the page, throws if not found */
+  $required(selector: string): HTMLElement
+  /** Query a required element by ID */
+  $id<T extends HTMLElement>(id: string, ctor: new () => T): T
+}
+
 export interface PageMethods<S> {
   /** Called once to initialize the page after DOM is ready */
   init?(ctx: PageContext<S>): void
@@ -60,11 +94,28 @@ export interface PageMethods<S> {
   cleanup?(ctx: PageContext<S>): void
 }
 
-// ─── Page Factory Builder ────────────────────────────────────────────────────
+export interface MethodPageMethods<S> {
+  /** Called once to initialize the page after DOM is ready */
+  init?(ctx: MethodPageContext<S>): void
+  /** Draw the current state to the canvas */
+  draw?(ctx: MethodPageContext<S>): void
+  /** Start/resume the animation */
+  start?(ctx: MethodPageContext<S>): void
+  /** Pause the animation */
+  pause?(ctx: MethodPageContext<S>): void
+  /** Perform a single step */
+  step?(ctx: MethodPageContext<S>): void
+  /** Reset to initial state */
+  reset?(ctx: MethodPageContext<S>): void
+  /** Cleanup when page is destroyed */
+  cleanup?(ctx: MethodPageContext<S>): void
+}
+
+// ─── Simple Page Factory ─────────────────────────────────────────────────────
 
 /**
- * Creates a page factory with reduced boilerplate.
- * Handles common patterns: canvas setup, controls, stats panel, animation loop.
+ * Creates a simple page factory with standard layout.
+ * Best for pages with basic canvas + controls + stats layout.
  */
 export function createPageFactory<S>(
   options: PageOptions,
@@ -213,6 +264,118 @@ export function createPageFactory<S>(
   }
 }
 
+// ─── Method Page Factory ─────────────────────────────────────────────────────
+
+/**
+ * Creates a method page factory with the standard viz-layout structure.
+ * This is the two-column layout with canvas on left and stats/info on right.
+ */
+export function createMethodPageFactory<S>(
+  options: MethodPageOptions,
+  initialState: S,
+  methods: MethodPageMethods<S>
+): () => Page {
+  const {
+    title,
+    subtitle,
+    index,
+    canvasWidth = 560,
+    canvasHeight = 560,
+    controls = '<button class="btn primary" id="btn-start">Start</button><button class="btn" id="btn-step">Step</button><button class="btn" id="btn-reset" disabled>Reset</button>',
+    statsPanel,
+  } = options
+
+  return function pageFactory(): Page {
+    const state: S = JSON.parse(JSON.stringify(initialState))
+    let animationId: number | null = null
+
+    function render(): HTMLElement {
+      const page = document.createElement('div')
+      page.className = 'page'
+
+      page.innerHTML = `
+        <header class="page-header">
+          ${index ? `<span class="page-index">Method ${index}</span>` : ''}
+          <h2 class="page-title">${title}</h2>
+          ${subtitle ? `<p class="page-subtitle">${subtitle}</p>` : ''}
+        </header>
+
+        <div class="viz-layout">
+          <div>
+            <div class="canvas-wrapper">
+              <canvas id="canvas" width="${canvasWidth}" height="${canvasHeight}"></canvas>
+            </div>
+            <div style="margin-top:14px" class="controls">
+              ${controls}
+            </div>
+          </div>
+
+          <div class="stats-panel">
+            ${statsPanel}
+          </div>
+        </div>
+      `
+
+      return page
+    }
+
+    function cleanup(): void {
+      if (animationId !== null) {
+        cancelAnimationFrame(animationId)
+        animationId = null
+      }
+
+      const ctx: MethodPageContext<S> = {
+        canvas: null as unknown as HTMLCanvasElement,
+        ctx: null as unknown as CanvasRenderingContext2D,
+        state,
+        statsPanel: null as unknown as HTMLElement,
+        $: () => null as unknown as HTMLElement,
+        $required: () => null as unknown as HTMLElement,
+        $id: () => null as unknown as HTMLElement as any,
+      }
+
+      methods.cleanup?.(ctx)
+    }
+
+    // The actual page object
+    const page: Page = { render, cleanup }
+
+    // Defer initialization until after render
+    setTimeout(() => {
+      const canvas = queryRequired(document, '#canvas', HTMLCanvasElement)
+      const ctx2d = canvas.getContext('2d')
+      if (!ctx2d) throw new Error('Could not get 2D context')
+
+      const statsPanelEl = queryRequired(document, '.stats-panel', HTMLElement)
+
+      // Helper functions for querying elements
+      const $ = (selector: string): HTMLElement => 
+        document.querySelector(selector) as HTMLElement
+      const $required = (selector: string): HTMLElement => 
+        queryRequired(document, selector, HTMLElement)
+      const $id = <T extends HTMLElement>(id: string, ctor: new () => T): T => 
+        queryRequired(document, `#${id}`, ctor)
+
+      const context: MethodPageContext<S> = {
+        canvas,
+        ctx: ctx2d,
+        state,
+        statsPanel: statsPanelEl,
+        $,
+        $required,
+        $id,
+      }
+
+      // Initialize and draw
+      methods.init?.(context)
+      methods.draw?.(context)
+    }, 0)
+
+    return page
+  }
+}
+
 // ─── Animation Loop Helper ───────────────────────────────────────────────────
 
 export interface AnimationOptions<S> {
@@ -303,4 +466,76 @@ export function updateStat(id: string, value: string | number, parent: HTMLEleme
 export function updateProgress(id: string, percent: number, parent: HTMLElement): void {
   const el = parent.querySelector(`#${id}`) as HTMLElement
   if (el) el.style.width = `${Math.min(100, Math.max(0, percent))}%`
+}
+
+// ─── Stat Card Builder ──────────────────────────────────────────────────────
+
+/**
+ * Creates HTML for a stat card with label, value, and optional subtext.
+ */
+export function statCard(
+  label: string,
+  valueId: string,
+  options: {
+    valueClass?: string
+    subtext?: string
+    errorId?: string
+    progressId?: string
+  } = {}
+): string {
+  const { valueClass = 'stat-value', subtext, errorId, progressId } = options
+  
+  let html = `
+    <div class="stat-card">
+      <div class="stat-label">${label}</div>
+      <div class="${valueClass}" id="${valueId}">—</div>
+  `
+  
+  if (errorId) {
+    html += `<div class="stat-error neutral" id="${errorId}">Error: —</div>`
+  }
+  
+  if (progressId) {
+    html += `
+      <div class="progress-bar-wrap">
+        <div class="progress-bar-fill" id="${progressId}" style="width:0%"></div>
+      </div>
+    `
+  }
+  
+  if (subtext) {
+    html += `<div class="stat-sub">${subtext}</div>`
+  }
+  
+  html += `</div>`
+  return html
+}
+
+/**
+ * Creates HTML for a legend item.
+ */
+export function legendItem(color: string, text: string): string {
+  return `<div class="legend-item"><div class="legend-dot" style="background:${color}"></div>${text}</div>`
+}
+
+/**
+ * Creates HTML for a legend section from an array of items.
+ */
+export function legend(items: Array<{ color: string; text: string }>): string {
+  return `<div class="legend">${items.map(i => legendItem(i.color, i.text)).join('')}</div>`
+}
+
+/**
+ * Creates HTML for an explanation section.
+ */
+export function explanation(title: string, paragraphs: string[], formula?: string): string {
+  let html = `<div class="explanation"><h3>${title}</h3>`
+  for (const p of paragraphs) {
+    html += `<p>${p}</p>`
+  }
+  if (formula) {
+    html += `<div class="formula">${formula}</div>`
+  }
+  html += `</div>`
+  return html
 }
