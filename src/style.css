@@ -256,6 +256,18 @@ html, body {
   position: relative;
 }
 
+/* Bouncing boxes canvas - responsive sizing */
+.canvas-wrapper-bouncing {
+  width: 100%;
+  max-width: 810px;
+}
+
+.canvas-wrapper-bouncing canvas {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
 canvas {
   display: block;
   width: 100%;
@@ -773,4 +785,9 @@ canvas {
     overflow-x: auto;
     white-space: nowrap;
   }
-}
+  
+  /* ── Bouncing boxes canvas: full width on mobile ── */
+  .canvas-wrapper-bouncing {
+    max-width: none;
+  }
+  }

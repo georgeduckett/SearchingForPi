@@ -5,16 +5,20 @@ import { clearCanvas } from './base/canvas'
 import { getMethodIndex } from './definitions'
 
 // ─── Constants ───────────────────────────────────────────────────────────────
-const CANVAS_W = 810
-const CANVAS_H = 240
-const BOX_SIZE = 20
-const BOX2_MIN_SIZE = 20
-const BOX2_MAX_SIZE = 60
-const WALL_X = 50
-const INITIAL_X1 = WALL_X + CANVAS_W / 3
-const INITIAL_X2 = (CANVAS_W / 3) * 2
+// Base dimensions (used for scaling calculations)
+const BASE_CANVAS_W = 810
+const BASE_CANVAS_H = 240
+const BASE_BOX_SIZE = 20
+const BASE_BOX2_MIN_SIZE = 20
+const BASE_BOX2_MAX_SIZE = 60
+const BASE_WALL_X = 50
+const BASE_INITIAL_X1 = BASE_WALL_X + BASE_CANVAS_W / 3
+const BASE_INITIAL_X2 = (BASE_CANVAS_W / 3) * 2
 const V0 = 80
 const M1 = 1
+
+// Mobile breakpoint
+const MOBILE_BREAKPOINT = 700
 
 // ─── Colours (using shared with method-specific) ─────────────────────────────
 const C_WALL = C_TEXT_MUTED
@@ -24,8 +28,8 @@ const C_TEXT = C_TEXT_PRIMARY
 
 // ─── Preview Renderer ────────────────────────────────────────────────────────
 export function drawPreview(ctx: CanvasRenderingContext2D, time: number): void {
-const s = PREVIEW_SIZE
-clearCanvas(ctx, s, s)
+  const s = PREVIEW_SIZE
+  clearCanvas(ctx, s, s)
 
   // Wall
   ctx.strokeStyle = C_TEXT_MUTED
@@ -50,6 +54,7 @@ clearCanvas(ctx, s, s)
 interface State {
   k: number
   m2: number
+  // Positions stored in BASE coordinates
   smallBoxX: number
   smallBoxV: number
   largeBoxX: number
@@ -58,6 +63,7 @@ interface State {
   running: boolean
   rafId: number | null
   time: number
+  scale: number
 }
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
@@ -65,23 +71,24 @@ function createInitialState(): State {
   return {
     k: 0,
     m2: 100 ** 0,
-    smallBoxX: INITIAL_X1,
+    smallBoxX: BASE_INITIAL_X1,
     smallBoxV: 0,
-    largeBoxX: INITIAL_X2,
+    largeBoxX: BASE_INITIAL_X2,
     largeBoxV: -V0,
     collisions: 0,
     running: false,
     rafId: null,
     time: 0,
+    scale: 1,
   }
 }
 
 function resetState(state: State): void {
   state.k = 0
   state.m2 = 100 ** state.k
-  state.smallBoxX = INITIAL_X1
+  state.smallBoxX = BASE_INITIAL_X1
   state.smallBoxV = 0
-  state.largeBoxX = INITIAL_X2
+  state.largeBoxX = BASE_INITIAL_X2
   state.largeBoxV = -V0
   state.collisions = 0
   state.running = false
@@ -92,11 +99,11 @@ function resetState(state: State): void {
 function getBox2Size(m2: number): number {
   // Scale box size based on mass: use cube root for volume-like scaling
   // m2 ranges from 1 (k=0) to 100,000,000 (k=4)
-  // Map to size range [BOX2_MIN_SIZE, BOX2_MAX_SIZE]
+  // Map to size range [BASE_BOX2_MIN_SIZE, BASE_BOX2_MAX_SIZE]
   const minMass = 1
   const maxMass = 100_000_000
   const t = (Math.log10(m2) - Math.log10(minMass)) / (Math.log10(maxMass) - Math.log10(minMass))
-  return BOX2_MIN_SIZE + t * (BOX2_MAX_SIZE - BOX2_MIN_SIZE)
+  return BASE_BOX2_MIN_SIZE + t * (BASE_BOX2_MAX_SIZE - BASE_BOX2_MIN_SIZE)
 }
 
 // ─── Page Factory ─────────────────────────────────────────────────────────────
@@ -113,6 +120,7 @@ export function createBouncingBoxesPage(): Page {
   let audioContext: AudioContext | null = null
   let currentOsc: OscillatorNode | null = null
   let soundTimeout: ReturnType<typeof setTimeout> | null = null
+  let resizeObserver: ResizeObserver | null = null
 
   // ── Sound ──────────────────────────────────────────────────────────────────
   function playCollisionSound(): void {
@@ -153,33 +161,77 @@ export function createBouncingBoxesPage(): Page {
     }, 80)
   }
 
+  // ── Canvas Sizing ───────────────────────────────────────────────────────────
+  function updateCanvasSize(): void {
+    const container = canvas.parentElement
+    if (!container) return
+
+    const containerWidth = container.clientWidth
+    // On mobile, use full width; on desktop, cap at base width
+    const isMobile = window.innerWidth <= MOBILE_BREAKPOINT
+    
+    if (isMobile) {
+      // On mobile, make canvas fill the container width
+      const canvasWidth = containerWidth
+      const canvasHeight = Math.round(canvasWidth * (BASE_CANVAS_H / BASE_CANVAS_W))
+      canvas.width = canvasWidth
+      canvas.height = canvasHeight
+      state.scale = canvasWidth / BASE_CANVAS_W
+    } else {
+      // On desktop, use base dimensions
+      canvas.width = BASE_CANVAS_W
+      canvas.height = BASE_CANVAS_H
+      state.scale = 1
+    }
+    
+    draw()
+  }
+
   // ── Draw ───────────────────────────────────────────────────────────────────
   function draw(): void {
+    const scale = state.scale
+    const canvasW = canvas.width
+    const canvasH = canvas.height
+
     ctx.fillStyle = C_BG
-    ctx.fillRect(0, 0, CANVAS_W, CANVAS_H)
+    ctx.fillRect(0, 0, canvasW, canvasH)
 
     // Wall
+    const wallX = BASE_WALL_X * scale
     ctx.strokeStyle = C_WALL
-    ctx.lineWidth = 1
+    ctx.lineWidth = Math.max(1, scale)
     ctx.beginPath()
-    ctx.moveTo(WALL_X, 0)
-    ctx.lineTo(WALL_X, CANVAS_H)
+    ctx.moveTo(wallX, 0)
+    ctx.lineTo(wallX, canvasH)
     ctx.stroke()
 
     // Boxes
     const box2Size = getBox2Size(state.m2)
-    
+    const boxSize = BASE_BOX_SIZE * scale
+    const scaledBox2Size = box2Size * scale
+
     ctx.fillStyle = C_BOX1
-    ctx.fillRect(state.smallBoxX - BOX_SIZE / 2, CANVAS_H / 2 - BOX_SIZE / 2, BOX_SIZE, BOX_SIZE)
-  
+    ctx.fillRect(
+      state.smallBoxX * scale - boxSize / 2,
+      canvasH / 2 - boxSize / 2,
+      boxSize,
+      boxSize
+    )
+
     ctx.fillStyle = C_BOX2
-    ctx.fillRect(state.largeBoxX - box2Size / 2, CANVAS_H / 2 - box2Size / 2, box2Size, box2Size)
-  
+    ctx.fillRect(
+      state.largeBoxX * scale - scaledBox2Size / 2,
+      canvasH / 2 - scaledBox2Size / 2,
+      scaledBox2Size,
+      scaledBox2Size
+    )
+
     // Labels
     ctx.fillStyle = C_TEXT
-    ctx.font = '12px monospace'
-    ctx.fillText('Box 1 (m=1)', state.smallBoxX - 30, CANVAS_H / 2 + 40)
-    ctx.fillText(`Box 2 (m=${state.m2})`, state.largeBoxX - 30, CANVAS_H / 2 + 55)
+    ctx.font = `${Math.max(10, Math.round(12 * scale))}px monospace`
+    const labelOffset = Math.round(40 * scale)
+    ctx.fillText('Box 1 (m=1)', state.smallBoxX * scale - 30 * scale, canvasH / 2 + labelOffset)
+    ctx.fillText(`Box 2 (m=${state.m2})`, state.largeBoxX * scale - 30 * scale, canvasH / 2 + labelOffset + Math.round(15 * scale))
   }
 
   // ── Physics ────────────────────────────────────────────────────────────────
@@ -190,7 +242,7 @@ export function createBouncingBoxesPage(): Page {
     let timeToBoxCollision = Infinity
     if (state.smallBoxV > state.largeBoxV) {
       const relVelocity = state.smallBoxV - state.largeBoxV
-      const gap = (state.largeBoxX - box2Size / 2) - (state.smallBoxX + BOX_SIZE / 2)
+      const gap = (state.largeBoxX - box2Size / 2) - (state.smallBoxX + BASE_BOX_SIZE / 2)
       if (gap > -EPSILON) {
         timeToBoxCollision = gap / relVelocity
       }
@@ -198,7 +250,7 @@ export function createBouncingBoxesPage(): Page {
 
     let timeToWallCollision = Infinity
     if (state.smallBoxV < 0) {
-      const distToWall = (state.smallBoxX - BOX_SIZE / 2) - WALL_X
+      const distToWall = (state.smallBoxX - BASE_BOX_SIZE / 2) - BASE_WALL_X
       if (distToWall > -EPSILON) {
         timeToWallCollision = distToWall / -state.smallBoxV
       }
@@ -258,8 +310,8 @@ export function createBouncingBoxesPage(): Page {
   function isSimulationComplete(): boolean {
     const box2Size = getBox2Size(state.m2)
     const boxesSeparated = state.largeBoxV > state.smallBoxV && state.smallBoxV >= 0
-    const gapLargeEnough = state.largeBoxX - state.smallBoxX > 5 * Math.max(BOX_SIZE, box2Size)
-    const smallBoxAwayFromWall = state.smallBoxX - BOX_SIZE / 2 > WALL_X + 5 * BOX_SIZE
+    const gapLargeEnough = state.largeBoxX - state.smallBoxX > 5 * Math.max(BASE_BOX_SIZE, box2Size)
+    const smallBoxAwayFromWall = state.smallBoxX - BASE_BOX_SIZE / 2 > BASE_WALL_X + 5 * BASE_BOX_SIZE
     return boxesSeparated && gapLargeEnough && smallBoxAwayFromWall
   }
 
@@ -322,58 +374,58 @@ export function createBouncingBoxesPage(): Page {
     page.className = 'page'
 
     page.innerHTML = `
-      <header class="page-header">
-        <span class="page-index">Method ${getMethodIndex('bouncing-boxes')}</span>
-        <h2 class="page-title">Bouncing Boxes</h2>
-        <p class="page-subtitle">
-          Elastic collisions between two masses reveal π's digits.
-        </p>
-      </header>
+<header class="page-header">
+  <span class="page-index">Method ${getMethodIndex('bouncing-boxes')}</span>
+  <h2 class="page-title">Bouncing Boxes</h2>
+  <p class="page-subtitle">
+    Elastic collisions between two masses reveal π's digits.
+  </p>
+</header>
 
-      <div class="viz-layout">
-        <!-- Canvas -->
-        <div>
-          <div class="canvas-wrapper">
-            <canvas id="bb-canvas" width="${CANVAS_W}" height="${CANVAS_H}"></canvas>
-          </div>
-          <div style="margin-top:14px" class="controls">
-            <select id="bb-k" class="control-select">
-              <option value="0">k=0 (1 digit)</option>
-              <option value="1">k=1 (2 digits)</option>
-              <option value="2">k=2 (3 digits)</option>
-              <option value="3">k=3 (4 digits)</option>
-              <option value="4">k=4 (5 digits)</option>
-            </select>
-            <button id="bb-start" class="btn primary">Start</button>
-            <button id="bb-reset" class="btn">Reset</button>
-          </div>
-        </div>
+<div class="viz-layout">
+  <!-- Canvas -->
+  <div>
+    <div class="canvas-wrapper canvas-wrapper-bouncing">
+      <canvas id="bb-canvas"></canvas>
+    </div>
+    <div style="margin-top:14px" class="controls">
+      <select id="bb-k" class="control-select">
+        <option value="0">k=0 (1 digit)</option>
+        <option value="1">k=1 (2 digits)</option>
+        <option value="2">k=2 (3 digits)</option>
+        <option value="3">k=3 (4 digits)</option>
+        <option value="4">k=4 (5 digits)</option>
+      </select>
+      <button id="bb-start" class="btn primary">Start</button>
+      <button id="bb-reset" class="btn">Reset</button>
+    </div>
+  </div>
 
-        <!-- Stats -->
-        <div class="stats-panel">
-          <div class="stat-card">
-            <div class="stat-label">π approximation</div>
-            <div class="stat-value large" id="bb-pi-approx">0.0</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-label">Collisions</div>
-            <div class="stat-value" id="bb-hits">0</div>
-          </div>
-          <div class="explanation">
-            <h3>The Bouncing Boxes Method</h3>
-            <p>
-              Two boxes with masses 1 and 100^k collide elastically. The number of times
-              the smaller box hits the wall after the first collision gives the first k+1
-              digits of π.
-            </p>
-            <p>
-              For k=1, 31 hits → π ≈ 3.1<br>
-              For k=2, 314 hits → π ≈ 3.14
-            </p>
-          </div>
-        </div>
-      </div>
-    `
+  <!-- Stats -->
+  <div class="stats-panel">
+    <div class="stat-card">
+      <div class="stat-label">π approximation</div>
+      <div class="stat-value large" id="bb-pi-approx">0.0</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Collisions</div>
+      <div class="stat-value" id="bb-hits">0</div>
+    </div>
+    <div class="explanation">
+      <h3>The Bouncing Boxes Method</h3>
+      <p>
+        Two boxes with masses 1 and 100^k collide elastically. The number of times
+        the smaller box hits the wall after the first collision gives the first k+1
+        digits of π.
+      </p>
+      <p>
+        For k=1, 31 hits → π ≈ 3.1<br>
+        For k=2, 314 hits → π ≈ 3.14
+      </p>
+    </div>
+  </div>
+</div>
+`
 
     canvas = queryRequired(page, '#bb-canvas', HTMLCanvasElement)
     elK = queryRequired(page, '#bb-k', HTMLSelectElement)
@@ -383,7 +435,15 @@ export function createBouncingBoxesPage(): Page {
     elResetBtn = queryRequired(page, '#bb-reset', HTMLButtonElement)
 
     ctx = getCanvasContext2D(canvas)
-    draw()
+    
+    // Set up resize handling
+    resizeObserver = new ResizeObserver(() => {
+      updateCanvasSize()
+    })
+    resizeObserver.observe(canvas.parentElement!)
+    
+    // Initial size
+    updateCanvasSize()
 
     elStartBtn.addEventListener('click', start)
     elResetBtn.addEventListener('click', reset)
@@ -395,6 +455,7 @@ export function createBouncingBoxesPage(): Page {
   function cleanup(): void {
     stop()
     if (soundTimeout) clearTimeout(soundTimeout)
+    if (resizeObserver) resizeObserver.disconnect()
   }
 
   return { render, cleanup }
