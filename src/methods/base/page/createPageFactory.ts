@@ -3,8 +3,29 @@
 // Best for pages with basic canvas + controls + stats layout.
 
 import type { Page } from '../../../router'
-import { queryRequired } from '../../../utils'
 import type { PageOptions, PageContext, PageMethods } from './types'
+import {
+  buildPageHeader,
+  buildCanvas,
+  buildControlButtons,
+  buildControlsContainer,
+  buildStatsPanel,
+  buildSimplePageLayout,
+} from './templates'
+import {
+  createAnimationLifecycle,
+  cancelAnimation,
+  cloneState,
+  deferInit,
+} from './lifecycle'
+import {
+  getCanvasContext,
+  getRequiredButton,
+  getRequiredElement,
+  wireStartPauseButton,
+  wireStepButton,
+  wireResetButton,
+} from './dom'
 
 /**
  * Creates a simple page factory with standard layout.
@@ -41,52 +62,41 @@ export function createPageFactory<S>(
   } = options
 
   return function pageFactory(): Page {
-    const state: S = JSON.parse(JSON.stringify(initialState))
-    let animationId: number | null = null
-    let running = false
+    // State and lifecycle management
+    const state = cloneState(initialState)
+    const lifecycle = createAnimationLifecycle()
 
-    // Build control buttons HTML
-    const controlsHtml = [
-      hasStartPause ? `<button class="btn" id="btn-start">Start</button>` : '',
-      hasStep ? `<button class="btn" id="btn-step">Step</button>` : '',
+    // Build HTML templates
+    const headerHtml = buildPageHeader({ title, subtitle, index })
+    const canvasHtml = buildCanvas({ width: canvasWidth, height: canvasHeight })
+    const buttonsHtml = buildControlButtons({
+      hasStartPause,
+      hasStep,
+      hasReset,
       extraControls,
-      hasReset ? `<button class="btn" id="btn-reset">Reset</button>` : '',
-    ].filter(Boolean).join('\n')
+    })
+    const controlsHtml = buildControlsContainer(buttonsHtml)
+    const statsHtml = buildStatsPanel(extraStats)
+
+    // Build complete page HTML
+    const pageHtml = buildSimplePageLayout({
+      header: headerHtml,
+      canvas: canvasHtml,
+      controls: controlsHtml,
+      stats: statsHtml,
+    })
 
     function render(): HTMLElement {
       const page = document.createElement('div')
       page.className = 'page'
-
-      page.innerHTML = `
-        <header class="page-header">
-          ${index ? `<span class="page-index">${index}</span>` : ''}
-          <h2 class="page-title">${title}</h2>
-          ${subtitle ? `<p class="page-subtitle">${subtitle}</p>` : ''}
-        </header>
-
-        <div class="visualization">
-          <canvas id="canvas" width="${canvasWidth}" height="${canvasHeight}"></canvas>
-        </div>
-
-        <div class="controls">
-          ${controlsHtml}
-        </div>
-
-        <div class="stats-panel">
-          ${extraStats}
-        </div>
-      `
-
+      page.innerHTML = pageHtml
       return page
     }
 
     function cleanup(): void {
-      if (animationId !== null) {
-        cancelAnimationFrame(animationId)
-        animationId = null
-      }
-      running = false
+      cancelAnimation(lifecycle)
 
+      // Create a minimal context for cleanup
       const ctx: PageContext<S> = {
         canvas: null as unknown as HTMLCanvasElement,
         ctx: null as unknown as CanvasRenderingContext2D,
@@ -104,16 +114,17 @@ export function createPageFactory<S>(
     const page: Page = { render, cleanup }
 
     // Defer initialization until after render
-    setTimeout(() => {
-      const canvas = queryRequired(document, '#canvas', HTMLCanvasElement)
-      const ctx2d = canvas.getContext('2d')
-      if (!ctx2d) throw new Error('Could not get 2D context')
+    deferInit(() => {
+      // Get canvas and context
+      const { canvas, ctx: ctx2d } = getCanvasContext()
 
-      const btnStart = hasStartPause ? queryRequired(document, '#btn-start', HTMLButtonElement) : null
-      const btnStep = hasStep ? queryRequired(document, '#btn-step', HTMLButtonElement) : null
-      const btnReset = hasReset ? queryRequired(document, '#btn-reset', HTMLButtonElement) : null
-      const statsContainer = queryRequired(document, '.stats-panel', HTMLElement)
+      // Get button references
+      const btnStart = hasStartPause ? getRequiredButton('btn-start') : null
+      const btnStep = hasStep ? getRequiredButton('btn-step') : null
+      const btnReset = hasReset ? getRequiredButton('btn-reset') : null
+      const statsContainer = getRequiredElement('.stats-panel', HTMLElement)
 
+      // Build context
       const context: PageContext<S> = {
         canvas,
         ctx: ctx2d,
@@ -126,44 +137,42 @@ export function createPageFactory<S>(
 
       // Wire up event handlers
       if (btnStart) {
-        btnStart.addEventListener('click', () => {
-          if (running) {
-            running = false
-            btnStart.textContent = 'Resume'
-            methods.pause?.(context)
-          } else {
-            running = true
-            btnStart.textContent = 'Pause'
-            methods.start?.(context)
-          }
-        })
+        wireStartPauseButton(
+          btnStart,
+          {
+            onStart: () => methods.start?.(context),
+            onPause: () => methods.pause?.(context),
+          },
+          () => lifecycle.running,
+          (value) => { lifecycle.running = value }
+        )
       }
 
       if (btnStep) {
-        btnStep.addEventListener('click', () => {
-          if (running && btnStart) {
-            running = false
-            btnStart.textContent = 'Resume'
-            methods.pause?.(context)
-          }
+        wireStepButton(btnStep, () => {
           methods.step?.(context)
           methods.draw(context)
+        }, {
+          getRunning: () => lifecycle.running,
+          setRunning: (value) => { lifecycle.running = value },
+          startPauseButton: btnStart,
         })
       }
 
       if (btnReset) {
-        btnReset.addEventListener('click', () => {
-          running = false
-          if (btnStart) btnStart.textContent = 'Start'
+        wireResetButton(btnReset, () => {
+          lifecycle.running = false
           methods.reset(context)
           methods.draw(context)
+        }, {
+          startPauseButton: btnStart,
         })
       }
 
       // Initialize and draw
       methods.init?.(context)
       methods.draw(context)
-    }, 0)
+    })
 
     return page
   }

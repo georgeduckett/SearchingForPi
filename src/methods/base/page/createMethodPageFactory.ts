@@ -3,8 +3,26 @@
 // This is the two-column layout with canvas on left and stats/info on right.
 
 import type { Page } from '../../../router'
-import { queryRequired } from '../../../utils'
 import type { MethodPageOptions, MethodPageContext, MethodPageMethods } from './types'
+import {
+  buildPageHeader,
+  buildCanvasWithWrapper,
+  buildControlsContainer,
+  buildVizLayout,
+} from './templates'
+import {
+  createAnimationLifecycle,
+  cancelAnimation,
+  cloneState,
+  deferInit,
+} from './lifecycle'
+import {
+  getCanvasContext,
+  getStatsPanel,
+  create$Helper,
+  create$RequiredHelper,
+  create$IdHelper,
+} from './dom'
 
 /**
  * Creates a method page factory with the standard viz-layout structure.
@@ -42,45 +60,42 @@ export function createMethodPageFactory<S>(
   } = options
 
   return function pageFactory(): Page {
-    const state: S = JSON.parse(JSON.stringify(initialState))
-    let animationId: number | null = null
+    // State and lifecycle management
+    const state = cloneState(initialState)
+    const lifecycle = createAnimationLifecycle()
+
+    // Build HTML templates
+    const headerHtml = buildPageHeader({
+      title,
+      subtitle,
+      index,
+      indexPrefix: 'Method ',
+    })
+    const canvasHtml = buildCanvasWithWrapper({
+      width: canvasWidth,
+      height: canvasHeight,
+    })
+    const controlsHtml = buildControlsContainer(controls, 'margin-top:14px')
+
+    // Build complete page HTML using viz-layout
+    const pageHtml = buildVizLayout({
+      header: headerHtml,
+      canvas: canvasHtml,
+      controls: controlsHtml,
+      stats: `<div class="stats-panel">${statsPanel}</div>`,
+    })
 
     function render(): HTMLElement {
       const page = document.createElement('div')
       page.className = 'page'
-
-      page.innerHTML = `
-        <header class="page-header">
-          ${index ? `<span class="page-index">Method ${index}</span>` : ''}
-          <h2 class="page-title">${title}</h2>
-          ${subtitle ? `<p class="page-subtitle">${subtitle}</p>` : ''}
-        </header>
-
-        <div class="viz-layout">
-          <div>
-            <div class="canvas-wrapper">
-              <canvas id="canvas" width="${canvasWidth}" height="${canvasHeight}"></canvas>
-            </div>
-            <div style="margin-top:14px" class="controls">
-              ${controls}
-            </div>
-          </div>
-
-          <div class="stats-panel">
-            ${statsPanel}
-          </div>
-        </div>
-      `
-
+      page.innerHTML = pageHtml
       return page
     }
 
     function cleanup(): void {
-      if (animationId !== null) {
-        cancelAnimationFrame(animationId)
-        animationId = null
-      }
+      cancelAnimation(lifecycle)
 
+      // Create a minimal context for cleanup
       const ctx: MethodPageContext<S> = {
         canvas: null as unknown as HTMLCanvasElement,
         ctx: null as unknown as CanvasRenderingContext2D,
@@ -98,21 +113,19 @@ export function createMethodPageFactory<S>(
     const page: Page = { render, cleanup }
 
     // Defer initialization until after render
-    setTimeout(() => {
-      const canvas = queryRequired(document, '#canvas', HTMLCanvasElement)
-      const ctx2d = canvas.getContext('2d')
-      if (!ctx2d) throw new Error('Could not get 2D context')
+    deferInit(() => {
+      // Get canvas and context
+      const { canvas, ctx: ctx2d } = getCanvasContext()
 
-      const statsPanelEl = queryRequired(document, '.stats-panel', HTMLElement)
+      // Get stats panel
+      const statsPanelEl = getStatsPanel()
 
-      // Helper functions for querying elements
-      const $ = (selector: string): HTMLElement =>
-        document.querySelector(selector) as HTMLElement
-      const $required = (selector: string): HTMLElement =>
-        queryRequired(document, selector, HTMLElement)
-      const $id = <T extends HTMLElement>(id: string, ctor: new () => T): T =>
-        queryRequired(document, `#${id}`, ctor)
+      // Create helper functions for querying elements
+      const $ = create$Helper()
+      const $required = create$RequiredHelper()
+      const $id = create$IdHelper()
 
+      // Build context
       const context: MethodPageContext<S> = {
         canvas,
         ctx: ctx2d,
@@ -126,7 +139,7 @@ export function createMethodPageFactory<S>(
       // Initialize and draw
       methods.init?.(context)
       methods.draw?.(context)
-    }, 0)
+    })
 
     return page
   }

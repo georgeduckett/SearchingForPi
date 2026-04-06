@@ -122,6 +122,7 @@ export const createMonteCarloPage = createMethodPageFactory<State>(
 
       function resetState(): void {
         animation.stop()
+        state.running = false
         state.inside = 0
         state.total = 0
         state.rafId = null
