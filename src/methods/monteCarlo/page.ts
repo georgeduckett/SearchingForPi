@@ -1,12 +1,10 @@
 // ─── Monte Carlo Page ────────────────────────────────────────────────────────
 // Main page factory for the Monte Carlo method.
 
-import { fmt } from '../../utils'
 import { C_INSIDE, C_OUTSIDE, CANVAS_SIZE } from '../../colors'
-import { createMethodPageFactory, createFrameAnimation, cancelAnimations, statCard, legend, explanation } from '../base/page'
-import { State, DOTS_PER_TICK, MAX_DOTS, createInitialState } from './types'
-import { estimatePi, generatePoint } from './sampling'
-import { drawBackground, drawPoint } from './rendering'
+import { createMethodPageFactory, statCard, legend, explanation } from '../base/page'
+import { State, MAX_DOTS, createInitialState } from './types'
+import { createMonteCarloController, StatsElements } from './controller'
 
 // ─── Page Factory ────────────────────────────────────────────────────────────
 export const createMonteCarloPage = createMethodPageFactory<State>(
@@ -38,100 +36,21 @@ export const createMonteCarloPage = createMethodPageFactory<State>(
   createInitialState(),
   {
     init(ctx) {
-      const { ctx: ctx2d, state, $id } = ctx
+      const { $id } = ctx
 
-      // Get button references
-      const btnStart = $id('btn-start', HTMLButtonElement)
-      const btnStep = $id('btn-step', HTMLButtonElement)
-      const btnReset = $id('btn-reset', HTMLButtonElement)
-      const elEstimate = $id('estimate', HTMLElement)
-      const elTotal = $id('total', HTMLElement)
-      const elError = $id('error', HTMLElement)
-      const elProgress = $id('progress', HTMLElement)
-
-      // Draw initial background
-      drawBackground(ctx2d)
-
-      // Stats update helper
-      function updateStats(): void {
-        const pi = estimatePi(state.inside, state.total)
-        elEstimate.textContent = fmt(pi)
-        elTotal.textContent = state.total.toLocaleString()
-        const error = Math.abs(pi - Math.PI)
-        elError.textContent = `Error: ${fmt(error)}`
-        elError.className = 'stat-error ' + (error < 0.01 ? 'improving' : 'neutral')
-        const pct = Math.min((state.total / MAX_DOTS) * 100, 100)
-        elProgress.style.width = `${pct}%`
+      // Get stats element references
+      const statsElements: StatsElements = {
+        estimate: $id('estimate', HTMLElement),
+        total: $id('total', HTMLElement),
+        error: $id('error', HTMLElement),
+        progress: $id('progress', HTMLElement),
       }
 
-      // Add dots helper
-      function addDots(count: number): void {
-        for (let i = 0; i < count; i++) {
-          const point = generatePoint()
-          if (point.isInside) state.inside++
-          state.total++
-          drawPoint(ctx2d, point.x, point.y, point.isInside)
-        }
-      }
+      // Create and store the controller
+      const controller = createMonteCarloController(ctx, statsElements)
 
-      // Create animation loop
-      const animation = createFrameAnimation(ctx, {
-        update(state, _dt) {
-          if (state.total >= MAX_DOTS) {
-            state.running = false
-            return
-          }
-          addDots(Math.min(DOTS_PER_TICK, MAX_DOTS - state.total))
-        },
-        draw(_ctx) {
-          updateStats()
-        },
-        isRunning: (state) => state.running,
-        onComplete() {
-          btnStart.textContent = 'Restart'
-          btnStart.disabled = false
-        },
-      })
-
-      // Wire up buttons
-      btnStart.addEventListener('click', () => {
-        if (state.total >= MAX_DOTS) {
-          resetState()
-        }
-        start()
-      })
-
-      btnStep.addEventListener('click', () => {
-        if (!state.running) {
-          addDots(10)
-          updateStats()
-          btnReset.disabled = false
-        }
-      })
-
-      btnReset.addEventListener('click', resetState)
-
-      function start(): void {
-        state.running = true
-        btnStart.disabled = true
-        btnStart.textContent = 'Running…'
-        btnReset.disabled = false
-        animation.start()
-        state.rafId = animation.getFrameId()
-      }
-
-      function resetState(): void {
-        animation.stop()
-        state.running = false
-        state.inside = 0
-        state.total = 0
-        state.rafId = null
-        drawBackground(ctx2d)
-        updateStats()
-        btnStart.textContent = 'Start'
-        btnStart.disabled = false
-        btnReset.disabled = true
-      }
+      // Store controller for cleanup
+      ;(ctx.state as any)._controller = controller
     },
 
     draw(_ctx) {
@@ -139,7 +58,10 @@ export const createMonteCarloPage = createMethodPageFactory<State>(
     },
 
     cleanup(ctx) {
-      cancelAnimations(ctx.state)
+      const controller = (ctx.state as any)._controller
+      if (controller) {
+        controller.cleanup()
+      }
     },
   }
 )

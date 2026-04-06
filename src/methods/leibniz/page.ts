@@ -2,10 +2,9 @@
 // Main page factory for the Leibniz series method.
 
 import { C_INSIDE, C_OUTSIDE, C_AMBER } from '../../colors'
-import { createMethodPageFactory, createIntervalAnimation, cancelAnimations, statCard, legend, explanation } from '../base/page'
-import { State, CANVAS_W, CANVAS_H, MAX_TERMS, MS_PER_TERM, createInitialState } from './types'
-import { leibnizTerm, formatTerm } from './series'
-import { draw } from './rendering'
+import { createMethodPageFactory, statCard, legend, explanation } from '../base/page'
+import { State, CANVAS_W, CANVAS_H, MAX_TERMS } from './types'
+import { createLeibnizController, StatsElements } from './controller'
 
 // Method-specific colors for UI
 const C_PLUS = C_INSIDE
@@ -46,120 +45,35 @@ export const createLeibnizPage = createMethodPageFactory<State>(
       ], 'π/4 = 1 − 1/3 + 1/5 − 1/7 + …')}
     `,
   },
-  createInitialState(),
+  { terms: [], running: false, termIndex: 0, intervalId: null, rafId: null },
   {
     init(ctx) {
-      const { ctx: ctx2d, state, $id } = ctx
+      const { $id } = ctx
 
-      // Get button references
-      const btnStart = $id('btn-start', HTMLButtonElement)
-      const btnStep = $id('btn-step', HTMLButtonElement)
-      const btnReset = $id('btn-reset', HTMLButtonElement)
-      const elEstimate = $id('estimate', HTMLElement)
-      const elTerms = $id('terms', HTMLElement)
-      const elCurrentTerm = $id('current-term', HTMLElement)
-      const elError = $id('error', HTMLElement)
-
-      // Create interval animation using the helper
-      const animation = createIntervalAnimation(ctx, {
-        intervalMs: MS_PER_TERM,
-        tick(_ctx) {
-          addTerm()
-        },
-        isRunning: (state) => state.running,
-        onComplete() {
-          btnStart.disabled = false
-          btnStart.textContent = state.termIndex >= MAX_TERMS ? 'Done' : 'Resume'
-          if (state.termIndex >= MAX_TERMS) btnStart.disabled = true
-        },
-      })
-
-      function updateStats(): void {
-        const n = state.terms.length
-        if (n === 0) {
-          elEstimate.textContent = '—'
-          elTerms.textContent = '0'
-          elCurrentTerm.textContent = '—'
-          elError.textContent = '—'
-          return
-        }
-        const pi = state.terms[n - 1]
-        elEstimate.textContent = pi.toFixed(8)
-        elTerms.textContent = n.toLocaleString()
-        const idx = n - 1
-        const formatted = formatTerm(idx)
-        elCurrentTerm.textContent = `${formatted.sign}1/${formatted.denominator} = ${formatted.sign}${formatted.value.toFixed(6)}`
-        elError.textContent = Math.abs(pi - Math.PI).toFixed(8)
+      // Get stats element references
+      const statsElements: StatsElements = {
+        estimate: $id('estimate', HTMLElement),
+        terms: $id('terms', HTMLElement),
+        currentTerm: $id('current-term', HTMLElement),
+        error: $id('error', HTMLElement),
       }
 
-      function addTerm(): void {
-        const n = state.termIndex
-        const prev = state.terms.length > 0 ? state.terms[state.terms.length - 1] : 0
-        const newSum = prev + leibnizTerm(n) * 4
-        state.terms.push(newSum)
-        state.termIndex++
-        updateStats()
-        draw(ctx2d, state)
+      // Create and store the controller
+      const controller = createLeibnizController(ctx, statsElements)
 
-        if (state.termIndex >= MAX_TERMS) {
-          stop()
-        }
-      }
+      // Store controller for cleanup
+      ;(ctx.state as any)._controller = controller
+    },
 
-      function start(): void {
-        state.running = true
-        btnStart.disabled = true
-        btnStep.disabled = false
-        btnReset.disabled = false
-        btnStart.textContent = 'Running…'
-        animation.start()
-        state.intervalId = animation.getIntervalId()
-      }
-
-      function stop(): void {
-        state.running = false
-        animation.stop()
-        state.intervalId = null
-        btnStart.disabled = false
-        btnStart.textContent = state.termIndex >= MAX_TERMS ? 'Done' : 'Resume'
-        if (state.termIndex >= MAX_TERMS) btnStart.disabled = true
-      }
-
-      function reset(): void {
-        stop()
-        state.terms = []
-        state.termIndex = 0
-        draw(ctx2d, state)
-        updateStats()
-        btnStart.textContent = 'Start'
-        btnStart.disabled = false
-        btnStep.disabled = false
-        btnReset.disabled = true
-      }
-
-      // Initial draw
-      draw(ctx2d, state)
-
-      // Wire up buttons
-      btnStart.addEventListener('click', () => {
-        if (!state.running) start()
-      })
-
-      btnStep.addEventListener('click', () => {
-        if (!state.running) {
-          const steps = state.termIndex === 0 ? 2 : 1
-          for (let i = 0; i < steps; i++) {
-            addTerm()
-          }
-          btnReset.disabled = false
-        }
-      })
-
-      btnReset.addEventListener('click', reset)
+    draw(_ctx) {
+      // Drawing is handled in init and animation loop
     },
 
     cleanup(ctx) {
-      cancelAnimations(ctx.state)
+      const controller = (ctx.state as any)._controller
+      if (controller) {
+        controller.cleanup()
+      }
     },
   }
 )
