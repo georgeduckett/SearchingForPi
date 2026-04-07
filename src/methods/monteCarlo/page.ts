@@ -2,7 +2,7 @@
 // Main page factory for the Monte Carlo method.
 
 import { C_INSIDE, C_OUTSIDE, CANVAS_SIZE } from '../../colors'
-import { createMethodPageFactory, statCard, legend, explanation } from '../base/page'
+import { createMethodPageFactory, statCard, legend, explanation, cleanupController } from '../base/page'
 import { State, MAX_DOTS, createInitialState } from './types'
 import { createMonteCarloController, StatsElements } from './controller'
 
@@ -48,20 +48,17 @@ export const createMonteCarloPage = createMethodPageFactory<State>(
 
       // Create and store the controller
       const controller = createMonteCarloController(ctx, statsElements)
-
+  
       // Store controller for cleanup
-      ;(ctx.state as any)._controller = controller
+      ctx.state._controller = controller
     },
-
+  
     draw(_ctx) {
       // Drawing is handled in init and animation loop
     },
-
+  
     cleanup(ctx) {
-      const controller = (ctx.state as any)._controller
-      if (controller) {
-        controller.cleanup()
-      }
+      cleanupController(ctx.state)
     },
   }
 )

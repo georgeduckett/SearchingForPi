@@ -36,7 +36,9 @@ export {
   cloneState,
   deferInit,
   createCleanupFunction,
+  cleanupController,
   type AnimationLifecycle,
+  type ControllerState,
 } from './lifecycle'
 
 // ─── DOM Helpers ──────────────────────────────────────────────────────────────

@@ -39,16 +39,19 @@ buildStatsPanel,
 
 // Re-export everything from the page/ subdirectory
 export {
-// Types
-type PageOptions,
-type PageContext,
-type PageMethods,
-type MethodPageOptions,
-type MethodPageContext,
-type MethodPageMethods,
-// Factories
-createPageFactory,
-createMethodPageFactory,
+  // Types
+  type PageOptions,
+  type PageContext,
+  type PageMethods,
+  type MethodPageOptions,
+  type MethodPageContext,
+  type MethodPageMethods,
+  type ControllerState,
+  // Factories
+  createPageFactory,
+  createMethodPageFactory,
+  // Lifecycle helpers
+  cleanupController,
 } from './page/index'
 
 // Re-export controller helpers

@@ -2,8 +2,8 @@
 // Main page factory for the Leibniz series method.
 
 import { C_INSIDE, C_OUTSIDE, C_AMBER } from '../../colors'
-import { createMethodPageFactory, statCard, legend, explanation } from '../base/page'
-import { State, CANVAS_W, CANVAS_H, MAX_TERMS } from './types'
+import { createMethodPageFactory, statCard, legend, explanation, cleanupController } from '../base/page'
+import { State, CANVAS_W, CANVAS_H, MAX_TERMS, createInitialState } from './types'
 import { createLeibnizController, StatsElements } from './controller'
 
 // Method-specific colors for UI
@@ -45,7 +45,7 @@ export const createLeibnizPage = createMethodPageFactory<State>(
       ], 'π/4 = 1 − 1/3 + 1/5 − 1/7 + …')}
     `,
   },
-  { terms: [], running: false, termIndex: 0, intervalId: null, rafId: null },
+  createInitialState(),
   {
     init(ctx) {
       const { $id } = ctx
@@ -60,20 +60,17 @@ export const createLeibnizPage = createMethodPageFactory<State>(
 
       // Create and store the controller
       const controller = createLeibnizController(ctx, statsElements)
-
+  
       // Store controller for cleanup
-      ;(ctx.state as any)._controller = controller
+      ctx.state._controller = controller
     },
-
+  
     draw(_ctx) {
       // Drawing is handled in init and animation loop
     },
-
+  
     cleanup(ctx) {
-      const controller = (ctx.state as any)._controller
-      if (controller) {
-        controller.cleanup()
-      }
+      cleanupController(ctx.state)
     },
   }
 )

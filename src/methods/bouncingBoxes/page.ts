@@ -1,7 +1,7 @@
 // ─── Bouncing Boxes Page ─────────────────────────────────────────────────────
 // Main page factory for the bouncing boxes method.
 
-import { createMethodPageFactory, statCard, explanation } from '../base/page'
+import { createMethodPageFactory, statCard, explanation, cleanupController } from '../base/page'
 import { State, BASE_CANVAS_W, BASE_CANVAS_H, createInitialState } from './types'
 import { createBouncingBoxesController } from './controller'
 
@@ -64,18 +64,15 @@ export const createBouncingBoxesPage = createMethodPageFactory<State>(
       })
 
       // Store controller for cleanup
-      ;(state as any)._controller = controller
+      state._controller = controller
     },
-
+  
     draw(_ctx) {
       // Drawing is handled in init and animation loop
     },
-
+  
     cleanup(ctx) {
-      const controller = (ctx.state as any)._controller
-      if (controller) {
-        controller.cleanup()
-      }
+      cleanupController(ctx.state)
       // Also clean up resize observer
       if (ctx.state.resizeObserver) {
         ctx.state.resizeObserver.disconnect()
