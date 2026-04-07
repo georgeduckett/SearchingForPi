@@ -93,21 +93,22 @@ export interface IntervalControllerConfig<S extends AnimationStateBase> {
 
 /**
  * Controller interface returned by factory functions.
+ * Provides a unified API for controlling animations regardless of the underlying implementation.
  */
 export interface AnimationController {
-  /** Start the animation */
+  /** Start the animation (resumes from paused state if applicable) */
   start(): void
-  /** Stop/pause the animation */
+  /** Stop/pause the animation (preserves current state) */
   stop(): void
-  /** Toggle between running and paused */
+  /** Toggle between running and paused states */
   toggle(): void
-  /** Reset to initial state */
+  /** Reset to initial state and stop animation */
   reset(): void
-  /** Perform a single step (if applicable) */
+  /** Perform a single step (only works when not running) */
   step(): void
   /** Check if animation is currently running */
   isRunning(): boolean
-  /** Cleanup resources */
+  /** Cleanup resources (stop animation, remove listeners) */
   cleanup(): void
 }
 
@@ -115,18 +116,36 @@ export interface AnimationController {
 
 /**
  * Creates a frame-based animation controller with standard button wiring.
- * 
+ *
+ * This controller uses requestAnimationFrame for smooth, frame-based animations.
+ * Best suited for continuous simulations and physics-based methods where
+ * delta time between frames matters (e.g., Monte Carlo, Bouncing Boxes).
+ *
+ * @typeParam S - The state type, must extend AnimationStateBase
+ * @param config - Configuration object containing:
+ *   - ctx: The page context with state and canvas
+ *   - buttons: Button element references and label options
+ *   - update: Function called each frame with delta time
+ *   - draw: Function called each frame to render
+ *   - isComplete: Optional function to check if animation should stop
+ *   - onComplete: Optional callback when animation completes
+ *   - onReset: Required callback to reset state
+ *   - onStep: Optional callback for single-step mode
+ *   - onStart: Optional callback after starting
+ *   - onStop: Optional callback after stopping
+ * @returns AnimationController with start, stop, toggle, reset, step, isRunning, cleanup
+ *
  * @example
  * ```ts
  * const controller = createFrameController({
- *   ctx,
- *   buttons: { btnStart, btnStep, btnReset },
- *   update: (state, dt) => { state.progress += dt },
- *   draw: (ctx) => { render(ctx) },
- *   onReset: () => { resetState() },
- *   onStep: () => { addSingleDot() },
+ * ctx,
+ * buttons: { btnStart, btnStep, btnReset },
+ * update: (state, dt) => { state.progress += dt },
+ * draw: (ctx) => { render(ctx) },
+ * onReset: () => { resetState() },
+ * onStep: () => { addSingleDot() },
  * })
- * 
+ *
  * // Buttons are automatically wired up
  * // Just call cleanup() in the page's cleanup method
  * ```
@@ -224,16 +243,34 @@ export function createFrameController<S extends AnimationStateBase>(
 
 /**
  * Creates an interval-based animation controller with standard button wiring.
- * 
+ *
+ * This controller uses setInterval for fixed-timestep animations.
+ * Best suited for series/sequence visualizations where consistent timing
+ * matters more than frame-perfect rendering (e.g., Leibniz Series).
+ *
+ * @typeParam S - The state type, must extend AnimationStateBase
+ * @param config - Configuration object containing:
+ *   - ctx: The page context with state and canvas
+ *   - buttons: Button element references and label options
+ *   - intervalMs: Milliseconds between each tick
+ *   - tick: Function called each interval
+ *   - isComplete: Optional function to check if animation should stop
+ *   - onComplete: Optional callback when animation completes
+ *   - onReset: Required callback to reset state
+ *   - onStep: Optional callback for single-step mode
+ *   - onStart: Optional callback after starting
+ *   - onStop: Optional callback after stopping
+ * @returns AnimationController with start, stop, toggle, reset, step, isRunning, cleanup
+ *
  * @example
  * ```ts
  * const controller = createIntervalController({
- *   ctx,
- *   buttons: { btnStart, btnStep, btnReset },
- *   intervalMs: 40,
- *   tick: (ctx) => { addTerm(ctx.state) },
- *   onReset: () => { resetState() },
- *   onStep: () => { addSingleTerm() },
+ * ctx,
+ * buttons: { btnStart, btnStep, btnReset },
+ * intervalMs: 40,
+ * tick: (ctx) => { addTerm(ctx.state) },
+ * onReset: () => { resetState() },
+ * onStep: () => { addSingleTerm() },
  * })
  * ```
  */

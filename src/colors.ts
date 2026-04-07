@@ -55,7 +55,7 @@ export function getOutsideColor(): string {
 
 /** Success/positive semantic color */
 export function getSuccessColor(): string {
-	return '#4ecb71' // Not currently a CSS variable
+  return getCSSVarCached('success', '#4ecb71')
 }
 
 // ─── Canvas Size Constants ────────────────────────────────────────────────────

@@ -52,19 +52,20 @@ export function clearCSSVarCache(): void {
 export function initCSSVarCache(): void {
 	// Pre-cache all theme variables used in the app
 	const themeVars = [
-		'bg-deep',
-		'bg-surface',
-		'bg-raised',
-		'border',
-		'border-bright',
-		'text-primary',
-		'text-secondary',
-		'text-muted',
-		'amber',
-		'amber-bright',
-		'amber-dim',
-		'inside',
-		'outside',
+	  'bg-deep',
+	  'bg-surface',
+	  'bg-raised',
+	  'border',
+	  'border-bright',
+	  'text-primary',
+	  'text-secondary',
+	  'text-muted',
+	  'amber',
+	  'amber-bright',
+	  'amber-dim',
+	  'inside',
+	  'outside',
+	  'success',
 	]
 	
 	for (const varName of themeVars) {

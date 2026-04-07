@@ -15,9 +15,10 @@
   --amber-dim:      #7a5518;
   --amber-glow:     rgba(200, 146, 42, 0.15);
 
-  --inside:         #4a9eff;
-  --outside:        #ff6b6b;
-  --needle:         #c8922a;
+  --inside: #4a9eff;
+  --outside: #ff6b6b;
+  --success: #4ecb71;
+  --needle: #c8922a;
 
   --font-display:   'Cormorant Garamond', Georgia, serif;
   --font-mono:      'JetBrains Mono', 'Courier New', monospace;
@@ -43,9 +44,10 @@ body.theme-light {
   --amber-dim:      #7f5f26;
   --amber-glow:     rgba(194, 145, 64, 0.15);
 
-  --inside:         #3c79d9;
-  --outside:        #d15456;
-  --needle:         #a87314;
+  --inside: #3c79d9;
+  --outside: #d15456;
+  --success: #3cb865;
+  --needle: #a87314;
 }
 
 body.theme-light .nav-link:hover {
