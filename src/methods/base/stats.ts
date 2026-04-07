@@ -114,8 +114,8 @@ export function explanation(title: string, paragraphs: string[], formula?: strin
  *   .addPiEstimate('estimate', { error: true, progress: true })
  *   .addCounter('total', 'Points plotted', { subtext: 'of 20,000 total' })
  *   .addLegend([
- *     { color: C_INSIDE, text: 'Inside circle' },
- *     { color: C_OUTSIDE, text: 'Outside circle' },
+ *     { color: getInsideColor(), text: 'Inside circle' },
+ *     { color: getOutsideColor(), text: 'Outside circle' },
  *   ])
  *   .addExplanation('How it works', [...])
  *   .build()

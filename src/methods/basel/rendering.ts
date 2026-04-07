@@ -1,7 +1,7 @@
 // ─── Basel Problem Rendering ─────────────────────────────────────────────────
 // Canvas drawing functions for the Basel problem visualization.
 
-import { C_BG, C_AMBER, C_TEXT_MUTED, CANVAS_SIZE } from '../../colors'
+import { getBgColor, getAmberColor, getTextMutedColor, CANVAS_SIZE } from '../../colors'
 import { State } from './types'
 import { estimatePi, calculateConvergence } from './types'
 
@@ -12,7 +12,7 @@ export function draw(ctx: CanvasRenderingContext2D, state: State): void {
   const W = CANVAS_SIZE
   const H = CANVAS_SIZE
 
-  ctx.fillStyle = C_BG
+  ctx.fillStyle = getBgColor()
   ctx.fillRect(0, 0, W, H)
 
   if (state.terms === 0) {
@@ -66,7 +66,7 @@ function drawEmptyState(ctx: CanvasRenderingContext2D, W: number, H: number): vo
   drawProgressIndicator(ctx, W, H, 0)
 
   // Formula text at top
-  ctx.fillStyle = C_AMBER
+  ctx.fillStyle = getAmberColor()
   ctx.font = '12px "JetBrains Mono", monospace'
   ctx.textAlign = 'center'
   ctx.fillText('Σ 1/n² → π²/6', W / 2, 20)
@@ -81,7 +81,7 @@ function drawProgressIndicator(ctx: CanvasRenderingContext2D, W: number, H: numb
   const radius = 28
 
   // Background circle
-  ctx.strokeStyle = C_TEXT_MUTED
+  ctx.strokeStyle = getTextMutedColor()
   ctx.lineWidth = 2
   ctx.beginPath()
   ctx.arc(cx, cy, radius, 0, Math.PI * 2)
@@ -89,7 +89,7 @@ function drawProgressIndicator(ctx: CanvasRenderingContext2D, W: number, H: numb
 
   // Progress arc (fills as we approach π)
   if (progress > 0) {
-    ctx.strokeStyle = C_AMBER
+    ctx.strokeStyle = getAmberColor()
     ctx.lineWidth = 4
     ctx.beginPath()
     ctx.arc(cx, cy, radius, -Math.PI / 2, -Math.PI / 2 + progress * Math.PI * 2)
@@ -97,7 +97,7 @@ function drawProgressIndicator(ctx: CanvasRenderingContext2D, W: number, H: numb
   }
 
   // π symbol in center
-  ctx.fillStyle = progress > 0 ? C_AMBER : C_TEXT_MUTED
+  ctx.fillStyle = progress > 0 ? getAmberColor() : getTextMutedColor()
   ctx.font = 'bold 20px "JetBrains Mono", monospace'
   ctx.textAlign = 'center'
   ctx.textBaseline = 'middle'
@@ -105,7 +105,7 @@ function drawProgressIndicator(ctx: CanvasRenderingContext2D, W: number, H: numb
   ctx.textBaseline = 'alphabetic'
 
   // Formula text at top
-  ctx.fillStyle = C_AMBER
+  ctx.fillStyle = getAmberColor()
   ctx.font = '12px "JetBrains Mono", monospace'
   ctx.textAlign = 'center'
   ctx.fillText('Σ 1/n² → π²/6', W / 2, 20)

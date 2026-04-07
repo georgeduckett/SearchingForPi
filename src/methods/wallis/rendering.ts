@@ -1,13 +1,13 @@
 // ─── Wallis Product Rendering ────────────────────────────────────────────────
 // Canvas drawing functions for the Wallis product visualization.
 
-import { C_BG, C_INSIDE, C_OUTSIDE, C_AMBER, C_TEXT_MUTED, CANVAS_SIZE } from '../../colors'
+import { getBgColor, getInsideColor, getOutsideColor, getAmberColor, getTextMutedColor, CANVAS_SIZE } from '../../colors'
 import { drawDashedLine, drawText } from '../base/canvas'
 import { State, MAX_FACTORS, getFactor, getTarget } from './types'
 
 // Method-specific colors
-const C_OVER = C_INSIDE
-const C_UNDER = C_OUTSIDE
+const C_OVER = getInsideColor()
+const C_UNDER = getOutsideColor()
 
 /**
  * Draw the complete Wallis visualization - deviation bars and product indicator.
@@ -16,7 +16,7 @@ export function draw(ctx: CanvasRenderingContext2D, state: State): void {
   const W = CANVAS_SIZE
   const H = CANVAS_SIZE
 
-  ctx.fillStyle = C_BG
+  ctx.fillStyle = getBgColor()
   ctx.fillRect(0, 0, W, H)
 
   // Reference line at π/2
@@ -41,10 +41,10 @@ export function draw(ctx: CanvasRenderingContext2D, state: State): void {
 
   // π/2 reference line
   const piY = baseY - target * scale
-  drawDashedLine(ctx, pad, piY, W - pad, piY, C_AMBER, 2, [8, 4])
+  drawDashedLine(ctx, pad, piY, W - pad, piY, getAmberColor(), 2, [8, 4])
 
   // Label
-  drawText(ctx, 'π/2 ≈ 1.5708', W - pad - 80, piY - 5, C_TEXT_MUTED, '11px "JetBrains Mono", monospace')
+  drawText(ctx, 'π/2 ≈ 1.5708', W - pad - 80, piY - 5, getTextMutedColor(), '11px "JetBrains Mono", monospace')
 
   // Draw bars showing deviation at each factor step
   if (state.factors > 0) {
@@ -90,7 +90,7 @@ export function draw(ctx: CanvasRenderingContext2D, state: State): void {
   }
 
   // Axis
-  ctx.strokeStyle = C_TEXT_MUTED
+  ctx.strokeStyle = getTextMutedColor()
   ctx.lineWidth = 1.5
   ctx.beginPath()
   ctx.moveTo(pad, baseY)

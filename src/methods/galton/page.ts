@@ -2,14 +2,14 @@
 // Main page factory for the Galton board method.
 
 import { fmt } from '../../utils'
-import { C_INSIDE, C_AMBER, CANVAS_SIZE } from '../../colors'
+import { getInsideColor, getAmberColor, CANVAS_SIZE } from '../../colors'
 import { createMethodPageFactory, statCard, legend, explanation } from '../base/page'
 import { State, NUM_BINS, MAX_BALLS, createInitialState } from './types'
 import { createBall, updateBall, estimatePi } from './physics'
 import { draw } from './rendering'
 
 // ─── Colors for UI ───────────────────────────────────────────────────────────
-const C_BALL = C_INSIDE
+const C_BALL = getInsideColor()
 
 // ─── Page Factory ────────────────────────────────────────────────────────────
 export const createGaltonPage = createMethodPageFactory<State>(
@@ -30,7 +30,7 @@ export const createGaltonPage = createMethodPageFactory<State>(
       ${statCard('Peak bin count', 'peak')}
       ${legend([
         { color: C_BALL, text: 'Dropped balls' },
-        { color: C_AMBER, text: 'Gaussian reference' },
+        { color: getAmberColor(), text: 'Gaussian reference' },
       ])}
       ${explanation('How it works', [
         'The Galton board demonstrates the central limit theorem: balls falling through pegs form a binomial distribution that approaches a Gaussian (normal) distribution.',

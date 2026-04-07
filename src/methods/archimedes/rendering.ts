@@ -1,13 +1,13 @@
 // ─── Archimedes Rendering ────────────────────────────────────────────────────
 // Canvas drawing functions for the Archimedes polygons visualization.
 
-import { C_INSIDE, C_AMBER, CANVAS_SIZE } from '../../colors'
+import { getInsideColor, getAmberColor, CANVAS_SIZE } from '../../colors'
 import { clearCanvas, drawGrid } from '../base/canvas'
 
 // Method-specific colors
-const C_POLYGON_INNER = C_INSIDE
+const C_POLYGON_INNER = getInsideColor()
 const C_POLYGON_OUTER = '#ff9f69'
-const C_CIRCLE = C_AMBER
+const C_CIRCLE = getAmberColor()
 
 /**
  * Draw the complete Archimedes visualization - circle and both polygons.

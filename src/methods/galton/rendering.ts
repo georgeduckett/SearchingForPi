@@ -1,13 +1,13 @@
 // ─── Galton Board Rendering ─────────────────────────────────────────────────
 // Canvas drawing functions for the Galton board visualization.
 
-import { C_BG, C_INSIDE, C_OUTSIDE, C_AMBER, CANVAS_SIZE } from '../../colors'
+import { getBgColor, getInsideColor, getOutsideColor, getAmberColor, CANVAS_SIZE } from '../../colors'
 import { State, ROWS, NUM_BINS, BALL_RADIUS, PEG_RADIUS, PEG_START_Y, PEG_SPACING_Y, PEG_SPACING_X } from './types'
 
 // ─── Colors ──────────────────────────────────────────────────────────────────
-const C_BALL = C_INSIDE
+const C_BALL = getInsideColor()
 const C_PEG = '#666'
-const C_BIN = C_OUTSIDE
+const C_BIN = getOutsideColor()
 
 // ─── Drawing Functions ───────────────────────────────────────────────────────
 
@@ -20,7 +20,7 @@ export function draw(ctx: CanvasRenderingContext2D, state: State): void {
   const centerX = W / 2
 
   // Background
-  ctx.fillStyle = C_BG
+  ctx.fillStyle = getBgColor()
   ctx.fillRect(0, 0, W, H)
 
   // Draw bin separators
@@ -103,7 +103,7 @@ function drawGaussianOverlay(
   const sigma = Math.sqrt(ROWS / 4)
   const mu = NUM_BINS / 2
 
-  ctx.strokeStyle = C_AMBER
+  ctx.strokeStyle = getAmberColor()
   ctx.lineWidth = 2
   ctx.beginPath()
 

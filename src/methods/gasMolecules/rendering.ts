@@ -1,7 +1,7 @@
 // ─── Gas Molecules Rendering ─────────────────────────────────────────────────
 // Canvas drawing functions for the gas molecules visualization.
 
-import { C_BG, CANVAS_SIZE } from '../../colors'
+import { getBgColor, CANVAS_SIZE } from '../../colors'
 import { State, PARTICLE_RADIUS, CONTAINER_PAD, C_PARTICLE, C_WALL } from './types'
 
 /**
@@ -14,7 +14,7 @@ export function draw(
   const W = CANVAS_SIZE
   const H = CANVAS_SIZE
 
-  ctx.fillStyle = C_BG
+  ctx.fillStyle = getBgColor()
   ctx.fillRect(0, 0, W, H)
 
   // Draw container

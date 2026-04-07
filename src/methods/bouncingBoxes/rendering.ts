@@ -1,15 +1,15 @@
 // ─── Bouncing Boxes Rendering ────────────────────────────────────────────────
 // Canvas drawing functions for the bouncing boxes visualization.
 
-import { C_BG, C_TEXT_MUTED, C_INSIDE, C_AMBER, C_TEXT_PRIMARY } from '../../colors'
+import { getBgColor, getTextMutedColor, getInsideColor, getAmberColor, getTextColor } from '../../colors'
 import { State, BASE_BOX_SIZE, BASE_WALL_X } from './types'
 import { getBox2Size } from './physics'
 
 // ─── Colors ──────────────────────────────────────────────────────────────────
-const C_WALL = C_TEXT_MUTED
-const C_BOX1 = C_INSIDE
-const C_BOX2 = C_AMBER
-const C_TEXT = C_TEXT_PRIMARY
+const C_WALL = getTextMutedColor()
+const C_BOX1 = getInsideColor()
+const C_BOX2 = getAmberColor()
+const C_TEXT = getTextColor()
 
 // ─── Drawing Functions ───────────────────────────────────────────────────────
 
@@ -25,7 +25,7 @@ export function draw(
   const scale = state.scale
 
   // Background
-  ctx.fillStyle = C_BG
+  ctx.fillStyle = getBgColor()
   ctx.fillRect(0, 0, canvasW, canvasH)
 
   // Wall

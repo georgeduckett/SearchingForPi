@@ -1,13 +1,13 @@
 // ─── Coin Toss Rendering ─────────────────────────────────────────────────────
 // Canvas drawing functions for the coin toss visualization.
 
-import { C_BG, C_INSIDE, C_AMBER, C_TEXT_MUTED } from '../../colors'
+import { getBgColor, getInsideColor, getAmberColor, getTextMutedColor } from '../../colors'
 import { State, Sequence, CANVAS_W, CANVAS_H, MAX_GRID_COLS, MAX_GRID_ROWS } from './types'
 
 // Method-specific colors
-const C_RATIO = C_INSIDE
-const C_TARGET = C_AMBER
-const C_TEXT = C_TEXT_MUTED
+const C_RATIO = getInsideColor()
+const C_TARGET = getAmberColor()
+const C_TEXT = getTextMutedColor()
 
 /**
  * Draw the complete coin toss visualization.
@@ -16,7 +16,7 @@ export function draw(
   ctx: CanvasRenderingContext2D,
   state: State
 ): void {
-  ctx.fillStyle = C_BG
+  ctx.fillStyle = getBgColor()
   ctx.fillRect(0, 0, CANVAS_W, CANVAS_H)
 
   drawGraph(ctx, state)

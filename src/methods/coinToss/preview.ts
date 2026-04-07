@@ -1,7 +1,7 @@
 // ─── Coin Toss Preview ───────────────────────────────────────────────────────
 // Preview renderer for the home page.
 
-import { C_BG, C_INSIDE, C_OUTSIDE, PREVIEW_SIZE } from '../../colors'
+import { getBgColor, getInsideColor, getOutsideColor, PREVIEW_SIZE } from '../../colors'
 import { clearCanvas } from '../base/canvas'
 
 /**
@@ -91,11 +91,11 @@ export function drawPreview(ctx: CanvasRenderingContext2D, time: number): void {
 
       const x = 12 + col * coinSpacing
       const isHead = seq[col]
-      ctx.fillStyle = isHead ? C_INSIDE : C_OUTSIDE
+      ctx.fillStyle = isHead ? getInsideColor() : getOutsideColor()
       ctx.beginPath()
       ctx.arc(x, y, coinRadius, 0, Math.PI * 2)
       ctx.fill()
-      ctx.fillStyle = C_BG
+      ctx.fillStyle = getBgColor()
       ctx.font = 'bold 8px monospace'
       ctx.textAlign = 'center'
       ctx.fillText(isHead ? 'H' : 'T', x, y + 3)

@@ -1,7 +1,7 @@
 // ─── Draw Circle Rendering ───────────────────────────────────────────────────
 // Canvas drawing functions for the draw circle visualization.
 
-import { C_BG, C_GRID, C_TEXT_MUTED, CANVAS_SIZE } from '../../colors'
+import { getBgColor, getGridColor, getTextMutedColor, CANVAS_SIZE } from '../../colors'
 import { distance } from '../../utils'
 import { State, Point, C_DRAWN, C_APPROX, C_CENTER, C_RADIUS, C_PERFECT } from './types'
 
@@ -31,11 +31,11 @@ export function draw(
   state: State
 ): void {
   const s = CANVAS_SIZE
-  ctx.fillStyle = C_BG
+  ctx.fillStyle = getBgColor()
   ctx.fillRect(0, 0, s, s)
 
   // Draw grid
-  ctx.strokeStyle = C_GRID
+  ctx.strokeStyle = getGridColor()
   ctx.lineWidth = 1
   for (let x = 0; x <= s; x += s / 8) {
     ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, s); ctx.stroke()
@@ -45,7 +45,7 @@ export function draw(
   }
 
   if (state.points.length === 0) {
-    ctx.fillStyle = C_TEXT_MUTED
+    ctx.fillStyle = getTextMutedColor()
     ctx.font = '14px JetBrains Mono, monospace'
     ctx.textAlign = 'center'
     ctx.fillText('Click and drag to draw a circle', s / 2, s / 2)

@@ -1,17 +1,17 @@
-import { C_BG, C_GRID, C_AMBER } from '../../colors'
+import { getBgColor, getGridColor, getAmberColor } from '../../colors'
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
 export interface Point {
-  x: number
-  y: number
+	x: number
+	y: number
 }
 
 export interface Rect {
-  x: number
-  y: number
-  width: number
-  height: number
+	x: number
+	y: number
+	width: number
+	height: number
 }
 
 // ─── Background Drawing ──────────────────────────────────────────────────────
@@ -20,48 +20,48 @@ export interface Rect {
  * Fills the canvas with the background color.
  */
 export function clearCanvas(ctx: CanvasRenderingContext2D, width: number, height: number): void {
-  ctx.fillStyle = C_BG
-  ctx.fillRect(0, 0, width, height)
+	ctx.fillStyle = getBgColor()
+	ctx.fillRect(0, 0, width, height)
 }
 
 /**
  * Draws a standard grid pattern on the canvas.
  */
 export function drawGrid(
-  ctx: CanvasRenderingContext2D,
-  width: number,
-  height: number,
-  divisions = 8
+	ctx: CanvasRenderingContext2D,
+	width: number,
+	height: number,
+	divisions = 8
 ): void {
-  ctx.strokeStyle = C_GRID
-  ctx.lineWidth = 1
+	ctx.strokeStyle = getGridColor()
+	ctx.lineWidth = 1
 
-  for (let x = 0; x <= width; x += width / divisions) {
-    ctx.beginPath()
-    ctx.moveTo(x, 0)
-    ctx.lineTo(x, height)
-    ctx.stroke()
-  }
+	for (let x = 0; x <= width; x += width / divisions) {
+		ctx.beginPath()
+		ctx.moveTo(x, 0)
+		ctx.lineTo(x, height)
+		ctx.stroke()
+	}
 
-  for (let y = 0; y <= height; y += height / divisions) {
-    ctx.beginPath()
-    ctx.moveTo(0, y)
-    ctx.lineTo(width, y)
-    ctx.stroke()
-  }
+	for (let y = 0; y <= height; y += height / divisions) {
+		ctx.beginPath()
+		ctx.moveTo(0, y)
+		ctx.lineTo(width, y)
+		ctx.stroke()
+	}
 }
 
 /**
  * Clears the canvas and draws a grid background (common pattern).
  */
 export function drawBackground(
-  ctx: CanvasRenderingContext2D,
-  width: number,
-  height: number,
-  divisions = 8
+	ctx: CanvasRenderingContext2D,
+	width: number,
+	height: number,
+	divisions = 8
 ): void {
-  clearCanvas(ctx, width, height)
-  drawGrid(ctx, width, height, divisions)
+	clearCanvas(ctx, width, height)
+	drawGrid(ctx, width, height, divisions)
 }
 
 // ─── Shape Drawing ───────────────────────────────────────────────────────────
@@ -70,54 +70,54 @@ export function drawBackground(
  * Draws a circle outline.
  */
 export function drawCircle(
-  ctx: CanvasRenderingContext2D,
-  cx: number,
-  cy: number,
-  radius: number,
-  strokeStyle = C_AMBER,
-  lineWidth = 1.5
+	ctx: CanvasRenderingContext2D,
+	cx: number,
+	cy: number,
+	radius: number,
+	strokeStyle?: string,
+	lineWidth = 1.5
 ): void {
-  ctx.strokeStyle = strokeStyle
-  ctx.lineWidth = lineWidth
-  ctx.beginPath()
-  ctx.arc(cx, cy, radius, 0, Math.PI * 2)
-  ctx.stroke()
+	ctx.strokeStyle = strokeStyle ?? getAmberColor()
+	ctx.lineWidth = lineWidth
+	ctx.beginPath()
+	ctx.arc(cx, cy, radius, 0, Math.PI * 2)
+	ctx.stroke()
 }
 
 /**
  * Draws a filled circle.
  */
 export function fillCircle(
-  ctx: CanvasRenderingContext2D,
-  cx: number,
-  cy: number,
-  radius: number,
-  fillStyle: string
+	ctx: CanvasRenderingContext2D,
+	cx: number,
+	cy: number,
+	radius: number,
+	fillStyle: string
 ): void {
-  ctx.fillStyle = fillStyle
-  ctx.beginPath()
-  ctx.arc(cx, cy, radius, 0, Math.PI * 2)
-  ctx.fill()
+	ctx.fillStyle = fillStyle
+	ctx.beginPath()
+	ctx.arc(cx, cy, radius, 0, Math.PI * 2)
+	ctx.fill()
 }
 
 /**
  * Draws a line between two points.
  */
 export function drawLine(
-  ctx: CanvasRenderingContext2D,
-  x1: number,
-  y1: number,
-  x2: number,
-  y2: number,
-  strokeStyle = C_AMBER,
-  lineWidth = 1
+	ctx: CanvasRenderingContext2D,
+	x1: number,
+	y1: number,
+	x2: number,
+	y2: number,
+	strokeStyle?: string,
+	lineWidth = 1
 ): void {
-  ctx.strokeStyle = strokeStyle
-  ctx.lineWidth = lineWidth
-  ctx.beginPath()
-  ctx.moveTo(x1, y1)
-  ctx.lineTo(x2, y2)
-  ctx.stroke()
+	ctx.strokeStyle = strokeStyle ?? getAmberColor()
+	ctx.lineWidth = lineWidth
+	ctx.beginPath()
+	ctx.moveTo(x1, y1)
+	ctx.lineTo(x2, y2)
+	ctx.stroke()
 }
 
 /**

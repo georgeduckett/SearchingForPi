@@ -1,7 +1,7 @@
 // ─── Bouncing Boxes Preview ──────────────────────────────────────────────────
 // Preview renderer for the home page card.
 
-import { C_TEXT_MUTED, C_INSIDE, C_AMBER, PREVIEW_SIZE } from '../../colors'
+import { getTextMutedColor, getInsideColor, getAmberColor, PREVIEW_SIZE } from '../../colors'
 import { clearCanvas } from '../base/canvas'
 
 /**
@@ -13,7 +13,7 @@ export function drawPreview(ctx: CanvasRenderingContext2D, time: number): void {
   clearCanvas(ctx, s, s)
 
   // Wall
-  ctx.strokeStyle = C_TEXT_MUTED
+  ctx.strokeStyle = getTextMutedColor()
   ctx.lineWidth = 2
   ctx.beginPath()
   ctx.moveTo(10, 0)
@@ -22,11 +22,11 @@ export function drawPreview(ctx: CanvasRenderingContext2D, time: number): void {
 
   // Small box (Box 1) - bounces left and right
   const x1 = 10 + Math.abs(Math.sin(time * 0.8)) * 40
-  ctx.fillStyle = C_INSIDE
+  ctx.fillStyle = getInsideColor()
   ctx.fillRect(x1, s / 2 - 10, 20, 20)
 
   // Large box (Box 2) - moves more slowly
   const x2 = 65 + Math.abs(Math.sin(time * 0.6)) * 30
-  ctx.fillStyle = C_AMBER
+  ctx.fillStyle = getAmberColor()
   ctx.fillRect(x2, s / 2 - 10, 20, 20)
 }

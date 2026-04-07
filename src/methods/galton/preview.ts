@@ -1,7 +1,7 @@
 // ─── Galton Board Preview ───────────────────────────────────────────────────
 // Preview renderer for the home page card.
 
-import { C_INSIDE, C_AMBER, C_TEXT_MUTED, PREVIEW_SIZE } from '../../colors'
+import { getInsideColor, getAmberColor, getTextMutedColor, PREVIEW_SIZE } from '../../colors'
 import { clearCanvas } from '../base/canvas'
 
 /**
@@ -13,7 +13,7 @@ export function drawPreview(ctx: CanvasRenderingContext2D, _time: number): void 
   clearCanvas(ctx, s, s)
 
   // Draw pegs
-  ctx.fillStyle = C_TEXT_MUTED
+  ctx.fillStyle = getTextMutedColor()
   const rows = 5
   for (let row = 0; row < rows; row++) {
     for (let peg = 0; peg <= row; peg++) {
@@ -26,7 +26,7 @@ export function drawPreview(ctx: CanvasRenderingContext2D, _time: number): void 
   }
 
   // Draw bins with sample distribution
-  ctx.fillStyle = C_INSIDE
+  ctx.fillStyle = getInsideColor()
   const bins = [2, 4, 6, 4, 2]
   const maxH = 30
   for (let i = 0; i < 5; i++) {
@@ -35,7 +35,7 @@ export function drawPreview(ctx: CanvasRenderingContext2D, _time: number): void 
   }
 
   // Draw Gaussian curve overlay
-  ctx.strokeStyle = C_AMBER
+  ctx.strokeStyle = getAmberColor()
   ctx.lineWidth = 1.5
   ctx.beginPath()
   ctx.moveTo(s / 2 - 40, s - 15)

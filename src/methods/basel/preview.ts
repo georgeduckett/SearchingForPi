@@ -1,7 +1,7 @@
 // ─── Basel Problem Preview ───────────────────────────────────────────────────
 // Preview renderer for the home page card.
 
-import { C_AMBER, C_TEXT_MUTED, PREVIEW_SIZE } from '../../colors'
+import { getAmberColor, getTextMutedColor, PREVIEW_SIZE } from '../../colors'
 import { clearCanvas } from '../base/canvas'
 
 /**
@@ -81,7 +81,7 @@ export function drawPreview(ctx: CanvasRenderingContext2D, time: number): void {
   const radius = 16
 
   // Background circle
-  ctx.strokeStyle = C_TEXT_MUTED
+  ctx.strokeStyle = getTextMutedColor()
   ctx.lineWidth = 2
   ctx.beginPath()
   ctx.arc(cx, cy, radius, 0, Math.PI * 2)
@@ -89,7 +89,7 @@ export function drawPreview(ctx: CanvasRenderingContext2D, time: number): void {
 
   // Progress arc (fills as we approach π)
   if (termsShown > 0) {
-    ctx.strokeStyle = C_AMBER
+    ctx.strokeStyle = getAmberColor()
     ctx.lineWidth = 3
     ctx.beginPath()
     ctx.arc(cx, cy, radius, -Math.PI / 2, -Math.PI / 2 + convergence * Math.PI * 2)
@@ -97,7 +97,7 @@ export function drawPreview(ctx: CanvasRenderingContext2D, time: number): void {
   }
 
   // π symbol in center
-  ctx.fillStyle = termsShown > 0 ? C_AMBER : C_TEXT_MUTED
+  ctx.fillStyle = termsShown > 0 ? getAmberColor() : getTextMutedColor()
   ctx.font = 'bold 12px monospace'
   ctx.textAlign = 'center'
   ctx.textBaseline = 'middle'
@@ -105,13 +105,13 @@ export function drawPreview(ctx: CanvasRenderingContext2D, time: number): void {
   ctx.textBaseline = 'alphabetic'
 
   // Formula text at top
-  ctx.fillStyle = C_AMBER
+  ctx.fillStyle = getAmberColor()
   ctx.font = '10px monospace'
   ctx.textAlign = 'center'
   ctx.fillText('Σ 1/n² → π²/6', s / 2, 14)
 
   // Show n=value indicator
-  ctx.fillStyle = C_TEXT_MUTED
+  ctx.fillStyle = getTextMutedColor()
   ctx.font = '9px monospace'
   ctx.fillText(`n=${termsShown}`, s / 2, s - 6)
 }

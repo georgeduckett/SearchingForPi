@@ -1,7 +1,7 @@
 // ─── Circle Packing Preview ──────────────────────────────────────────────────
 // Preview renderer for the home page card.
 
-import { C_BG, C_INSIDE, PREVIEW_SIZE } from '../../colors'
+import { getBgColor, getInsideColor, PREVIEW_SIZE } from '../../colors'
 import { clearCanvas } from '../base/canvas'
 
 // ─── Preview State ───────────────────────────────────────────────────────────
@@ -64,7 +64,7 @@ export function drawPreview(ctx: CanvasRenderingContext2D, time: number): void {
   )
 
   // Draw background
-  ctx.fillStyle = C_BG
+  ctx.fillStyle = getBgColor()
   ctx.fillRect(0, 0, s, s)
 
   // Draw circles progressively with fade-in
@@ -73,13 +73,13 @@ export function drawPreview(ctx: CanvasRenderingContext2D, time: number): void {
     const timeSinceAdded = timeInCycle - (i + 1) * circleAddInterval
     const fadeInProgress = Math.min(1, timeSinceAdded * 4) // Quick fade over 0.25 seconds
 
-    ctx.fillStyle = C_INSIDE
+    ctx.fillStyle = getInsideColor()
     ctx.globalAlpha = 0.2 + 0.1 * fadeInProgress
     ctx.beginPath()
     ctx.arc(circle.x, circle.y, circle.r, 0, Math.PI * 2)
     ctx.fill()
 
-    ctx.strokeStyle = C_INSIDE
+    ctx.strokeStyle = getInsideColor()
     ctx.lineWidth = 1
     ctx.globalAlpha = 0.5 + 0.3 * fadeInProgress
     ctx.stroke()

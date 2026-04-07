@@ -1,7 +1,7 @@
 // ─── Coprimality Rendering ───────────────────────────────────────────────────
 // Canvas drawing functions for the coprimality visualization.
 
-import { C_BG, C_TEXT_MUTED, CANVAS_SIZE } from '../../colors'
+import { getBgColor, getTextMutedColor, CANVAS_SIZE } from '../../colors'
 import { State, GRID_SIZE, C_COPRIME, C_NOT_COPRIME } from './types'
 
 /**
@@ -14,7 +14,7 @@ export function draw(
   const W = CANVAS_SIZE
   const H = CANVAS_SIZE
 
-  ctx.fillStyle = C_BG
+  ctx.fillStyle = getBgColor()
   ctx.fillRect(0, 0, W, H)
 
   const cellSize = Math.min((W - 40) / GRID_SIZE, (H - 40) / GRID_SIZE)
@@ -56,7 +56,7 @@ export function draw(
   ctx.globalAlpha = 1
 
   // Labels
-  ctx.fillStyle = C_TEXT_MUTED
+  ctx.fillStyle = getTextMutedColor()
   ctx.font = '11px "JetBrains Mono", monospace'
   ctx.fillText('a', offsetX - 10, offsetY + GRID_SIZE * cellSize / 2)
   ctx.fillText('b', offsetX + GRID_SIZE * cellSize / 2 - 10, offsetY - 5)
