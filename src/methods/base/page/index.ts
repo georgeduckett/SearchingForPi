@@ -1,7 +1,5 @@
-// ─── Page Module Barrel Export ───────────────────────────────────────────────
-// Re-exports all types and functions from the page module.
+// Barrel export for page submodule.
 
-// ─── Types ────────────────────────────────────────────────────────────────────
 export type {
   PageOptions,
   PageContext,
@@ -11,11 +9,9 @@ export type {
   MethodPageMethods,
 } from './types'
 
-// ─── Factories ────────────────────────────────────────────────────────────────
 export { createPageFactory } from './createPageFactory'
 export { createMethodPageFactory } from './createMethodPageFactory'
 
-// ─── Templates ────────────────────────────────────────────────────────────────
 export {
   buildPageHeader,
   buildCanvas,
@@ -28,7 +24,6 @@ export {
   type ControlButtonsOptions,
 } from './templates'
 
-// ─── Lifecycle ────────────────────────────────────────────────────────────────
 export {
   createAnimationLifecycle,
   cancelAnimation,
@@ -41,7 +36,6 @@ export {
   type ControllerState,
 } from './lifecycle'
 
-// ─── DOM Helpers ──────────────────────────────────────────────────────────────
 export {
   getCanvasContext,
   getButton,
