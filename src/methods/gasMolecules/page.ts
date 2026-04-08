@@ -4,7 +4,19 @@
 import { fmt } from '../../utils'
 import { CANVAS_SIZE } from '../../colors'
 import { createMethodPageFactory, statCard, explanation, legend } from '../base/page'
-import { State, MAX_PARTICLES, TICKS_PER_FRAME, CONTAINER_PAD, PARTICLE_RADIUS, C_PARTICLE, C_WALL, createInitialState, gaussianRandom, estimatePi, calculateAvgSpeed } from './types'
+import {
+  State,
+  MAX_PARTICLES,
+  TICKS_PER_FRAME,
+  CONTAINER_PAD,
+  PARTICLE_RADIUS,
+  C_PARTICLE,
+  C_WALL,
+  createInitialState,
+  gaussianRandom,
+  estimatePi,
+  calculateAvgSpeed,
+} from './types'
 import { physicsStep } from './physics'
 import { draw } from './rendering'
 
@@ -32,14 +44,18 @@ export const createGasMoleculesPage = createMethodPageFactory<State>(
       ${statCard('Average speed <v>', 'gm-avg-speed')}
       ${legend([
         { color: C_PARTICLE, text: 'Gas particles' },
-        { color: C_WALL, text: 'Maxwell-Boltzmann curve' }
+        { color: C_WALL, text: 'Maxwell-Boltzmann curve' },
       ])}
-      ${explanation('How it works', [
-        'In an ideal gas, the Maxwell-Boltzmann speed distribution gives the mean speed as √(πT/2) in normalized units.',
-        'By simulating particles and measuring their average speed, we can estimate π: π = 2<v>²/T, where T is temperature.',
-        'The histogram shows the actual speed distribution compared to the theoretical Maxwell-Boltzmann curve.'
-      ], '<v> = √(πT/2)')}
-    `
+      ${explanation(
+        'How it works',
+        [
+          'In an ideal gas, the Maxwell-Boltzmann speed distribution gives the mean speed as √(πT/2) in normalized units.',
+          'By simulating particles and measuring their average speed, we can estimate π: π = 2<v>²/T, where T is temperature.',
+          'The histogram shows the actual speed distribution compared to the theoretical Maxwell-Boltzmann curve.',
+        ],
+        '<v> = √(πT/2)'
+      )}
+    `,
   },
   createInitialState(),
   {
@@ -88,7 +104,8 @@ export const createGasMoleculesPage = createMethodPageFactory<State>(
         ctx.state.particles.push({
           x: CONTAINER_PAD + PARTICLE_RADIUS + Math.random() * W,
           y: CONTAINER_PAD + PARTICLE_RADIUS + Math.random() * H,
-          vx, vy
+          vx,
+          vy,
         })
       }
 
@@ -105,7 +122,13 @@ export const createGasMoleculesPage = createMethodPageFactory<State>(
         if (!ctx.state.running) return
 
         for (let i = 0; i < TICKS_PER_FRAME; i++) {
-          physicsStep(ctx.state.particles, canvas.width, canvas.height, ctx.state.temperature, ctx.state.steps)
+          physicsStep(
+            ctx.state.particles,
+            canvas.width,
+            canvas.height,
+            ctx.state.temperature,
+            ctx.state.steps
+          )
           ctx.state.steps++
         }
 
@@ -170,6 +193,6 @@ export const createGasMoleculesPage = createMethodPageFactory<State>(
         cancelAnimationFrame(ctx.state.rafId)
         ctx.state.rafId = null
       }
-    }
+    },
   }
 )

@@ -37,7 +37,7 @@ export function getTimeToCollision(state: State): CollisionResult {
   let timeToBoxCollision = Infinity
   if (state.smallBoxV > state.largeBoxV) {
     const relVelocity = state.smallBoxV - state.largeBoxV
-    const gap = (state.largeBoxX - box2Size / 2) - (state.smallBoxX + BASE_BOX_SIZE / 2)
+    const gap = state.largeBoxX - box2Size / 2 - (state.smallBoxX + BASE_BOX_SIZE / 2)
     if (gap > -EPSILON) {
       timeToBoxCollision = gap / relVelocity
     }
@@ -46,7 +46,7 @@ export function getTimeToCollision(state: State): CollisionResult {
   // Time until box-wall collision
   let timeToWallCollision = Infinity
   if (state.smallBoxV < 0) {
-    const distToWall = (state.smallBoxX - BASE_BOX_SIZE / 2) - BASE_WALL_X
+    const distToWall = state.smallBoxX - BASE_BOX_SIZE / 2 - BASE_WALL_X
     if (distToWall > -EPSILON) {
       timeToWallCollision = distToWall / -state.smallBoxV
     }
@@ -74,8 +74,8 @@ export function applyBoxCollision(state: State): void {
   const v2 = state.largeBoxV
 
   // Elastic collision formulas
-  const newV1 = ((m1 - m2) / (m1 + m2)) * v1 + (2 * m2 / (m1 + m2)) * v2
-  const newV2 = (2 * m1 / (m1 + m2)) * v1 + ((m2 - m1) / (m1 + m2)) * v2
+  const newV1 = ((m1 - m2) / (m1 + m2)) * v1 + ((2 * m2) / (m1 + m2)) * v2
+  const newV2 = ((2 * m1) / (m1 + m2)) * v1 + ((m2 - m1) / (m1 + m2)) * v2
 
   state.smallBoxV = newV1
   state.largeBoxV = newV2
@@ -106,11 +106,7 @@ export function isSimulationComplete(state: State): boolean {
  * Update physics for one frame.
  * Handles multiple collisions per frame for high-k simulations.
  */
-export function updatePhysics(
-  state: State,
-  timestamp: number,
-  onCollision: () => void
-): void {
+export function updatePhysics(state: State, timestamp: number, onCollision: () => void): void {
   const elapsedTimeMS = Math.min(timestamp - state.time, 100)
   state.time = timestamp
   let timeRemaining = elapsedTimeMS / 1000
@@ -156,5 +152,5 @@ export function updatePhysics(
  * Calculate π approximation from collision count.
  */
 export function calculatePiApprox(collisions: number, k: number): number {
-  return collisions / (10 ** k)
+  return collisions / 10 ** k
 }

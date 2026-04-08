@@ -1,6 +1,9 @@
 // ─── Bouncing Boxes Types & Constants ────────────────────────────────────────
 // Type definitions and constants for the bouncing boxes method.
 
+// Controller type is defined in controller.ts to avoid circular dependency
+// The _controller property uses BouncingBoxesController interface
+
 // ─── Constants ───────────────────────────────────────────────────────────────
 export const BASE_CANVAS_W = 810
 export const BASE_CANVAS_H = 240
@@ -35,6 +38,8 @@ export interface State {
   currentOsc: OscillatorNode | null
   soundTimeout: ReturnType<typeof setTimeout> | null
   resizeObserver: ResizeObserver | null
+  /** Controller instance for cleanup (set during init) */
+  _controller?: { cleanup(): void }
 }
 
 // ─── Initial State Factory ───────────────────────────────────────────────────

@@ -29,7 +29,11 @@ export interface PlacementResult {
  * Attempt to place a new circle using random sequential adsorption.
  * Returns the placed circle or null if placement failed.
  */
-export function tryPlaceCircle(canvasWidth: number, canvasHeight: number, circles: Circle[]): PlacementResult {
+export function tryPlaceCircle(
+  canvasWidth: number,
+  canvasHeight: number,
+  circles: Circle[]
+): PlacementResult {
   const W = canvasWidth - PADDING * 2
   const H = canvasHeight - PADDING * 2
 
@@ -94,7 +98,11 @@ export function estimatePi(circles: Circle[], canvasWidth: number, canvasHeight:
 /**
  * Calculate the area coverage percentage.
  */
-export function calculateCoverage(circles: Circle[], canvasWidth: number, canvasHeight: number): number {
+export function calculateCoverage(
+  circles: Circle[],
+  canvasWidth: number,
+  canvasHeight: number
+): number {
   const totalArea = (canvasWidth - PADDING * 2) * (canvasHeight - PADDING * 2)
   let circleArea = 0
   for (const c of circles) {

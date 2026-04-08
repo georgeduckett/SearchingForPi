@@ -72,12 +72,18 @@ npm run preview
 
 ## Adding a new method
 
-1. Create `src/methods/myMethod.ts` — export a `createMyMethodPage()` factory that returns `{ render, cleanup }`.
-2. In `src/main.ts`, import and register it: `registerPage('my-method', createMyMethodPage)`.
-3. In `index.html`, add a `<li>` entry to `#nav-list`.
-4. In `src/methods/home.ts`, add a card to the `methods` array.
+1. Create a new directory `src/methods/myMethod/` with the following files:
+   - `index.ts` — Module barrel export
+   - `page.ts` — Page factory using `createMethodPageFactory`
+   - `types.ts` — State interface and constants
+   - `controller.ts` — Animation control logic
+   - `rendering.ts` — Canvas drawing functions
+   - `preview.ts` — Home page preview animation
+2. Add the page info to `src/methods/definitions.ts` in the `methodPages` array.
+3. Register the factory in `src/methods/registry/factories.ts`.
+4. Add preview registration in `src/methods/registry/previews.ts`.
 
-The router handles everything else via URL hashes.
+The router handles everything else via URL hashes. See `docs/ARCHITECTURE.md` for detailed patterns.
 
 ---
 
@@ -85,20 +91,52 @@ The router handles everything else via URL hashes.
 
 ```
 SearchingForPi/
-├── .github/workflows/deploy.yml   GitHub Actions deployment
+├── .github/workflows/deploy.yml    GitHub Actions deployment
+├── docs/
+│   └── ARCHITECTURE.md             Architecture patterns and guidelines
 ├── src/
-│   ├── main.ts                    Entry point — registers pages, starts router
-│   ├── router.ts                  Hash-based client-side router
-│   ├── style.css                  Global styles and design tokens
+│   ├── main.ts                     Entry point — registers pages, starts router
+│   ├── router.ts                   Hash-based client-side router
+│   ├── style.css                   Global styles and design tokens
+│   ├── colors.ts                   Color getters (reads from CSS variables)
+│   ├── cssVars.ts                  CSS custom property utilities
+│   ├── utils.ts                    Shared utility functions
+│   ├── navigation/                 Navigation components
+│   │   ├── sidebar.ts              Sidebar navigation builder
+│   │   ├── pageNav.ts              Page navigation controls
+│   │   └── theme.ts                Light/dark theme toggle
 │   └── methods/
-│       ├── home.ts                Introduction / method selection page
-│       ├── monteCarlo.ts          Monte Carlo visualisation
-│       ├── leibniz.ts             Leibniz series visualisation
-│       ├── buffon.ts              Buffon's Needle visualisation
-│       ├── coinToss.ts            Coin toss sequences visualisation
-│       ├── bouncingBoxes.ts       Bouncing boxes visualisation
-│       ├── archimedes.ts          Archimedes' polygons visualisation
-│       └── drawCircle.ts          Draw circle visualisation
+│       ├── definitions.ts          Page metadata (titles, descriptions)
+│       ├── home.ts                 Introduction / method selection page
+│       ├── homePreviews.ts         Preview animations for home page
+│       ├── registry/               Page factory and preview registries
+│       ├── base/                   Shared base modules
+│       │   ├── animation.ts        Animation loop helpers
+│       │   ├── controller.ts       Animation controller factories
+│       │   ├── canvas.ts           Canvas utilities
+│       │   ├── stats.ts            Stats panel helpers
+│       │   └── page/               Page factory system
+│       ├── monteCarlo/             Monte Carlo method
+│       │   ├── index.ts
+│       │   ├── page.ts
+│       │   ├── controller.ts
+│       │   ├── types.ts
+│       │   ├── rendering.ts
+│       │   ├── preview.ts
+│       │   └── sampling.ts         Domain-specific logic
+│       ├── leibniz/                Leibniz series method
+│       ├── buffon/                 Buffon's Needle method
+│       ├── coinToss/               Coin toss sequences method
+│       ├── bouncingBoxes/          Bouncing boxes method
+│       ├── archimedes/             Archimedes' polygons method
+│       ├── drawCircle/             Draw circle method
+│       ├── riemann/                Riemann integral method
+│       ├── basel/                  Basel problem method
+│       ├── wallis/                 Wallis product method
+│       ├── coprimality/            Coprimality method
+│       ├── galton/                 Galton board method
+│       ├── circlePacking/          Circle packing method
+│       └── gasMolecules/           Gas molecules method
 ├── index.html
 ├── vite.config.ts
 ├── tsconfig.json

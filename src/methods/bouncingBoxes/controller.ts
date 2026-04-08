@@ -3,7 +3,15 @@
 // Handles physics simulation, sound, and canvas resizing.
 
 import type { MethodPageContext } from '../base/page/types'
-import { State, BASE_CANVAS_W, BASE_CANVAS_H, BASE_INITIAL_X1, BASE_INITIAL_X2, V0, MOBILE_BREAKPOINT } from './types'
+import {
+  State,
+  BASE_CANVAS_W,
+  BASE_CANVAS_H,
+  BASE_INITIAL_X1,
+  BASE_INITIAL_X2,
+  V0,
+  MOBILE_BREAKPOINT,
+} from './types'
 import { updatePhysics, isSimulationComplete, calculatePiApprox } from './physics'
 import { createSoundManager } from './sound'
 import { draw, calculateCanvasSize } from './rendering'
@@ -21,10 +29,7 @@ export interface StatsElements {
 /**
  * Creates a stats updater function for Bouncing Boxes.
  */
-export function createStatsUpdater(
-  elements: StatsElements,
-  state: State
-): () => void {
+export function createStatsUpdater(elements: StatsElements, state: State): () => void {
   return function updateStats(): void {
     elements.hits.textContent = state.collisions.toString()
     const piApprox = calculatePiApprox(state.collisions, state.k)

@@ -1,7 +1,7 @@
 // ─── Gas Molecules Types ─────────────────────────────────────────────────────
 // Type definitions and constants for the gas molecules method.
 
-import { C_INSIDE, C_AMBER } from '../../colors'
+import { getInsideColor, getAmberColor } from '../../colors'
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 export const MAX_PARTICLES = 200
@@ -10,8 +10,8 @@ export const TICKS_PER_FRAME = 2
 export const CONTAINER_PAD = 30
 
 // Method-specific colors
-export const C_PARTICLE = C_INSIDE
-export const C_WALL = C_AMBER
+export const C_PARTICLE = getInsideColor()
+export const C_WALL = getAmberColor()
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 export interface Particle {
@@ -36,7 +36,7 @@ export function createInitialState(): State {
     temperature: 1,
     running: false,
     rafId: null,
-    steps: 0
+    steps: 0,
   }
 }
 

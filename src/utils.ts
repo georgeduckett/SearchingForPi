@@ -10,10 +10,7 @@ export function fmt(n: number, digits = 6): string {
 /**
  * Calculate the Euclidean distance between two points.
  */
-export function distance(
-  p1: { x: number; y: number },
-  p2: { x: number; y: number }
-): number {
+export function distance(p1: { x: number; y: number }, p2: { x: number; y: number }): number {
   return Math.sqrt((p2.x - p1.x) ** 2 + (p2.y - p1.y) ** 2)
 }
 
@@ -29,8 +26,8 @@ export function getCanvasCoords(
   const scaleY = canvas.height / rect.height
 
   // Handle both mouse events and touch events
-  const clientX = 'touches' in e ? e.touches[0]?.clientX ?? 0 : e.clientX
-  const clientY = 'touches' in e ? e.touches[0]?.clientY ?? 0 : e.clientY
+  const clientX = 'touches' in e ? (e.touches[0]?.clientX ?? 0) : e.clientX
+  const clientY = 'touches' in e ? (e.touches[0]?.clientY ?? 0) : e.clientY
 
   return {
     x: (clientX - rect.left) * scaleX,
@@ -89,4 +86,3 @@ export function getCanvasContext2D(canvas: HTMLCanvasElement): CanvasRenderingCo
   }
   return ctx
 }
-

@@ -13,12 +13,8 @@ export function buildPageHeader(options: {
   indexPrefix?: string
 }): string {
   const { title, subtitle, index, indexPrefix = '' } = options
-  const indexHtml = index
-    ? `<span class="page-index">${indexPrefix}${index}</span>`
-    : ''
-  const subtitleHtml = subtitle
-    ? `<p class="page-subtitle">${subtitle}</p>`
-    : ''
+  const indexHtml = index ? `<span class="page-index">${indexPrefix}${index}</span>` : ''
+  const subtitleHtml = subtitle ? `<p class="page-subtitle">${subtitle}</p>` : ''
 
   return `
     <header class="page-header">
@@ -50,10 +46,7 @@ export function buildCanvas(options: {
 /**
  * Builds a canvas with wrapper div (for viz-layout).
  */
-export function buildCanvasWithWrapper(options: {
-  width: number
-  height: number
-}): string {
+export function buildCanvasWithWrapper(options: { width: number; height: number }): string {
   const { width, height } = options
   return `
     <div class="canvas-wrapper">

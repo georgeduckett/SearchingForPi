@@ -10,7 +10,16 @@ import {
   statCard,
   explanation,
 } from '../base/page'
-import { State, Needle, CANVAS_W, CANVAS_H, NEEDLE_LENGTH, NEEDLES_PER_TICK, MAX_NEEDLES, createInitialState } from './types'
+import {
+  State,
+  Needle,
+  CANVAS_W,
+  CANVAS_H,
+  NEEDLE_LENGTH,
+  NEEDLES_PER_TICK,
+  MAX_NEEDLES,
+  createInitialState,
+} from './types'
 import { estimatePi, doesCross, generateRandomNeedle } from './physics'
 import { drawBackground, drawNeedle, drawScene } from './rendering'
 
@@ -31,12 +40,16 @@ export const createBuffonPage = createMethodPageFactory<State>(
       ${statCard('π estimate', 'estimate', { valueClass: 'stat-value large', errorId: 'error', progressId: 'progress' })}
       ${statCard('Needles dropped', 'total', { subtext: `of ${MAX_NEEDLES.toLocaleString()} total` })}
       ${statCard('Crossings', 'crosses')}
-      ${explanation('How it works', [
-        `Drop a needle of length <em>l</em> at random onto a surface ruled with parallel lines spaced <em>d</em> apart (here both are ${NEEDLE_LENGTH}px). The probability it crosses a line is:`,
-        'Rearranging: π = 2l / (d × P). We estimate P by counting crossings over many throws.',
-        'A needle crosses when its perpendicular projection reaches a ruled line — i.e. when ½l·|sin θ| ≥ distance to nearest line.',
-        'Use <em>Drop one</em> to watch individual needles fall, or <em>Start</em> to run the full simulation.',
-      ], 'P = 2l / (d × π)')}
+      ${explanation(
+        'How it works',
+        [
+          `Drop a needle of length <em>l</em> at random onto a surface ruled with parallel lines spaced <em>d</em> apart (here both are ${NEEDLE_LENGTH}px). The probability it crosses a line is:`,
+          'Rearranging: π = 2l / (d × P). We estimate P by counting crossings over many throws.',
+          'A needle crosses when its perpendicular projection reaches a ruled line — i.e. when ½l·|sin θ| ≥ distance to nearest line.',
+          'Use <em>Drop one</em> to watch individual needles fall, or <em>Start</em> to run the full simulation.',
+        ],
+        'P = 2l / (d × π)'
+      )}
     `,
   },
   createInitialState(),
@@ -91,7 +104,7 @@ export const createBuffonPage = createMethodPageFactory<State>(
         draw(_ctx) {
           updateStats()
         },
-        isRunning: (state) => state.running,
+        isRunning: state => state.running,
         onComplete() {
           btnStart.textContent = 'Done'
           btnStart.disabled = true
@@ -107,7 +120,13 @@ export const createBuffonPage = createMethodPageFactory<State>(
         const crosses = doesCross(params.cy, params.angle)
         const initialAngle = Math.random() * Math.PI * 2
 
-        state.currentNeedle = { cx: params.cx, cy: params.cy - 80, angle: initialAngle, crosses, scale: 3.0 }
+        state.currentNeedle = {
+          cx: params.cx,
+          cy: params.cy - 80,
+          angle: initialAngle,
+          crosses,
+          scale: 3.0,
+        }
         state.animationStartY = params.cy - 80
         state.animationEndY = params.cy
         state.initialAngle = initialAngle
@@ -119,10 +138,12 @@ export const createBuffonPage = createMethodPageFactory<State>(
           easing: Easing.easeInCubic,
           update(state, progress) {
             if (state.currentNeedle) {
-              state.currentNeedle.cy = state.animationStartY + (state.animationEndY - state.animationStartY) * progress
+              state.currentNeedle.cy =
+                state.animationStartY + (state.animationEndY - state.animationStartY) * progress
               state.currentNeedle.scale = 2.0 - (2.0 - 1.0) * progress
 
-              const angleDiff = ((state.finalAngle - state.initialAngle + Math.PI * 3) % (Math.PI * 2)) - Math.PI
+              const angleDiff =
+                ((state.finalAngle - state.initialAngle + Math.PI * 3) % (Math.PI * 2)) - Math.PI
               state.currentNeedle.angle = state.initialAngle + angleDiff * progress
             }
           },
@@ -189,7 +210,11 @@ export const createBuffonPage = createMethodPageFactory<State>(
       // Wire up buttons
       btnStart.addEventListener('click', () => {
         if (state.total >= MAX_NEEDLES) return
-        state.running ? stop() : start()
+        if (state.running) {
+          stop()
+        } else {
+          start()
+        }
       })
 
       btnStep.addEventListener('click', () => {

@@ -1,6 +1,8 @@
 // ─── Theme Toggle ───────────────────────────────────────────────────────────
 // Handles light/dark theme switching with localStorage persistence.
 
+import { clearCSSVarCache } from '../cssVars'
+
 const THEME_KEY = 'theme-preference'
 
 export type Theme = 'dark' | 'light'
@@ -10,10 +12,13 @@ export type Theme = 'dark' | 'light'
  */
 export function applyTheme(theme: Theme): void {
   const themeToggle = document.getElementById('theme-toggle')
-  
+
   document.body.classList.toggle('theme-light', theme === 'light')
   document.body.classList.toggle('theme-dark', theme === 'dark')
-  
+
+  // Clear cached CSS variable values so colors update for the new theme
+  clearCSSVarCache()
+
   if (themeToggle) {
     themeToggle.textContent = theme === 'light' ? '☾ Dark Mode' : '☀️ Light Mode'
     themeToggle.setAttribute('aria-pressed', String(theme === 'light'))
@@ -44,7 +49,7 @@ export function detectPreferredTheme(): Theme {
  */
 export function initTheme(): void {
   const themeToggle = document.getElementById('theme-toggle')
-  
+
   // Apply initial theme
   const initialTheme = getStoredTheme() ?? detectPreferredTheme()
   applyTheme(initialTheme)

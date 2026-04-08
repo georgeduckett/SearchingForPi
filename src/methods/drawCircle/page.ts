@@ -4,7 +4,15 @@
 import { fmt, distance, getCanvasCoords } from '../../utils'
 import { CANVAS_SIZE } from '../../colors'
 import { createMethodPageFactory, statCard, legend, explanation } from '../base/page'
-import { State, C_DRAWN, C_APPROX, C_CENTER, C_RADIUS, C_PERFECT, createInitialState } from './types'
+import {
+  State,
+  C_DRAWN,
+  C_APPROX,
+  C_CENTER,
+  C_RADIUS,
+  C_PERFECT,
+  createInitialState,
+} from './types'
 import { draw, calculateCenter, calculateAvgRadius } from './rendering'
 
 // ─── Page Factory ─────────────────────────────────────────────────────────────
@@ -47,10 +55,14 @@ export const createDrawCirclePage = createMethodPageFactory<State>(
         { color: C_CENTER, text: 'Center (average of all points)' },
         { color: C_RADIUS, text: 'Radius (from center to first point)' },
       ])}
-      ${explanation('How it works', [
-        'Draw a circle by clicking and dragging. Your circle is made of straight lines that connect the points you create. This means we know its exact length. The center is calculated as the average of all your points, with the radius being the average distance from that center.',
-        'The better your circle, the closer your approximation will be to π. Using smaller line segments gives smoother circles and better accuracy.',
-      ], 'π ≈ perimeter / (2 × r)')}
+      ${explanation(
+        'How it works',
+        [
+          'Draw a circle by clicking and dragging. Your circle is made of straight lines that connect the points you create. This means we know its exact length. The center is calculated as the average of all your points, with the radius being the average distance from that center.',
+          'The better your circle, the closer your approximation will be to π. Using smaller line segments gives smoother circles and better accuracy.',
+        ],
+        'π ≈ perimeter / (2 × r)'
+      )}
     `,
   },
   createInitialState(),
@@ -249,12 +261,12 @@ export const createDrawCirclePage = createMethodPageFactory<State>(
       window.addEventListener('mousemove', onMouseMove)
       window.addEventListener('mouseup', onMouseUp)
 
-      ctx.canvas.addEventListener('touchstart', (e) => {
+      ctx.canvas.addEventListener('touchstart', e => {
         e.preventDefault()
         handleTouchStart(e)
       })
 
-      ctx.canvas.addEventListener('touchmove', (e) => {
+      ctx.canvas.addEventListener('touchmove', e => {
         e.preventDefault()
         handleTouchMove(e)
       })
@@ -263,7 +275,7 @@ export const createDrawCirclePage = createMethodPageFactory<State>(
 
       btnClear.addEventListener('click', clear)
 
-      sliderLength.addEventListener('input', (e) => {
+      sliderLength.addEventListener('input', e => {
         state.segmentLength = parseInt((e.target as HTMLInputElement).value)
         elLength.textContent = `${state.segmentLength}px`
       })

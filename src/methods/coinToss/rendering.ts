@@ -1,22 +1,19 @@
 // ─── Coin Toss Rendering ─────────────────────────────────────────────────────
 // Canvas drawing functions for the coin toss visualization.
 
-import { C_BG, C_INSIDE, C_AMBER, C_TEXT_MUTED } from '../../colors'
+import { getBgColor, getInsideColor, getAmberColor, getTextMutedColor } from '../../colors'
 import { State, Sequence, CANVAS_W, CANVAS_H, MAX_GRID_COLS, MAX_GRID_ROWS } from './types'
 
 // Method-specific colors
-const C_RATIO = C_INSIDE
-const C_TARGET = C_AMBER
-const C_TEXT = C_TEXT_MUTED
+const C_RATIO = getInsideColor()
+const C_TARGET = getAmberColor()
+const C_TEXT = getTextMutedColor()
 
 /**
  * Draw the complete coin toss visualization.
  */
-export function draw(
-  ctx: CanvasRenderingContext2D,
-  state: State
-): void {
-  ctx.fillStyle = C_BG
+export function draw(ctx: CanvasRenderingContext2D, state: State): void {
+  ctx.fillStyle = getBgColor()
   ctx.fillRect(0, 0, CANVAS_W, CANVAS_H)
 
   drawGraph(ctx, state)
@@ -26,16 +23,13 @@ export function draw(
 /**
  * Draw the running estimate graph showing convergence to π/4.
  */
-function drawGraph(
-  ctx: CanvasRenderingContext2D,
-  state: State
-): void {
+function drawGraph(ctx: CanvasRenderingContext2D, state: State): void {
   const n = state.sequences.length
   if (n === 0) return
 
   // Draw target line and text first
   const targetScale = Math.max(0, Math.min(1, (Math.PI / 4 - 0.6) / 0.3))
-  const targetY = CANVAS_H - (targetScale * CANVAS_H)
+  const targetY = CANVAS_H - targetScale * CANVAS_H
   ctx.strokeStyle = C_TARGET
   ctx.lineWidth = 2
   ctx.setLineDash([5, 5])
@@ -47,7 +41,7 @@ function drawGraph(
 
   ctx.fillStyle = C_TEXT
   ctx.font = '12px monospace'
-  ctx.fillText(`π/4 ${(Math.PI/4).toFixed(2)}`, CANVAS_W - 70, targetY - 5)
+  ctx.fillText(`π/4 ${(Math.PI / 4).toFixed(2)}`, CANVAS_W - 70, targetY - 5)
 
   // Then draw running estimate graph
   ctx.strokeStyle = C_RATIO
@@ -59,15 +53,15 @@ function drawGraph(
     const avg = cumulativeSum / (i + 1)
     const x = (i / Math.max(n - 1, 1)) * CANVAS_W
     const scale = Math.max(0, Math.min(1, (avg - 0.6) / 0.3))
-    const y = CANVAS_H - (scale * CANVAS_H)
+    const y = CANVAS_H - scale * CANVAS_H
     if (i === 0) ctx.moveTo(x, y)
     else ctx.lineTo(x, y)
   }
   ctx.stroke()
 
   const lastX = ((n - 1) / Math.max(n - 1, 1)) * CANVAS_W
-  const lastScale = Math.max(0, Math.min(1, ((cumulativeSum / n) - 0.6) / 0.3))
-  const lastY = CANVAS_H - (lastScale * CANVAS_H)
+  const lastScale = Math.max(0, Math.min(1, (cumulativeSum / n - 0.6) / 0.3))
+  const lastY = CANVAS_H - lastScale * CANVAS_H
   ctx.fillStyle = C_RATIO
   ctx.beginPath()
   ctx.arc(lastX, lastY, 4, 0, Math.PI * 2)
@@ -77,10 +71,7 @@ function drawGraph(
 /**
  * Draw the grid of coin toss sequences.
  */
-function drawSequenceGrid(
-  ctx: CanvasRenderingContext2D,
-  state: State
-): void {
+function drawSequenceGrid(ctx: CanvasRenderingContext2D, state: State): void {
   const combined: Sequence[] = [...state.sequenceBatch]
   if (state.currentSequence) combined.push(state.currentSequence)
   if (combined.length === 0) return
@@ -97,7 +88,7 @@ function drawSequenceGrid(
     const finished = seq !== state.currentSequence
 
     for (let j = 0; j < Math.min(tosses.length, MAX_GRID_COLS); j++) {
-      const x = (j * (CANVAS_W / MAX_GRID_COLS)) + 15
+      const x = j * (CANVAS_W / MAX_GRID_COLS) + 15
       const isHead = tosses[j]
       const isNew = !finished && j === state.newCoinIndex
       ctx.fillStyle = isHead ? C_RATIO : '#888'

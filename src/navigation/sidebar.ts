@@ -44,7 +44,11 @@ export function initMobileNav(): void {
   }
 
   hamburger.addEventListener('click', () => {
-    sidebar.classList.contains('open') ? closeNav() : openNav()
+    if (sidebar.classList.contains('open')) {
+      closeNav()
+    } else {
+      openNav()
+    }
   })
 
   // Close when tapping the overlay

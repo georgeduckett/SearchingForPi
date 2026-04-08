@@ -3,7 +3,16 @@
 
 import { fmt } from '../../utils'
 import { createMethodPageFactory, statCard, explanation } from '../base/page'
-import { State, MAX_SEQUENCES, MAX_GRID_COLS, MAX_GRID_ROWS, createInitialState, createEmptySequence, advanceSequence, estimatePi } from './types'
+import {
+  State,
+  MAX_SEQUENCES,
+  MAX_GRID_COLS,
+  MAX_GRID_ROWS,
+  createInitialState,
+  createEmptySequence,
+  advanceSequence,
+  estimatePi,
+} from './types'
 import { draw } from './rendering'
 
 // ─── Page Factory ─────────────────────────────────────────────────────────────
@@ -23,12 +32,16 @@ export const createCoinTossPage = createMethodPageFactory<State>(
       ${statCard('π estimate', 'ct-estimate', { valueClass: 'stat-value large', errorId: 'ct-error', progressId: 'ct-bar' })}
       ${statCard('Sequences completed', 'ct-sequences', { subtext: `of ${MAX_SEQUENCES.toLocaleString()} max` })}
       ${statCard('Average heads/total ratio', 'ct-avg-ratio')}
-      ${explanation('The Coin Toss Method', [
-        'For each sequence: toss a coin repeatedly until the number of heads exceeds the number of tails. Record the ratio of heads to total tosses.',
-        'Surprisingly, this ratio converges to π/4. The expected number of tosses until heads exceed tails is π²/8, but the ratio of heads to total flips approaches π/4.',
-        'Press <em>Start</em> to watch sequences build step-by-step, or use <em>Show</em> to add individual sequences instantly.'
-      ], 'π/4 ≈ average(heads/total)')}
-    `
+      ${explanation(
+        'The Coin Toss Method',
+        [
+          'For each sequence: toss a coin repeatedly until the number of heads exceeds the number of tails. Record the ratio of heads to total tosses.',
+          'Surprisingly, this ratio converges to π/4. The expected number of tosses until heads exceed tails is π²/8, but the ratio of heads to total flips approaches π/4.',
+          'Press <em>Start</em> to watch sequences build step-by-step, or use <em>Show</em> to add individual sequences instantly.',
+        ],
+        'π/4 ≈ average(heads/total)'
+      )}
+    `,
   },
   createInitialState(),
   {
@@ -249,6 +262,6 @@ export const createCoinTossPage = createMethodPageFactory<State>(
         clearTimeout(ctx.state.highlightTimeout)
         ctx.state.highlightTimeout = null
       }
-    }
+    },
   }
 )

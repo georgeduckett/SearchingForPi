@@ -89,3 +89,28 @@ export function createCleanupFunction(
     onCleanup?.()
   }
 }
+
+// ─── Controller Cleanup Helper ────────────────────────────────────────────────
+
+/**
+ * State interface for pages that store a controller reference.
+ */
+export interface ControllerState {
+  /** Controller instance for cleanup (set during init) */
+  _controller?: { cleanup(): void }
+}
+
+/**
+ * Cleans up a controller stored in the state.
+ * This is a convenience helper for the common cleanup pattern.
+ *
+ * @example
+ * ```ts
+ * cleanup(ctx) {
+ *   cleanupController(ctx.state)
+ * }
+ * ```
+ */
+export function cleanupController<S extends ControllerState>(state: S): void {
+  state._controller?.cleanup()
+}

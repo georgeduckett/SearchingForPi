@@ -57,7 +57,7 @@ export const methodPages: PageInfo[] = [
   {
     hash: 'archimedes',
     title: "Archimedes' Polygons",
-    desc: "Squeeze π between inscribed and circumscribed regular polygons doubling in sides. Archimedes used just 96 sides to achieve remarkable precision in 250 BCE.",
+    desc: 'Squeeze π between inscribed and circumscribed regular polygons doubling in sides. Archimedes used just 96 sides to achieve remarkable precision in 250 BCE.',
     index: '06',
   },
   {

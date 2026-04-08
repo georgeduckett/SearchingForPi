@@ -39,13 +39,14 @@ export function createPiEstimateUpdater(
   return function updatePiEstimate(): void {
     const pi = getEstimate()
     elements.estimate.textContent = fmt(pi)
-    
+
     if (elements.error) {
       const error = Math.abs(pi - Math.PI)
       elements.error.textContent = `Error: ${fmt(error)}`
-      elements.error.className = 'stat-error ' + (error < improvingThreshold ? 'improving' : 'neutral')
+      elements.error.className =
+        'stat-error ' + (error < improvingThreshold ? 'improving' : 'neutral')
     }
-    
+
     if (elements.progress && getProgressValue) {
       const pct = Math.min((getProgressValue() / maxProgress) * 100, 100)
       elements.progress.style.width = `${pct}%`
@@ -101,9 +102,9 @@ export function updateErrorDisplay(
 ): void {
   const { goodThreshold = 0.01, acceptableThreshold = 0.1, decimals = 6 } = options
   const absError = Math.abs(error)
-  
+
   element.textContent = absError.toFixed(decimals)
-  
+
   if (absError < goodThreshold) {
     element.className = 'stat-error improving'
   } else if (absError < acceptableThreshold) {
@@ -118,11 +119,7 @@ export function updateErrorDisplay(
 /**
  * Updates a progress bar element.
  */
-export function updateProgressBar(
-  element: HTMLElement,
-  current: number,
-  max: number
-): void {
+export function updateProgressBar(element: HTMLElement, current: number, max: number): void {
   const pct = Math.min((current / max) * 100, 100)
   element.style.width = `${pct}%`
 }
@@ -132,12 +129,15 @@ export function updateProgressBar(
 /**
  * Formats a series term for display (e.g., "+1/3 = 0.333333").
  */
-export function formatSeriesTerm(n: number, options: {
-  /** Function to get the term value */
-  getTerm: (n: number) => number
-  /** Number of decimal places for value */
-  decimals?: number
-} ): string {
+export function formatSeriesTerm(
+  n: number,
+  options: {
+    /** Function to get the term value */
+    getTerm: (n: number) => number
+    /** Number of decimal places for value */
+    decimals?: number
+  }
+): string {
   const { getTerm, decimals = 6 } = options
   const term = getTerm(n)
   const sign = term > 0 ? '+' : '-'

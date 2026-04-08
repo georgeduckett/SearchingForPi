@@ -16,7 +16,7 @@ export function createInitialState(): State {
   return {
     rects: 0,
     running: false,
-    intervalId: null
+    intervalId: null,
   }
 }
 

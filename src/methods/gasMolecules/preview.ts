@@ -1,7 +1,7 @@
 // ─── Gas Molecules Preview ───────────────────────────────────────────────────
 // Preview renderer for the home page.
 
-import { C_BG, C_BORDER, PREVIEW_SIZE } from '../../colors'
+import { getBgColor, getBorderColor, PREVIEW_SIZE } from '../../colors'
 
 // ─── Preview State ────────────────────────────────────────────────────────────
 interface PreviewParticle {
@@ -29,7 +29,7 @@ function initPreviewParticles(): void {
       x: margin + radius + Math.random() * (s - margin * 2 - radius * 2),
       y: margin + radius + Math.random() * (s - margin * 2 - radius * 2),
       vx: Math.cos(angle) * speed,
-      vy: Math.sin(angle) * speed
+      vy: Math.sin(angle) * speed,
     })
   }
 }
@@ -45,10 +45,10 @@ export function drawPreview(ctx: CanvasRenderingContext2D, _time: number): void 
   const radius = 4
   const innerMargin = margin + radius
 
-  ctx.fillStyle = C_BG
+  ctx.fillStyle = getBgColor()
   ctx.fillRect(0, 0, s, s)
 
-  ctx.strokeStyle = C_BORDER
+  ctx.strokeStyle = getBorderColor()
   ctx.lineWidth = 1
   ctx.strokeRect(margin, margin, s - margin * 2, s - margin * 2)
 

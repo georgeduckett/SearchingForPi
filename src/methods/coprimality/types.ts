@@ -1,7 +1,7 @@
 // ─── Coprimality Types ───────────────────────────────────────────────────────
 // Type definitions and constants for the coprimality method.
 
-import { C_INSIDE, C_OUTSIDE } from '../../colors'
+import { getInsideColor, getOutsideColor } from '../../colors'
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 export const MAX_PAIRS = 5000
@@ -9,8 +9,8 @@ export const PAIRS_PER_TICK = 20
 export const GRID_SIZE = 50
 
 // Method-specific colors
-export const C_COPRIME = C_INSIDE
-export const C_NOT_COPRIME = C_OUTSIDE
+export const C_COPRIME = getInsideColor()
+export const C_NOT_COPRIME = getOutsideColor()
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 export interface Pair {
@@ -34,7 +34,7 @@ export function createInitialState(): State {
     coprimeCount: 0,
     totalPairs: 0,
     running: false,
-    rafId: null
+    rafId: null,
   }
 }
 

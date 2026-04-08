@@ -39,7 +39,7 @@ export function createInitialState(): State {
     autoRafId: null,
     newCoinIndex: null,
     highlightTimeout: null,
-    highlightComplete: false
+    highlightComplete: false,
   }
 }
 

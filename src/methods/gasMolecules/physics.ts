@@ -27,10 +27,22 @@ export function physicsStep(
     p.y += p.vy
 
     // Wall collisions (elastic)
-    if (p.x < minX) { p.x = minX; p.vx = Math.abs(p.vx) }
-    if (p.x > maxX) { p.x = maxX; p.vx = -Math.abs(p.vx) }
-    if (p.y < minY) { p.y = minY; p.vy = Math.abs(p.vy) }
-    if (p.y > maxY) { p.y = maxY; p.vy = -Math.abs(p.vy) }
+    if (p.x < minX) {
+      p.x = minX
+      p.vx = Math.abs(p.vx)
+    }
+    if (p.x > maxX) {
+      p.x = maxX
+      p.vx = -Math.abs(p.vx)
+    }
+    if (p.y < minY) {
+      p.y = minY
+      p.vy = Math.abs(p.vy)
+    }
+    if (p.y > maxY) {
+      p.y = maxY
+      p.vy = -Math.abs(p.vy)
+    }
 
     // Gentle thermalization toward temperature
     if (steps % 10 === 0) {
@@ -56,7 +68,8 @@ export function physicsStep(
         const dvy = p1.vy - p2.vy
         const dvDotDr = dvx * dx + dvy * dy
 
-        if (dvDotDr > 0) { // Approaching
+        if (dvDotDr > 0) {
+          // Approaching
           const scale = dvDotDr / (dist * dist)
           p1.vx -= scale * dx
           p1.vy -= scale * dy

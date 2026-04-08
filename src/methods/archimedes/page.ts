@@ -4,7 +4,15 @@
 import { fmt } from '../../utils'
 import { CANVAS_SIZE } from '../../colors'
 import { createMethodPageFactory, statCard, legend, explanation } from '../base/page'
-import { State, MAX_ITERATIONS, INITIAL_SIDES, createInitialState, calculateBounds, estimatePi, calculateGap } from './types'
+import {
+  State,
+  MAX_ITERATIONS,
+  INITIAL_SIDES,
+  createInitialState,
+  calculateBounds,
+  estimatePi,
+  calculateGap,
+} from './types'
 import { draw, C_POLYGON_INNER, C_POLYGON_OUTER, C_CIRCLE } from './rendering'
 
 // ─── Page Factory ────────────────────────────────────────────────────────────
@@ -49,11 +57,15 @@ export const createArchimedesPage = createMethodPageFactory<State>(
         { color: C_POLYGON_INNER, text: 'Inscribed polygon (π ≥ this)' },
         { color: C_CIRCLE, text: 'Unit circle (π = this)' },
       ])}
-      ${explanation('How it works', [
-        'Archimedes (≈250 BCE) approximated π by drawing regular polygons inside and outside a unit circle.',
-        'Starting with a hexagon (6 sides), each iteration doubles the number of sides. The polygons increasingly approximate the circle, squeezing π into an ever-narrower range.',
-        'With just 96 sides, Archimedes bounded π between 3.1408 and 3.1429 — an accuracy that stood for centuries.',
-      ], 'n·sin(π/n) ≤ π ≤ n·tan(π/n)')}
+      ${explanation(
+        'How it works',
+        [
+          'Archimedes (≈250 BCE) approximated π by drawing regular polygons inside and outside a unit circle.',
+          'Starting with a hexagon (6 sides), each iteration doubles the number of sides. The polygons increasingly approximate the circle, squeezing π into an ever-narrower range.',
+          'With just 96 sides, Archimedes bounded π between 3.1408 and 3.1429 — an accuracy that stood for centuries.',
+        ],
+        'n·sin(π/n) ≤ π ≤ n·tan(π/n)'
+      )}
     `,
   },
   createInitialState(),
@@ -112,7 +124,8 @@ export const createArchimedesPage = createMethodPageFactory<State>(
 
         const currentLower = state.startLower + (state.endLower - state.startLower) * state.progress
         const currentUpper = state.startUpper + (state.endUpper - state.startUpper) * state.progress
-        const currentSides = state.startSides + (state.targetSides - state.startSides) * state.progress
+        const currentSides =
+          state.startSides + (state.targetSides - state.startSides) * state.progress
 
         draw(ctx2d, currentSides, currentLower, currentUpper)
 
@@ -168,7 +181,10 @@ export const createArchimedesPage = createMethodPageFactory<State>(
 
         const playSequence = () => {
           const nextSides = state.sides * 2
-          if (nextSides > INITIAL_SIDES * Math.pow(2, MAX_ITERATIONS) || state.iteration >= MAX_ITERATIONS) {
+          if (
+            nextSides > INITIAL_SIDES * Math.pow(2, MAX_ITERATIONS) ||
+            state.iteration >= MAX_ITERATIONS
+          ) {
             btnPlay.disabled = true
             return
           }
@@ -192,7 +208,7 @@ export const createArchimedesPage = createMethodPageFactory<State>(
       btnStep.addEventListener('click', step)
       btnPlay.addEventListener('click', play)
       btnReset.addEventListener('click', reset)
-      selectIter.addEventListener('change', (e) => {
+      selectIter.addEventListener('change', e => {
         const iter = parseInt((e.target as HTMLSelectElement).value)
         const sides = INITIAL_SIDES * Math.pow(2, iter)
         stepTo(sides)

@@ -1,14 +1,14 @@
 // ─── Draw Circle Rendering ───────────────────────────────────────────────────
 // Canvas drawing functions for the draw circle visualization.
 
-import { C_BG, C_GRID, C_TEXT_MUTED, CANVAS_SIZE } from '../../colors'
+import { getBgColor, getGridColor, getTextMutedColor, CANVAS_SIZE } from '../../colors'
 import { distance } from '../../utils'
 import { State, Point, C_DRAWN, C_APPROX, C_CENTER, C_RADIUS, C_PERFECT } from './types'
 
 /**
  * Calculate center as average of all points.
  */
-export function calculateCenter(points: Point[]): { x: number, y: number } {
+export function calculateCenter(points: Point[]): { x: number; y: number } {
   if (points.length === 0) return { x: 0, y: 0 }
   const sum = points.reduce((acc, p) => ({ x: acc.x + p.x, y: acc.y + p.y }), { x: 0, y: 0 })
   return { x: sum.x / points.length, y: sum.y / points.length }
@@ -17,7 +17,7 @@ export function calculateCenter(points: Point[]): { x: number, y: number } {
 /**
  * Calculate average radius from center.
  */
-export function calculateAvgRadius(points: Point[], center: { x: number, y: number }): number {
+export function calculateAvgRadius(points: Point[], center: { x: number; y: number }): number {
   if (points.length === 0) return 0
   const sum = points.reduce((acc, p) => acc + distance(p, center), 0)
   return sum / points.length
@@ -26,26 +26,29 @@ export function calculateAvgRadius(points: Point[], center: { x: number, y: numb
 /**
  * Draw the complete draw circle visualization.
  */
-export function draw(
-  ctx: CanvasRenderingContext2D,
-  state: State
-): void {
+export function draw(ctx: CanvasRenderingContext2D, state: State): void {
   const s = CANVAS_SIZE
-  ctx.fillStyle = C_BG
+  ctx.fillStyle = getBgColor()
   ctx.fillRect(0, 0, s, s)
 
   // Draw grid
-  ctx.strokeStyle = C_GRID
+  ctx.strokeStyle = getGridColor()
   ctx.lineWidth = 1
   for (let x = 0; x <= s; x += s / 8) {
-    ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, s); ctx.stroke()
+    ctx.beginPath()
+    ctx.moveTo(x, 0)
+    ctx.lineTo(x, s)
+    ctx.stroke()
   }
   for (let y = 0; y <= s; y += s / 8) {
-    ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(s, y); ctx.stroke()
+    ctx.beginPath()
+    ctx.moveTo(0, y)
+    ctx.lineTo(s, y)
+    ctx.stroke()
   }
 
   if (state.points.length === 0) {
-    ctx.fillStyle = C_TEXT_MUTED
+    ctx.fillStyle = getTextMutedColor()
     ctx.font = '14px JetBrains Mono, monospace'
     ctx.textAlign = 'center'
     ctx.fillText('Click and drag to draw a circle', s / 2, s / 2)

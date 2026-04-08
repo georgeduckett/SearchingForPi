@@ -1,7 +1,7 @@
 // ─── Circle Packing Rendering ────────────────────────────────────────────────
 // Canvas drawing functions for the circle packing visualization.
 
-import { C_BG, C_TEXT_MUTED } from '../../colors'
+import { getBgColor, getTextMutedColor } from '../../colors'
 import { Circle, PADDING } from './types'
 
 // ─── Drawing Functions ───────────────────────────────────────────────────────
@@ -9,13 +9,18 @@ import { Circle, PADDING } from './types'
 /**
  * Draw the complete scene - bounding square and all circles.
  */
-export function draw(ctx: CanvasRenderingContext2D, circles: Circle[], canvasWidth: number, canvasHeight: number): void {
+export function draw(
+  ctx: CanvasRenderingContext2D,
+  circles: Circle[],
+  canvasWidth: number,
+  canvasHeight: number
+): void {
   // Background
-  ctx.fillStyle = C_BG
+  ctx.fillStyle = getBgColor()
   ctx.fillRect(0, 0, canvasWidth, canvasHeight)
 
   // Draw bounding square
-  ctx.strokeStyle = C_TEXT_MUTED
+  ctx.strokeStyle = getTextMutedColor()
   ctx.lineWidth = 1
   ctx.strokeRect(PADDING, PADDING, canvasWidth - PADDING * 2, canvasHeight - PADDING * 2)
 

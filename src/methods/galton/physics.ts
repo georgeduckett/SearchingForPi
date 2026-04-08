@@ -1,7 +1,21 @@
 // ─── Galton Board Physics ────────────────────────────────────────────────────
 // Ball physics and π estimation calculations.
 
-import { Ball, State, ROWS, NUM_BINS, BALL_RADIUS, PEG_RADIUS, GRAVITY, RESTITUTION, FRICTION, PEG_DAMPING, PEG_START_Y, PEG_SPACING_Y, PEG_SPACING_X } from './types'
+import {
+  Ball,
+  State,
+  ROWS,
+  NUM_BINS,
+  BALL_RADIUS,
+  PEG_RADIUS,
+  GRAVITY,
+  RESTITUTION,
+  FRICTION,
+  PEG_DAMPING,
+  PEG_START_Y,
+  PEG_SPACING_Y,
+  PEG_SPACING_X,
+} from './types'
 
 // ─── Ball Creation ───────────────────────────────────────────────────────────
 
@@ -112,6 +126,6 @@ export function estimatePi(state: State): number {
   variance /= total
 
   // π estimate from Stirling's approximation
-  const piEstimate = (total ** 2) / (2 * variance * peakBin ** 2)
+  const piEstimate = total ** 2 / (2 * variance * peakBin ** 2)
   return piEstimate
 }

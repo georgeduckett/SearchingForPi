@@ -1,6 +1,8 @@
 // ─── Leibniz Series Types & Constants ────────────────────────────────────────
 // Type definitions and constants for the Leibniz series method.
 
+import type { AnimationController } from '../base/controller'
+
 // ─── Constants ───────────────────────────────────────────────────────────────
 export const CANVAS_W = 560
 export const CANVAS_H = 320
@@ -14,6 +16,8 @@ export interface State {
   termIndex: number
   intervalId: ReturnType<typeof setInterval> | null
   rafId: number | null // For AnimationState compatibility
+  /** Controller instance for cleanup (set during init) */
+  _controller?: AnimationController
 }
 
 // ─── Initial State Factory ───────────────────────────────────────────────────

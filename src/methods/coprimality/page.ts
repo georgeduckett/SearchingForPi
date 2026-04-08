@@ -4,7 +4,15 @@
 import { fmt, isCoprime } from '../../utils'
 import { CANVAS_SIZE } from '../../colors'
 import { createMethodPageFactory, statCard, legend, explanation } from '../base/page'
-import { State, MAX_PAIRS, PAIRS_PER_TICK, C_COPRIME, C_NOT_COPRIME, createInitialState, estimatePi } from './types'
+import {
+  State,
+  MAX_PAIRS,
+  PAIRS_PER_TICK,
+  C_COPRIME,
+  C_NOT_COPRIME,
+  createInitialState,
+  estimatePi,
+} from './types'
 import { draw } from './rendering'
 
 // ─── Page Factory ─────────────────────────────────────────────────────────────
@@ -28,11 +36,15 @@ export const createCoprimalityPage = createMethodPageFactory<State>(
         { color: C_COPRIME, text: 'Coprime (GCD = 1)' },
         { color: C_NOT_COPRIME, text: 'Not coprime (GCD > 1)' },
       ])}
-      ${explanation('How it works', [
-        'Two random positive integers are coprime (share no common factors other than 1) with probability 6/π².',
-        'By generating many random pairs and counting coprimes, we can estimate π: π ≈ √(6 / P(coprime)).',
-        'The grid visualizes pairs by their values modulo 50, coloring each by whether they\'re coprime.',
-      ], 'P(coprime) = 6/π² ≈ 0.6079')}
+      ${explanation(
+        'How it works',
+        [
+          'Two random positive integers are coprime (share no common factors other than 1) with probability 6/π².',
+          'By generating many random pairs and counting coprimes, we can estimate π: π ≈ √(6 / P(coprime)).',
+          "The grid visualizes pairs by their values modulo 50, coloring each by whether they're coprime.",
+        ],
+        'P(coprime) = 6/π² ≈ 0.6079'
+      )}
     `,
   },
   createInitialState(),
@@ -57,7 +69,13 @@ export const createCoprimalityPage = createMethodPageFactory<State>(
         elPairs.textContent = state.totalPairs.toLocaleString()
         elCoprime.textContent = state.coprimeCount.toLocaleString()
         elError.textContent = state.totalPairs === 0 ? 'Error: —' : `Error: ${fmt(error)}`
-        elError.className = 'stat-error ' + (error < 0.1 || state.totalPairs < 100 ? 'neutral' : error < 0.5 ? 'improving' : 'neutral')
+        elError.className =
+          'stat-error ' +
+          (error < 0.1 || state.totalPairs < 100
+            ? 'neutral'
+            : error < 0.5
+              ? 'improving'
+              : 'neutral')
       }
 
       // Generate random pairs

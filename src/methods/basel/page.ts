@@ -2,7 +2,7 @@
 // Main page factory for the Basel problem method.
 
 import { fmt } from '../../utils'
-import { C_INSIDE, C_AMBER, CANVAS_SIZE } from '../../colors'
+import { getInsideColor, getAmberColor, CANVAS_SIZE } from '../../colors'
 import { createMethodPageFactory, statCard, legend, explanation } from '../base/page'
 import { State, MAX_TERMS, estimatePi, createInitialState } from './types'
 import { draw } from './rendering'
@@ -25,13 +25,17 @@ export const createBaselPage = createMethodPageFactory<State>(
       ${statCard('Current sum ∑1/n²', 'sum', { subtext: '→ π²/6 ≈ 1.6449' })}
       ${statCard('Terms added', 'terms', { subtext: `of ${MAX_TERMS} max` })}
       ${legend([
-        { color: C_INSIDE, text: 'Cumulative sum' },
-        { color: C_AMBER, text: 'Limit π²/6' },
+        { color: getInsideColor(), text: 'Cumulative sum' },
+        { color: getAmberColor(), text: 'Limit π²/6' },
       ])}
-      ${explanation('How it works', [
-        'Euler proved in 1734 that the sum of reciprocal squares equals π²/6. This was a famous open problem known as the Basel Problem.',
-        'Each term 1/n² is visualized as a rectangle. The total height of all rectangles approaches π²/6 ≈ 1.6449. Therefore π ≈ √(6 × sum).',
-      ], '∑₁^∞ 1/n² = π²/6')}
+      ${explanation(
+        'How it works',
+        [
+          'Euler proved in 1734 that the sum of reciprocal squares equals π²/6. This was a famous open problem known as the Basel Problem.',
+          'Each term 1/n² is visualized as a rectangle. The total height of all rectangles approaches π²/6 ≈ 1.6449. Therefore π ≈ √(6 × sum).',
+        ],
+        '∑₁^∞ 1/n² = π²/6'
+      )}
     `,
   },
   createInitialState(),

@@ -1,51 +1,53 @@
 /* ─── CSS Variables ────────────────────────────────────────────────────────── */
 :root {
-  --bg-deep:        #0c0e14;
-  --bg-surface:     #13161f;
-  --bg-raised:      #1a1e2b;
-  --border:         #2a2f42;
-  --border-bright:  #3d4460;
+  --bg-deep: #0c0e14;
+  --bg-surface: #13161f;
+  --bg-raised: #1a1e2b;
+  --border: #2a2f42;
+  --border-bright: #3d4460;
 
-  --text-primary:   #e8e4d9;
+  --text-primary: #e8e4d9;
   --text-secondary: #8a8fa8;
-  --text-muted:     #4a5068;
+  --text-muted: #4a5068;
 
-  --amber:          #c8922a;
-  --amber-bright:   #e8ac42;
-  --amber-dim:      #7a5518;
-  --amber-glow:     rgba(200, 146, 42, 0.15);
+  --amber: #c8922a;
+  --amber-bright: #e8ac42;
+  --amber-dim: #7a5518;
+  --amber-glow: rgba(200, 146, 42, 0.15);
 
-  --inside:         #4a9eff;
-  --outside:        #ff6b6b;
-  --needle:         #c8922a;
+  --inside: #4a9eff;
+  --outside: #ff6b6b;
+  --success: #4ecb71;
+  --needle: #c8922a;
 
-  --font-display:   'Cormorant Garamond', Georgia, serif;
-  --font-mono:      'JetBrains Mono', 'Courier New', monospace;
+  --font-display: 'Cormorant Garamond', Georgia, serif;
+  --font-mono: 'JetBrains Mono', 'Courier New', monospace;
 
-  --sidebar-w:      260px;
-  --radius:         6px;
+  --sidebar-w: 260px;
+  --radius: 6px;
 }
 
 /* ─── Light theme overrides ─────────────────────────────────────────────────── */
 body.theme-light {
-  --bg-deep:        #f2f4f8;
-  --bg-surface:     #ffffff;
-  --bg-raised:      #f8fafc;
-  --border:         #d7dbe4;
-  --border-bright:  #c1c7d4;
+  --bg-deep: #f2f4f8;
+  --bg-surface: #ffffff;
+  --bg-raised: #f8fafc;
+  --border: #d7dbe4;
+  --border-bright: #c1c7d4;
 
-  --text-primary:   #1b1f29;
+  --text-primary: #1b1f29;
   --text-secondary: #56616f;
-  --text-muted:     #7a8695;
+  --text-muted: #7a8695;
 
-  --amber:          #a87314;
-  --amber-bright:   #c2852f;
-  --amber-dim:      #7f5f26;
-  --amber-glow:     rgba(194, 145, 64, 0.15);
+  --amber: #a87314;
+  --amber-bright: #c2852f;
+  --amber-dim: #7f5f26;
+  --amber-glow: rgba(194, 145, 64, 0.15);
 
-  --inside:         #3c79d9;
-  --outside:        #d15456;
-  --needle:         #a87314;
+  --inside: #3c79d9;
+  --outside: #d15456;
+  --success: #3cb865;
+  --needle: #a87314;
 }
 
 body.theme-light .nav-link:hover {
@@ -57,9 +59,16 @@ body.theme-light .btn {
 }
 
 /* ─── Reset & Base ──────────────────────────────────────────────────────────── */
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
 
-html, body {
+html,
+body {
   height: 100%;
   background: var(--bg-deep);
   color: var(--text-primary);
@@ -154,8 +163,6 @@ html, body {
   border-left-color: var(--amber);
 }
 
-
-
 .nav-label {
   font-size: 0.8rem;
   letter-spacing: 0.02em;
@@ -200,8 +207,14 @@ html, body {
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(8px); }
-  to   { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* ─── Page Header ───────────────────────────────────────────────────────────── */
@@ -323,8 +336,12 @@ canvas {
   margin-top: 8px;
 }
 
-.stat-error.improving { color: #4ecb71; }
-.stat-error.neutral   { color: var(--text-muted); }
+.stat-error.improving {
+  color: #4ecb71;
+}
+.stat-error.neutral {
+  color: var(--text-muted);
+}
 
 /* ─── Controls ──────────────────────────────────────────────────────────────── */
 .controls {
@@ -448,7 +465,9 @@ canvas {
   margin-bottom: 10px;
 }
 
-.explanation p:last-child { margin-bottom: 0; }
+.explanation p:last-child {
+  margin-bottom: 0;
+}
 
 .formula {
   font-family: var(--font-mono);
@@ -511,7 +530,6 @@ canvas {
   padding: 20px;
   min-width: 0;
 }
-
 
 .method-card-title {
   font-family: var(--font-display);
@@ -594,7 +612,8 @@ canvas {
 /* ─── Mobile (≤ 700px) ──────────────────────────────────────────────────────── */
 @media (max-width: 700px) {
   /* Use dynamic viewport height to avoid iOS URL-bar clipping */
-  html, body {
+  html,
+  body {
     height: 100%;
   }
 
@@ -633,7 +652,7 @@ canvas {
     font-style: italic;
     font-weight: 300;
   }
-  
+
   /* ── Mobile nav buttons (prev/next) ── */
   .mobile-nav-buttons {
     display: flex;
@@ -641,7 +660,7 @@ canvas {
     gap: 4px;
     margin-left: auto;
   }
-  
+
   .mobile-nav-btn {
     display: flex;
     align-items: center;
@@ -656,22 +675,22 @@ canvas {
     color: var(--text-secondary);
     transition: all 0.15s ease;
   }
-  
+
   .mobile-nav-btn:hover:not(:disabled) {
     background: var(--bg-raised);
     color: var(--text-primary);
   }
-  
+
   .mobile-nav-btn:disabled {
     opacity: 0.3;
     cursor: not-allowed;
   }
-  
+
   .mobile-nav-btn svg {
     width: 20px;
     height: 20px;
   }
-  
+
   /* ── Hamburger button ── */
   #hamburger {
     display: flex;
@@ -823,9 +842,9 @@ canvas {
     overflow-x: auto;
     white-space: nowrap;
   }
-  
+
   /* ── Bouncing boxes canvas: full width on mobile ── */
   .canvas-wrapper-bouncing {
     max-width: none;
   }
-  }
+}

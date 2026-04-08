@@ -23,10 +23,7 @@ export interface StatsElements {
 /**
  * Creates a stats updater function for Leibniz method.
  */
-export function createStatsUpdater(
-  elements: StatsElements,
-  state: State
-): () => void {
+export function createStatsUpdater(elements: StatsElements, state: State): () => void {
   return function updateStats(): void {
     const n = state.terms.length
     if (n === 0) {
@@ -92,7 +89,7 @@ export function createLeibnizController(
       addTerm(state, ctx2d)
       updateStats()
     },
-    isComplete: (state) => state.termIndex >= MAX_TERMS,
+    isComplete: state => state.termIndex >= MAX_TERMS,
     onComplete: () => {
       btnStart.disabled = false
       btnStart.textContent = state.termIndex >= MAX_TERMS ? 'Done' : 'Resume'

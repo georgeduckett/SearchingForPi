@@ -2,14 +2,14 @@
 // Main page factory for the Wallis product method.
 
 import { fmt } from '../../utils'
-import { C_INSIDE, C_OUTSIDE, C_AMBER, CANVAS_SIZE } from '../../colors'
+import { getInsideColor, getOutsideColor, getAmberColor, CANVAS_SIZE } from '../../colors'
 import { createMethodPageFactory, statCard, legend, explanation } from '../base/page'
 import { State, MAX_FACTORS, getFactor, estimatePi, createInitialState } from './types'
 import { draw } from './rendering'
 
 // Method-specific colors for UI
-const C_OVER = C_INSIDE
-const C_UNDER = C_OUTSIDE
+const C_OVER = getInsideColor()
+const C_UNDER = getOutsideColor()
 
 // ─── Page Factory ────────────────────────────────────────────────────────────
 export const createWallisPage = createMethodPageFactory<State>(
@@ -31,12 +31,16 @@ export const createWallisPage = createMethodPageFactory<State>(
       ${legend([
         { color: C_OVER, text: 'Over π/2' },
         { color: C_UNDER, text: 'Under π/2' },
-        { color: C_AMBER, text: 'Target π/2' },
+        { color: getAmberColor(), text: 'Target π/2' },
       ])}
-      ${explanation('How it works', [
-        'Discovered by John Wallis in 1655, this infinite product represents π/2 as an elegant alternating product of fractions.',
-        'Each odd-numbered factor (2n/(2n-1)) is greater than 1 and temporarily pushes the product above π/2. Each even-numbered factor (2n/(2n+1)) brings it back below. This oscillation gradually dampens as the product converges.',
-      ], 'π/2 = (2/1)·(2/3)·(4/3)·…')}
+      ${explanation(
+        'How it works',
+        [
+          'Discovered by John Wallis in 1655, this infinite product represents π/2 as an elegant alternating product of fractions.',
+          'Each odd-numbered factor (2n/(2n-1)) is greater than 1 and temporarily pushes the product above π/2. Each even-numbered factor (2n/(2n+1)) brings it back below. This oscillation gradually dampens as the product converges.',
+        ],
+        'π/2 = (2/1)·(2/3)·(4/3)·…'
+      )}
     `,
   },
   createInitialState(),

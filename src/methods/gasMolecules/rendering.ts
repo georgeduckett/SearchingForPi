@@ -1,20 +1,17 @@
 // ─── Gas Molecules Rendering ─────────────────────────────────────────────────
 // Canvas drawing functions for the gas molecules visualization.
 
-import { C_BG, CANVAS_SIZE } from '../../colors'
+import { getBgColor, CANVAS_SIZE } from '../../colors'
 import { State, PARTICLE_RADIUS, CONTAINER_PAD, C_PARTICLE, C_WALL } from './types'
 
 /**
  * Draw the complete gas molecules visualization.
  */
-export function draw(
-  ctx: CanvasRenderingContext2D,
-  state: State
-): void {
+export function draw(ctx: CanvasRenderingContext2D, state: State): void {
   const W = CANVAS_SIZE
   const H = CANVAS_SIZE
 
-  ctx.fillStyle = C_BG
+  ctx.fillStyle = getBgColor()
   ctx.fillRect(0, 0, W, H)
 
   // Draw container
@@ -44,10 +41,7 @@ export function draw(
 /**
  * Draw speed histogram with Maxwell-Boltzmann reference curve.
  */
-function drawHistogram(
-  ctx: CanvasRenderingContext2D,
-  state: State
-): void {
+function drawHistogram(ctx: CanvasRenderingContext2D, state: State): void {
   if (state.particles.length < 5) return
 
   const W = CANVAS_SIZE
@@ -56,9 +50,7 @@ function drawHistogram(
   const histX = CONTAINER_PAD
 
   // Calculate speeds
-  const speeds = state.particles.map(p =>
-    Math.sqrt(p.vx * p.vx + p.vy * p.vy)
-  )
+  const speeds = state.particles.map(p => Math.sqrt(p.vx * p.vx + p.vy * p.vy))
 
   // Create histogram bins
   const maxSpeed = Math.max(...speeds, 5)
@@ -91,7 +83,7 @@ function drawHistogram(
   for (let i = 0; i <= numBins; i++) {
     const v = (i / numBins) * maxSpeed
     // 2D Maxwell-Boltzmann: f(v) = (v/T) * exp(-v²/(2T)) for normalized distribution
-    const fv = (v / state.temperature) * Math.exp(-v * v / (2 * state.temperature))
+    const fv = (v / state.temperature) * Math.exp((-v * v) / (2 * state.temperature))
     const maxFv = 1 / (state.temperature * Math.sqrt(Math.E)) // Peak value
     const normalizedFv = fv / maxFv
     const y = histY + histH - normalizedFv * histH

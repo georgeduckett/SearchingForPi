@@ -1,7 +1,7 @@
 // ─── Riemann Preview ─────────────────────────────────────────────────────────
 // Preview renderer for the home page.
 
-import { C_INSIDE, C_AMBER, PREVIEW_SIZE } from '../../colors'
+import { getInsideColor, getAmberColor, PREVIEW_SIZE } from '../../colors'
 import { clearCanvas } from '../base/canvas'
 
 /**
@@ -11,7 +11,7 @@ export function drawPreview(ctx: CanvasRenderingContext2D, _time: number): void 
   const s = PREVIEW_SIZE
   clearCanvas(ctx, s, s)
 
-  ctx.strokeStyle = C_AMBER
+  ctx.strokeStyle = getAmberColor()
   ctx.lineWidth = 1.5
   ctx.beginPath()
   for (let x = 0; x <= s - 10; x++) {
@@ -23,7 +23,7 @@ export function drawPreview(ctx: CanvasRenderingContext2D, _time: number): void 
   }
   ctx.stroke()
 
-  ctx.fillStyle = C_INSIDE
+  ctx.fillStyle = getInsideColor()
   ctx.globalAlpha = 0.5
   const n = 8
   for (let i = 0; i < n; i++) {

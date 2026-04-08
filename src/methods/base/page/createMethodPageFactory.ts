@@ -10,12 +10,7 @@ import {
   buildControlsContainer,
   buildVizLayout,
 } from './templates'
-import {
-  createAnimationLifecycle,
-  cancelAnimation,
-  cloneState,
-  deferInit,
-} from './lifecycle'
+import { createAnimationLifecycle, cancelAnimation, cloneState, deferInit } from './lifecycle'
 import {
   getCanvasContext,
   getStatsPanel,

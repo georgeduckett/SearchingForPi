@@ -1,26 +1,65 @@
-/**
- * Shared color constants for visualizations.
- * Colors are aligned with CSS custom properties in style.css.
- */
+// ─── Shared Color Constants ───────────────────────────────────────────────────
+// Colors are read from CSS custom properties defined in style.css.
+// This ensures a single source of truth for colors across JS and CSS.
 
-// Background colors
-export const C_BG = '#13161f' // --bg-surface
-export const C_GRID = '#1a1e2b' // grid lines
-export const C_BORDER = '#2a2f42' // --border
+import { getCSSVarCached } from './cssVars'
 
-// Text colors
-export const C_TEXT_MUTED = '#4a5068' // --text-muted
-export const C_TEXT_PRIMARY = '#e8e4d9' // --text-primary
+// ─── Color Getters ────────────────────────────────────────────────────────────
+// These functions read from CSS variables at runtime, supporting theme changes.
+// Use these for canvas rendering where CSS classes can't be applied.
 
-// Accent colors
-export const C_AMBER = '#c8922a' // --amber
-export const C_AMBER_BRIGHT = '#e8ac42' // --amber-bright
+/** Background surface color (--bg-surface) */
+export function getBgColor(): string {
+  return getCSSVarCached('bg-surface', '#13161f')
+}
 
-// Semantic colors
-export const C_INSIDE = '#4a9eff' // Points inside circle / positive values
-export const C_OUTSIDE = '#ff6b6b' // Points outside / negative values
-export const C_SUCCESS = '#4ecb71' // Success / radius / good values
+/** Grid line color */
+export function getGridColor(): string {
+  return getCSSVarCached('bg-raised', '#1a1e2b')
+}
 
-// Canvas size constants
+/** Border color */
+export function getBorderColor(): string {
+  return getCSSVarCached('border', '#2a2f42')
+}
+
+/** Muted text color */
+export function getTextMutedColor(): string {
+  return getCSSVarCached('text-muted', '#4a5068')
+}
+
+/** Primary text color */
+export function getTextColor(): string {
+  return getCSSVarCached('text-primary', '#e8e4d9')
+}
+
+/** Amber accent color */
+export function getAmberColor(): string {
+  return getCSSVarCached('amber', '#c8922a')
+}
+
+/** Bright amber accent color */
+export function getAmberBrightColor(): string {
+  return getCSSVarCached('amber-bright', '#e8ac42')
+}
+
+/** Inside/positive semantic color */
+export function getInsideColor(): string {
+  return getCSSVarCached('inside', '#4a9eff')
+}
+
+/** Outside/negative semantic color */
+export function getOutsideColor(): string {
+  return getCSSVarCached('outside', '#ff6b6b')
+}
+
+/** Success/positive semantic color */
+export function getSuccessColor(): string {
+  return getCSSVarCached('success', '#4ecb71')
+}
+
+// ─── Canvas Size Constants ────────────────────────────────────────────────────
+// These are layout constants, not colors, but are kept here for convenience.
+
 export const CANVAS_SIZE = 560
 export const PREVIEW_SIZE = 140

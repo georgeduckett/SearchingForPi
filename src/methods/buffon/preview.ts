@@ -1,7 +1,7 @@
 // ─── Buffon's Needle Preview ────────────────────────────────────────────────
 // Preview renderer for the home page card.
 
-import { C_BORDER, C_TEXT_MUTED, C_AMBER, PREVIEW_SIZE } from '../../colors'
+import { getBorderColor, getTextMutedColor, getAmberColor, PREVIEW_SIZE } from '../../colors'
 import { clearCanvas, drawLine } from '../base/canvas'
 
 // ─── Preview Constants ───────────────────────────────────────────────────────
@@ -16,11 +16,15 @@ const PREV_NEEDLE_LEN = 20
  */
 export function drawPreview(ctx: CanvasRenderingContext2D, _time: number): void {
   const s = PREVIEW_SIZE
+  const borderColor = getBorderColor()
+  const textMutedColor = getTextMutedColor()
+  const amberColor = getAmberColor()
+
   clearCanvas(ctx, s, s)
 
   // Draw horizontal lines
   for (let y = PREV_LINE_START; y < s; y += PREV_LINE_SPACING) {
-    drawLine(ctx, 0, y, s, y, C_BORDER, 1)
+    drawLine(ctx, 0, y, s, y, borderColor, 1)
   }
 
   // Draw needles with pseudo-random positions
@@ -35,7 +39,7 @@ export function drawPreview(ctx: CanvasRenderingContext2D, _time: number): void 
         Math.floor((cy + dy - PREV_LINE_START) / PREV_LINE_SPACING) ||
       Math.floor((cy - PREV_LINE_START) / PREV_LINE_SPACING) !==
         Math.floor((cy - dy - PREV_LINE_START) / PREV_LINE_SPACING)
-    ctx.strokeStyle = crosses ? C_AMBER : C_TEXT_MUTED
+    ctx.strokeStyle = crosses ? amberColor : textMutedColor
     ctx.lineWidth = crosses ? 1.5 : 1
     ctx.globalAlpha = crosses ? 1 : 0.5
     ctx.beginPath()

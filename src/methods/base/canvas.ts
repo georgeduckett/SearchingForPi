@@ -1,4 +1,4 @@
-import { C_BG, C_GRID, C_AMBER } from '../../colors'
+import { getBgColor, getGridColor, getAmberColor } from '../../colors'
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -20,7 +20,7 @@ export interface Rect {
  * Fills the canvas with the background color.
  */
 export function clearCanvas(ctx: CanvasRenderingContext2D, width: number, height: number): void {
-  ctx.fillStyle = C_BG
+  ctx.fillStyle = getBgColor()
   ctx.fillRect(0, 0, width, height)
 }
 
@@ -33,7 +33,7 @@ export function drawGrid(
   height: number,
   divisions = 8
 ): void {
-  ctx.strokeStyle = C_GRID
+  ctx.strokeStyle = getGridColor()
   ctx.lineWidth = 1
 
   for (let x = 0; x <= width; x += width / divisions) {
@@ -74,10 +74,10 @@ export function drawCircle(
   cx: number,
   cy: number,
   radius: number,
-  strokeStyle = C_AMBER,
+  strokeStyle?: string,
   lineWidth = 1.5
 ): void {
-  ctx.strokeStyle = strokeStyle
+  ctx.strokeStyle = strokeStyle ?? getAmberColor()
   ctx.lineWidth = lineWidth
   ctx.beginPath()
   ctx.arc(cx, cy, radius, 0, Math.PI * 2)
@@ -109,10 +109,10 @@ export function drawLine(
   y1: number,
   x2: number,
   y2: number,
-  strokeStyle = C_AMBER,
+  strokeStyle?: string,
   lineWidth = 1
 ): void {
-  ctx.strokeStyle = strokeStyle
+  ctx.strokeStyle = strokeStyle ?? getAmberColor()
   ctx.lineWidth = lineWidth
   ctx.beginPath()
   ctx.moveTo(x1, y1)
@@ -224,7 +224,13 @@ export function drawLabel(
 /**
  * Checks if a point is inside a circle.
  */
-export function isInsideCircle(x: number, y: number, cx: number, cy: number, radius: number): boolean {
+export function isInsideCircle(
+  x: number,
+  y: number,
+  cx: number,
+  cy: number,
+  radius: number
+): boolean {
   const dx = x - cx
   const dy = y - cy
   return dx * dx + dy * dy <= radius * radius
@@ -293,11 +299,7 @@ export function easeInOutQuad(t: number): number {
  */
 export function easeOutElastic(t: number): number {
   const c4 = (2 * Math.PI) / 3
-  return t === 0
-    ? 0
-    : t === 1
-      ? 1
-      : Math.pow(2, -10 * t) * Math.sin((t * 10 - 0.75) * c4) + 1
+  return t === 0 ? 0 : t === 1 ? 1 : Math.pow(2, -10 * t) * Math.sin((t * 10 - 0.75) * c4) + 1
 }
 
 /**

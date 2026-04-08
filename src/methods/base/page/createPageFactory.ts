@@ -12,12 +12,7 @@ import {
   buildStatsPanel,
   buildSimplePageLayout,
 } from './templates'
-import {
-  createAnimationLifecycle,
-  cancelAnimation,
-  cloneState,
-  deferInit,
-} from './lifecycle'
+import { createAnimationLifecycle, cancelAnimation, cloneState, deferInit } from './lifecycle'
 import {
   getCanvasContext,
   getRequiredButton,
@@ -144,29 +139,41 @@ export function createPageFactory<S>(
             onPause: () => methods.pause?.(context),
           },
           () => lifecycle.running,
-          (value) => { lifecycle.running = value }
+          value => {
+            lifecycle.running = value
+          }
         )
       }
 
       if (btnStep) {
-        wireStepButton(btnStep, () => {
-          methods.step?.(context)
-          methods.draw(context)
-        }, {
-          getRunning: () => lifecycle.running,
-          setRunning: (value) => { lifecycle.running = value },
-          startPauseButton: btnStart,
-        })
+        wireStepButton(
+          btnStep,
+          () => {
+            methods.step?.(context)
+            methods.draw(context)
+          },
+          {
+            getRunning: () => lifecycle.running,
+            setRunning: value => {
+              lifecycle.running = value
+            },
+            startPauseButton: btnStart,
+          }
+        )
       }
 
       if (btnReset) {
-        wireResetButton(btnReset, () => {
-          lifecycle.running = false
-          methods.reset(context)
-          methods.draw(context)
-        }, {
-          startPauseButton: btnStart,
-        })
+        wireResetButton(
+          btnReset,
+          () => {
+            lifecycle.running = false
+            methods.reset(context)
+            methods.draw(context)
+          },
+          {
+            startPauseButton: btnStart,
+          }
+        )
       }
 
       // Initialize and draw

@@ -2,7 +2,7 @@
 // Main page factory for the circle packing method.
 
 import { fmt } from '../../utils'
-import { C_INSIDE, CANVAS_SIZE } from '../../colors'
+import { getInsideColor, CANVAS_SIZE } from '../../colors'
 import { createMethodPageFactory, statCard, explanation, legend } from '../base/page'
 import { State, MAX_CIRCLES, createInitialState } from './types'
 import { tryPlaceCircle, estimatePi, calculateCoverage } from './packing'
@@ -25,12 +25,16 @@ export const createCirclePackingPage = createMethodPageFactory<State>(
       ${statCard('π estimate', 'cp-estimate', { valueClass: 'stat-value large', errorId: 'cp-error' })}
       ${statCard('Circles placed', 'cp-circles', { subtext: `of ${MAX_CIRCLES} max` })}
       ${statCard('Area coverage', 'cp-covered', { subtext: 'jamming limit ~55%' })}
-      ${legend([{ color: C_INSIDE, text: 'Placed circles' }])}
-      ${explanation('How it works', [
-        'We place circles randomly without overlap (random sequential adsorption). The covered area equals π times the sum of squared radii (for non-overlapping circles).',
-        'By measuring the actual covered area and dividing by Σr², we can estimate the value of π.',
-        'The maximum packing density (jamming limit) for random circle placement is approximately 54.7%.',
-      ], 'Area = π × Σr²')}
+      ${legend([{ color: getInsideColor(), text: 'Placed circles' }])}
+      ${explanation(
+        'How it works',
+        [
+          'We place circles randomly without overlap (random sequential adsorption). The covered area equals π times the sum of squared radii (for non-overlapping circles).',
+          'By measuring the actual covered area and dividing by Σr², we can estimate the value of π.',
+          'The maximum packing density (jamming limit) for random circle placement is approximately 54.7%.',
+        ],
+        'Area = π × Σr²'
+      )}
     `,
   },
   createInitialState(),

@@ -2,6 +2,7 @@
 // Type definitions and constants for the Monte Carlo method.
 
 import { CANVAS_SIZE } from '../../colors'
+import type { AnimationController } from '../base/controller'
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 export const DOTS_PER_TICK = 30
@@ -21,6 +22,8 @@ export interface State {
   running: boolean
   rafId: number | null
   intervalId: ReturnType<typeof setInterval> | null // For AnimationState compatibility
+  /** Controller instance for cleanup (set during init) */
+  _controller?: AnimationController
 }
 
 // ─── Initial State Factory ───────────────────────────────────────────────────

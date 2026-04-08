@@ -39,9 +39,7 @@ export function getRequiredButton(id: string): HTMLButtonElement {
 /**
  * Gets an element by CSS selector, returns null if not found.
  */
-export function getElement<T extends HTMLElement = HTMLElement>(
-  selector: string
-): T | null {
+export function getElement<T extends HTMLElement = HTMLElement>(selector: string): T | null {
   const el = document.querySelector(selector)
   return el instanceof HTMLElement ? (el as T) : null
 }
@@ -59,9 +57,7 @@ export function getRequiredElement<T extends HTMLElement = HTMLElement>(
 /**
  * Gets an element by ID, returns null if not found.
  */
-export function getElementById<T extends HTMLElement = HTMLElement>(
-  id: string
-): T | null {
+export function getElementById<T extends HTMLElement = HTMLElement>(id: string): T | null {
   const el = document.getElementById(id)
   return el instanceof HTMLElement ? (el as T) : null
 }
@@ -69,10 +65,7 @@ export function getElementById<T extends HTMLElement = HTMLElement>(
 /**
  * Gets a required element by ID, throws if not found.
  */
-export function getRequiredElementById<T extends HTMLElement>(
-  id: string,
-  ctor: new () => T
-): T {
+export function getRequiredElementById<T extends HTMLElement>(id: string, ctor: new () => T): T {
   return queryRequired(document, `#${id}`, ctor)
 }
 
@@ -82,25 +75,20 @@ export function getRequiredElementById<T extends HTMLElement>(
  * Creates the $ helper function for querying elements.
  */
 export function create$Helper(): (selector: string) => HTMLElement {
-  return (selector: string): HTMLElement =>
-    document.querySelector(selector) as HTMLElement
+  return (selector: string): HTMLElement => document.querySelector(selector) as HTMLElement
 }
 
 /**
  * Creates the $required helper function for querying required elements.
  */
 export function create$RequiredHelper(): (selector: string) => HTMLElement {
-  return (selector: string): HTMLElement =>
-    queryRequired(document, selector, HTMLElement)
+  return (selector: string): HTMLElement => queryRequired(document, selector, HTMLElement)
 }
 
 /**
  * Creates the $id helper function for querying elements by ID.
  */
-export function create$IdHelper(): <T extends HTMLElement>(
-  id: string,
-  ctor: new () => T
-) => T {
+export function create$IdHelper(): <T extends HTMLElement>(id: string, ctor: new () => T) => T {
   return <T extends HTMLElement>(id: string, ctor: new () => T): T =>
     queryRequired(document, `#${id}`, ctor)
 }

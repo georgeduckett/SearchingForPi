@@ -24,10 +24,7 @@ export interface StatsElements {
 /**
  * Creates a stats updater function for Monte Carlo.
  */
-export function createStatsUpdater(
-  elements: StatsElements,
-  state: State
-): () => void {
+export function createStatsUpdater(elements: StatsElements, state: State): () => void {
   return function updateStats(): void {
     const pi = estimatePi(state.inside, state.total)
     elements.estimate.textContent = fmt(pi)
@@ -45,7 +42,10 @@ export function createStatsUpdater(
 /**
  * Creates the update function for frame-based animation.
  */
-export function createUpdateFunction(state: State, ctx2d: CanvasRenderingContext2D): (state: State, dt: number) => void {
+export function createUpdateFunction(
+  state: State,
+  ctx2d: CanvasRenderingContext2D
+): (state: State, dt: number) => void {
   return function update(_state: State, _dt: number): void {
     if (state.total >= MAX_DOTS) {
       state.running = false
@@ -96,7 +96,7 @@ export function createMonteCarloController(
     buttons: { btnStart, btnStep, btnReset },
     update: createUpdateFunction(state, ctx2d),
     draw: () => updateStats(),
-    isComplete: (state) => state.total >= MAX_DOTS,
+    isComplete: state => state.total >= MAX_DOTS,
     onComplete: () => {
       btnStart.textContent = 'Restart'
       btnStart.disabled = false
