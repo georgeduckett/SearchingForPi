@@ -1,11 +1,28 @@
-// ─── Archimedes Module ───────────────────────────────────────────────────────
-// Barrel export for the Archimedes polygons method.
+// ─── Archimedes Method Barrel Export ──────────────────────────────────────────
+// Re-exports all archimedes method components.
 
-// Export page factory (main entry point)
+// Types and constants
+export type { State } from './types'
+export {
+  INITIAL_SIDES,
+  MAX_ITERATIONS,
+  createInitialState,
+  calculateBounds,
+  estimatePi,
+  calculateGap,
+} from './types'
+
+// Controller
+export { createArchimedesController, type StatsElements } from './controller'
+
+// Page factory
 export { createArchimedesPage } from './page'
 
-// Export preview renderer
+// Preview
 export { drawPreview } from './preview'
 
-// Export types for external use
-export type { State } from './types'
+// Rendering
+export { draw } from './rendering'
+
+// Animation actions (for advanced use)
+export { stepTo, step, play, reset, type ArchimedesButtons } from './animation'

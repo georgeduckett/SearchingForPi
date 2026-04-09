@@ -1,46 +1,21 @@
 // ─── Bouncing Boxes Controller ────────────────────────────────────────────────
-// Animation control logic for the bouncing boxes method.
-// Handles physics simulation, sound, and canvas resizing.
+// Main controller factory for the bouncing boxes method.
+// Wires up buttons, manages physics simulation, sound, and canvas sizing.
 
 import type { MethodPageContext } from '../base/page/types'
-import { createStatsUpdater as buildStatsUpdater } from '../base/statsHelpers'
 import {
   State,
-  BASE_CANVAS_W,
-  BASE_CANVAS_H,
   BASE_INITIAL_X1,
   BASE_INITIAL_X2,
   V0,
-  MOBILE_BREAKPOINT,
 } from './types'
-import { updatePhysics, isSimulationComplete, calculatePiApprox } from './physics'
+import { updatePhysics, isSimulationComplete } from './physics'
 import { createSoundManager } from './sound'
-import { draw, calculateCanvasSize } from './rendering'
+import { draw } from './rendering'
+import { createStatsUpdater, type StatsElements } from './stats'
+import { calculateCanvasSize } from './canvasSizing'
 
-// ─── Stats Management ─────────────────────────────────────────────────────────
-
-/**
- * Stats element references for Bouncing Boxes method.
- */
-export interface StatsElements {
-  hits: HTMLElement
-  piApprox: HTMLElement
-}
-
-/**
- * Creates a stats updater function for Bouncing Boxes.
- */
-export function createStatsUpdater(elements: StatsElements, state: State): () => void {
-  return buildStatsUpdater()
-    .counter(elements.hits, () => state.collisions, n => n.toString())
-    .custom(() => {
-      const piApprox = calculatePiApprox(state.collisions, state.k)
-      elements.piApprox.textContent = piApprox.toFixed(state.k)
-    })
-    .build()
-}
-
-// ─── Controller ───────────────────────────────────────────────────────────────
+// ─── Controller Interface ──────────────────────────────────────────────────────
 
 /**
  * Controller for Bouncing Boxes animation.
@@ -58,6 +33,8 @@ export interface BouncingBoxesController {
   /** Cleanup resources */
   cleanup(): void
 }
+
+// ─── Controller Factory ────────────────────────────────────────────────────────
 
 /**
  * Creates the controller for Bouncing Boxes method.
@@ -84,10 +61,7 @@ export function createBouncingBoxesController(
 
     const { width, height, scale } = calculateCanvasSize(
       container.clientWidth,
-      window.innerWidth,
-      BASE_CANVAS_W,
-      BASE_CANVAS_H,
-      MOBILE_BREAKPOINT
+      window.innerWidth
     )
 
     canvas.width = width
@@ -178,3 +152,6 @@ export function createBouncingBoxesController(
 
   return { start, stop, reset, updateCanvasSize, cleanup }
 }
+
+// Re-export types for backward compatibility
+export type { StatsElements } from './stats'
