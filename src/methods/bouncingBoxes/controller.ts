@@ -137,7 +137,10 @@ export function createBouncingBoxesController(
   state.resizeObserver = new ResizeObserver(() => {
     updateCanvasSize()
   })
-  state.resizeObserver.observe(canvas.parentElement!)
+  const parent = canvas.parentElement
+  if (parent) {
+    state.resizeObserver.observe(parent)
+  }
 
   // Initial size
   updateCanvasSize()
