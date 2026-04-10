@@ -19,7 +19,11 @@ export interface StatsElements {
  */
 export function createStatsUpdater(elements: StatsElements, state: State): () => void {
   return buildStatsUpdater()
-    .counter(elements.hits, () => state.collisions, n => n.toString())
+    .counter(
+      elements.hits,
+      () => state.collisions,
+      n => n.toString()
+    )
     .custom(() => {
       const piApprox = calculatePiApprox(state.collisions, state.k)
       elements.piApprox.textContent = piApprox.toFixed(state.k)

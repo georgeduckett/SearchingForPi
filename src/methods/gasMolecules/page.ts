@@ -2,7 +2,13 @@
 // Main page factory for the gas molecules method.
 
 import { CANVAS_SIZE } from '../../colors'
-import { createMethodPageFactory, statCard, explanation, legend, cleanupController } from '../base/page'
+import {
+  createMethodPageFactory,
+  statCard,
+  explanation,
+  legend,
+  cleanupController,
+} from '../base/page'
 import { State, MAX_PARTICLES, C_PARTICLE, C_WALL, createInitialState } from './types'
 import { createGasMoleculesController, StatsElements } from './controller'
 

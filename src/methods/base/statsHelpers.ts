@@ -187,22 +187,14 @@ export class StatsUpdaterBuilder {
   private updaters: (() => void)[] = []
 
   /** Add a π estimate updater */
-  piEstimate(
-    element: HTMLElement,
-    getEstimate: () => number,
-    options?: PiEstimateOptions
-  ): this {
+  piEstimate(element: HTMLElement, getEstimate: () => number, options?: PiEstimateOptions): this {
     const updater = createPiEstimateUpdater({ estimate: element }, getEstimate, options)
     this.updaters.push(updater)
     return this
   }
 
   /** Add a counter updater */
-  counter(
-    element: HTMLElement,
-    getValue: () => number,
-    formatter?: (n: number) => string
-  ): this {
+  counter(element: HTMLElement, getValue: () => number, formatter?: (n: number) => string): this {
     const updater = createCounterUpdater(element, getValue, formatter)
     this.updaters.push(updater)
     return this
@@ -225,11 +217,7 @@ export class StatsUpdaterBuilder {
   }
 
   /** Add a progress bar updater */
-  progress(
-    element: HTMLElement,
-    getCurrent: () => number,
-    max: number
-  ): this {
+  progress(element: HTMLElement, getCurrent: () => number, max: number): this {
     const updater = () => {
       const pct = Math.min((getCurrent() / max) * 100, 100)
       element.style.width = `${pct}%`

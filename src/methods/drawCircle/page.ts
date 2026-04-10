@@ -2,8 +2,22 @@
 // Main page factory for the draw circle method.
 
 import { CANVAS_SIZE } from '../../colors'
-import { createMethodPageFactory, statCard, legend, explanation, cleanupController } from '../base/page'
-import { State, C_DRAWN, C_APPROX, C_CENTER, C_RADIUS, C_PERFECT, createInitialState } from './types'
+import {
+  createMethodPageFactory,
+  statCard,
+  legend,
+  explanation,
+  cleanupController,
+} from '../base/page'
+import {
+  State,
+  C_DRAWN,
+  C_APPROX,
+  C_CENTER,
+  C_RADIUS,
+  C_PERFECT,
+  createInitialState,
+} from './types'
 import { createDrawCircleController, StatsElements } from './controller'
 
 // ─── Page Factory ─────────────────────────────────────────────────────────────

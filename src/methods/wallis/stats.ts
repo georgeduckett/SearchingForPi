@@ -19,10 +19,7 @@ export interface StatsElements {
 /**
  * Creates a stats updater function for Wallis method.
  */
-export function createStatsUpdater(
-  elements: StatsElements,
-  state: State
-): () => void {
+export function createStatsUpdater(elements: StatsElements, state: State): () => void {
   return function updateStats(): void {
     const piEstimate = estimatePi(state.product)
     const error = Math.abs(piEstimate - Math.PI)

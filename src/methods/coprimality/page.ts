@@ -2,7 +2,13 @@
 // Main page factory for the coprimality method.
 
 import { CANVAS_SIZE } from '../../colors'
-import { createMethodPageFactory, statCard, legend, explanation, cleanupController } from '../base/page'
+import {
+  createMethodPageFactory,
+  statCard,
+  legend,
+  explanation,
+  cleanupController,
+} from '../base/page'
 import { State, MAX_PAIRS, C_COPRIME, C_NOT_COPRIME, createInitialState } from './types'
 import { createCoprimalityController, StatsElements } from './controller'
 

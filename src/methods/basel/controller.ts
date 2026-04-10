@@ -22,10 +22,7 @@ export interface StatsElements {
 /**
  * Creates a stats updater function for Basel method.
  */
-export function createStatsUpdater(
-  elements: StatsElements,
-  state: State
-): () => void {
+export function createStatsUpdater(elements: StatsElements, state: State): () => void {
   return buildStatsUpdater()
     .piEstimate(elements.estimate, () => estimatePi(state.sum), {
       improvingThreshold: 0.1,
@@ -78,10 +75,7 @@ export function start(
 /**
  * Stop the automatic animation.
  */
-export function stop(
-  state: State,
-  buttons: { btnStart: HTMLButtonElement }
-): void {
+export function stop(state: State, buttons: { btnStart: HTMLButtonElement }): void {
   state.running = false
   if (state.intervalId !== null) {
     clearInterval(state.intervalId)

@@ -12,14 +12,7 @@ export {
 } from './card'
 
 // Legend and explanation helpers
-export {
-  legendItem,
-  legend,
-  explanation,
-} from './legend'
+export { legendItem, legend, explanation } from './legend'
 
 // Builder
-export {
-  StatsPanelBuilder,
-  buildStatsPanel,
-} from './builder'
+export { StatsPanelBuilder, buildStatsPanel } from './builder'

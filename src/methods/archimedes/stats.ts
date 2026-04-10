@@ -21,10 +21,7 @@ export interface StatsElements {
 /**
  * Creates a stats updater function for Archimedes method.
  */
-export function createStatsUpdater(
-  elements: StatsElements,
-  state: State
-): () => void {
+export function createStatsUpdater(elements: StatsElements, state: State): () => void {
   return buildStatsUpdater()
     .custom(() => {
       const currentBounds = calculateBounds(state.sides)

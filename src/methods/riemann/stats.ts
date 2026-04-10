@@ -18,10 +18,7 @@ export interface StatsElements {
 /**
  * Creates a stats updater function for Riemann method.
  */
-export function createStatsUpdater(
-  elements: StatsElements,
-  state: State
-): () => void {
+export function createStatsUpdater(elements: StatsElements, state: State): () => void {
   return function updateStats(): void {
     const estimate = computeSum(state.rects)
     const error = Math.abs(estimate - Math.PI)

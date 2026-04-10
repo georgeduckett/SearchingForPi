@@ -2,11 +2,7 @@
 // Re-exports all animation-related types and functions.
 
 // Frame-based animation
-export {
-  createFrameAnimation,
-  type FrameAnimationOptions,
-  type FrameAnimationLoop,
-} from './frame'
+export { createFrameAnimation, type FrameAnimationOptions, type FrameAnimationLoop } from './frame'
 
 // Interval-based animation
 export {
@@ -24,7 +20,4 @@ export {
 } from './easing'
 
 // State helpers
-export {
-  type AnimationState,
-  cancelAnimations,
-} from './state'
+export { type AnimationState, cancelAnimations } from './state'

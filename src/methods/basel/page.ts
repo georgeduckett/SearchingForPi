@@ -2,7 +2,13 @@
 // Main page factory for the Basel problem method.
 
 import { getInsideColor, getAmberColor, CANVAS_SIZE } from '../../colors'
-import { createMethodPageFactory, statCard, legend, explanation, cleanupController } from '../base/page'
+import {
+  createMethodPageFactory,
+  statCard,
+  legend,
+  explanation,
+  cleanupController,
+} from '../base/page'
 import { State, MAX_TERMS, createInitialState } from './types'
 import { createBaselController, StatsElements } from './controller'
 

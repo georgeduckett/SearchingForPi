@@ -21,10 +21,7 @@ export interface StatsElements {
 /**
  * Creates a stats updater function for Coprimality method.
  */
-export function createStatsUpdater(
-  elements: StatsElements,
-  state: State
-): () => void {
+export function createStatsUpdater(elements: StatsElements, state: State): () => void {
   return function updateStats(): void {
     const piEstimate = estimatePi(state.coprimeCount, state.totalPairs)
     const error = Math.abs(piEstimate - Math.PI)
@@ -35,11 +32,7 @@ export function createStatsUpdater(
     elements.error.textContent = state.totalPairs === 0 ? 'Error: —' : `Error: ${fmt(error)}`
     elements.error.className =
       'stat-error ' +
-      (error < 0.1 || state.totalPairs < 100
-        ? 'neutral'
-        : error < 0.5
-        ? 'improving'
-        : 'neutral')
+      (error < 0.1 || state.totalPairs < 100 ? 'neutral' : error < 0.5 ? 'improving' : 'neutral')
   }
 }
 
