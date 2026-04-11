@@ -34,6 +34,8 @@ export interface State {
   eventHandlers: {
     mouseMoveHandler: (e: MouseEvent) => void
     mouseUpHandler: (e: MouseEvent) => void
+    touchStartHandler: (e: TouchEvent) => void
+    touchMoveHandler: (e: TouchEvent) => void
     touchEndHandler: (e: TouchEvent) => void
   } | null
   /** Controller instance for cleanup (set during init) */

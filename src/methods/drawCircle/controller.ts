@@ -142,6 +142,61 @@ export function onMouseUp(
 }
 
 /**
+ * Handle touch start - start drawing on mobile.
+ */
+export function onTouchStart(
+  e: TouchEvent,
+  ctx: MethodPageContext<State>,
+  updateStats: () => void
+): void {
+  e.preventDefault()
+  const { canvas, ctx: ctx2d, state } = ctx
+  const coords = getCanvasCoords(canvas, e)
+  state.points = []
+  state.center = null
+  state.avgRadius = 0
+  state.perimeter = 0
+  state.isDrawing = true
+  state.lastDrawPoint = coords
+  state.points.push({ ...coords, angle: 0 })
+  updateStats()
+  draw(ctx2d, state)
+}
+
+/**
+ * Handle touch move - continue drawing on mobile.
+ */
+export function onTouchMove(
+  e: TouchEvent,
+  ctx: MethodPageContext<State>,
+  updateStats: () => void
+): void {
+  e.preventDefault()
+  const { canvas, ctx: ctx2d, state } = ctx
+  if (!state.isDrawing || state.lastDrawPoint === null) return
+
+  const coords = getCanvasCoords(canvas, e)
+  const dist = distance(state.lastDrawPoint, coords)
+
+  if (dist >= state.segmentLength) {
+    let angle = 0
+    if (state.center) {
+      angle = Math.atan2(coords.y - state.center.y, coords.x - state.center.x)
+    }
+
+    state.points.push({ ...coords, angle })
+    state.lastDrawPoint = coords
+
+    const center = calculateCenter(state.points)
+    state.center = center
+    state.avgRadius = calculateAvgRadius(state.points, center)
+
+    draw(ctx2d, state)
+    updateStats()
+  }
+}
+
+/**
  * Handle touch end.
  */
 export function onTouchEnd(
@@ -201,12 +256,16 @@ export function createDrawCircleController(
   const boundMouseDown = (e: MouseEvent) => onMouseDown(e, ctx, updateStats)
   const boundMouseMove = (e: MouseEvent) => onMouseMove(e, ctx, updateStats)
   const boundMouseUp = () => onMouseUp(ctx, updateStats)
+  const boundTouchStart = (e: TouchEvent) => onTouchStart(e, ctx, updateStats)
+  const boundTouchMove = (e: TouchEvent) => onTouchMove(e, ctx, updateStats)
   const boundTouchEnd = (e: TouchEvent) => onTouchEnd(e, ctx, updateStats)
 
   // Store event handlers in state for cleanup
   state.eventHandlers = {
     mouseMoveHandler: boundMouseMove,
     mouseUpHandler: boundMouseUp,
+    touchStartHandler: boundTouchStart,
+    touchMoveHandler: boundTouchMove,
     touchEndHandler: boundTouchEnd,
   }
 
@@ -215,6 +274,8 @@ export function createDrawCircleController(
   canvas.addEventListener('mousemove', boundMouseMove)
   canvas.addEventListener('mouseup', boundMouseUp)
   canvas.addEventListener('mouseleave', boundMouseUp)
+  canvas.addEventListener('touchstart', boundTouchStart, { passive: false })
+  canvas.addEventListener('touchmove', boundTouchMove, { passive: false })
   canvas.addEventListener('touchend', boundTouchEnd)
 
   // Wire up controls
@@ -242,6 +303,8 @@ export function createDrawCircleController(
       canvas.removeEventListener('mousemove', boundMouseMove)
       canvas.removeEventListener('mouseup', boundMouseUp)
       canvas.removeEventListener('mouseleave', boundMouseUp)
+      canvas.removeEventListener('touchstart', boundTouchStart)
+      canvas.removeEventListener('touchmove', boundTouchMove)
       canvas.removeEventListener('touchend', boundTouchEnd)
     },
   }
