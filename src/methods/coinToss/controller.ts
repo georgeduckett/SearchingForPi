@@ -4,7 +4,14 @@
 
 import { fmt } from '../../utils'
 import type { MethodPageContext } from '../base/page/types'
-import { State, MAX_SEQUENCES, MAX_GRID_ROWS, createEmptySequence, advanceSequence, estimatePi } from './types'
+import {
+  State,
+  MAX_SEQUENCES,
+  MAX_GRID_ROWS,
+  createEmptySequence,
+  advanceSequence,
+  estimatePi,
+} from './types'
 import { draw } from './rendering'
 
 // ─── Constants ─────────────────────────────────────────────────────────────────
@@ -26,10 +33,7 @@ export interface StatsElements {
 /**
  * Creates a stats updater function for CoinToss method.
  */
-export function createStatsUpdater(
-  elements: StatsElements,
-  state: State
-): () => void {
+export function createStatsUpdater(elements: StatsElements, state: State): () => void {
   return function updateStats(): void {
     const n = state.sequences.length
     const pi = estimatePi(state.sumRatios, n)

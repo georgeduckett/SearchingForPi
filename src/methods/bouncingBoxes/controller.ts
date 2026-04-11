@@ -3,12 +3,7 @@
 // Wires up buttons, manages physics simulation, sound, and canvas sizing.
 
 import type { MethodPageContext } from '../base/page/types'
-import {
-  State,
-  BASE_INITIAL_X1,
-  BASE_INITIAL_X2,
-  V0,
-} from './types'
+import { State, BASE_INITIAL_X1, BASE_INITIAL_X2, V0 } from './types'
 import { updatePhysics, isSimulationComplete } from './physics'
 import { createSoundManager } from './sound'
 import { draw } from './rendering'
@@ -59,10 +54,7 @@ export function createBouncingBoxesController(
     const container = canvas.parentElement
     if (!container) return
 
-    const { width, height, scale } = calculateCanvasSize(
-      container.clientWidth,
-      window.innerWidth
-    )
+    const { width, height, scale } = calculateCanvasSize(container.clientWidth, window.innerWidth)
 
     canvas.width = width
     canvas.height = height
@@ -145,7 +137,10 @@ export function createBouncingBoxesController(
   state.resizeObserver = new ResizeObserver(() => {
     updateCanvasSize()
   })
-  state.resizeObserver.observe(canvas.parentElement!)
+  const parent = canvas.parentElement
+  if (parent) {
+    state.resizeObserver.observe(parent)
+  }
 
   // Initial size
   updateCanvasSize()

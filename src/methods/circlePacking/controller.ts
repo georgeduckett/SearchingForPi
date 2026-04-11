@@ -163,8 +163,7 @@ export function createCirclePackingController(
   const updateStats = createStatsUpdater(elements, state, canvas.width, canvas.height)
 
   // Create bound tick function
-  const boundTick = () =>
-    tick(state, canvas.width, canvas.height, ctx2d, updateStats, buttons)
+  const boundTick = () => tick(state, canvas.width, canvas.height, ctx2d, updateStats, buttons)
 
   // Initial draw
   draw(ctx2d, state.circles, canvas.width, canvas.height)

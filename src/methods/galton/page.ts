@@ -2,7 +2,13 @@
 // Main page factory for the Galton board method.
 
 import { getInsideColor, getAmberColor, CANVAS_SIZE } from '../../colors'
-import { createMethodPageFactory, statCard, legend, explanation, cleanupController } from '../base/page'
+import {
+  createMethodPageFactory,
+  statCard,
+  legend,
+  explanation,
+  cleanupController,
+} from '../base/page'
 import { State, MAX_BALLS, createInitialState } from './types'
 import { createGaltonController, StatsElements } from './controller'
 

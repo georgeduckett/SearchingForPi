@@ -2,7 +2,13 @@
 // Main page factory for the Archimedes polygons method.
 
 import { CANVAS_SIZE } from '../../colors'
-import { createMethodPageFactory, statCard, legend, explanation, cleanupController } from '../base/page'
+import {
+  createMethodPageFactory,
+  statCard,
+  legend,
+  explanation,
+  cleanupController,
+} from '../base/page'
 import { State, createInitialState } from './types'
 import { createArchimedesController, StatsElements } from './controller'
 import { C_POLYGON_INNER, C_POLYGON_OUTER, C_CIRCLE } from './rendering'

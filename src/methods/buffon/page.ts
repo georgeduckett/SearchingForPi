@@ -1,12 +1,7 @@
 // ─── Buffon's Needle Page ────────────────────────────────────────────────────
 // Main page factory for the Buffon's needle method.
 
-import {
-  createMethodPageFactory,
-  statCard,
-  explanation,
-  cleanupController,
-} from '../base/page'
+import { createMethodPageFactory, statCard, explanation, cleanupController } from '../base/page'
 import { State, NEEDLE_LENGTH, MAX_NEEDLES, createInitialState } from './types'
 import { createBuffonController, StatsElements } from './controller'
 

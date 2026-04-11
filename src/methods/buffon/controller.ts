@@ -24,10 +24,7 @@ export interface StatsElements {
 /**
  * Creates a stats updater function for Buffon method.
  */
-export function createStatsUpdater(
-  elements: StatsElements,
-  state: State
-): () => void {
+export function createStatsUpdater(elements: StatsElements, state: State): () => void {
   return buildStatsUpdater()
     .custom(() => {
       // Handle empty state display

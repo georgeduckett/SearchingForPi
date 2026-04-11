@@ -6,14 +6,7 @@
 export type { Point, Rect } from './geometry'
 
 // Geometry helpers
-export {
-  isInsideCircle,
-  randomPoint,
-  randomPointInCircle,
-  lerp,
-  clamp,
-  mapRange,
-} from './geometry'
+export { isInsideCircle, randomPoint, randomPointInCircle, lerp, clamp, mapRange } from './geometry'
 
 // Color utilities
 export { rgba, lerpColor } from './color'

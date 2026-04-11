@@ -4,7 +4,16 @@
 
 import { fmt } from '../../utils'
 import type { MethodPageContext } from '../base/page/types'
-import { State, MAX_PARTICLES, TICKS_PER_FRAME, CONTAINER_PAD, PARTICLE_RADIUS, gaussianRandom, estimatePi, calculateAvgSpeed } from './types'
+import {
+  State,
+  MAX_PARTICLES,
+  TICKS_PER_FRAME,
+  CONTAINER_PAD,
+  PARTICLE_RADIUS,
+  gaussianRandom,
+  estimatePi,
+  calculateAvgSpeed,
+} from './types'
 import { physicsStep } from './physics'
 import { draw } from './rendering'
 
@@ -22,10 +31,7 @@ export interface StatsElements {
 /**
  * Creates a stats updater function for GasMolecules method.
  */
-export function createStatsUpdater(
-  elements: StatsElements,
-  state: State
-): () => void {
+export function createStatsUpdater(elements: StatsElements, state: State): () => void {
   return function updateStats(): void {
     const piEstimate = estimatePi(state.particles, state.temperature)
     const error = Math.abs(piEstimate - Math.PI)
@@ -50,11 +56,7 @@ export function createStatsUpdater(
 /**
  * Add a particle with random velocity based on temperature.
  */
-export function addParticle(
-  state: State,
-  canvasWidth: number,
-  canvasHeight: number
-): void {
+export function addParticle(state: State, canvasWidth: number, canvasHeight: number): void {
   const W = canvasWidth - CONTAINER_PAD * 2 - PARTICLE_RADIUS * 2
   const H = canvasHeight - CONTAINER_PAD * 2 - PARTICLE_RADIUS * 2
 

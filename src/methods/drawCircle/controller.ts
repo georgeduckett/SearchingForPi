@@ -22,10 +22,7 @@ export interface StatsElements {
 /**
  * Creates a stats updater function for DrawCircle method.
  */
-export function createStatsUpdater(
-  elements: StatsElements,
-  state: State
-): () => void {
+export function createStatsUpdater(elements: StatsElements, state: State): () => void {
   return function updateStats(): void {
     if (state.center === null) {
       elements.points.textContent = '0 points'
@@ -124,10 +121,7 @@ export function onMouseMove(
 /**
  * Handle mouse up - finish drawing.
  */
-export function onMouseUp(
-  ctx: MethodPageContext<State>,
-  updateStats: () => void
-): void {
+export function onMouseUp(ctx: MethodPageContext<State>, updateStats: () => void): void {
   const { ctx: ctx2d, state } = ctx
   state.isDrawing = false
   state.lastDrawPoint = null

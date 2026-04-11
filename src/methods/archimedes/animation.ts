@@ -43,8 +43,7 @@ export function createAnimateTransition(
 
     const currentLower = state.startLower + (state.endLower - state.startLower) * state.progress
     const currentUpper = state.startUpper + (state.endUpper - state.startUpper) * state.progress
-    const currentSides =
-      state.startSides + (state.targetSides - state.startSides) * state.progress
+    const currentSides = state.startSides + (state.targetSides - state.startSides) * state.progress
 
     draw(ctx2d, currentSides, currentLower, currentUpper)
 

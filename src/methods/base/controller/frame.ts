@@ -25,8 +25,17 @@ import type { AnimationStateBase, FrameControllerConfig, AnimationController } f
 export function createFrameController<S extends AnimationStateBase>(
   config: FrameControllerConfig<S>
 ): AnimationController {
-  const { ctx, buttons, update, draw, isComplete, onComplete, onReset, onStep, onStart, onStop } = config
-  const { btnStart, btnStep, btnReset, startLabel = 'Start', runningLabel = 'Running…', resumeLabel = 'Resume', doneLabel = 'Done' } = buttons
+  const { ctx, buttons, update, draw, isComplete, onComplete, onReset, onStep, onStart, onStop } =
+    config
+  const {
+    btnStart,
+    btnStep,
+    btnReset,
+    startLabel = 'Start',
+    runningLabel = 'Running…',
+    resumeLabel = 'Resume',
+    doneLabel = 'Done',
+  } = buttons
 
   let animation: FrameAnimationLoop | null = null
 
@@ -34,7 +43,7 @@ export function createFrameController<S extends AnimationStateBase>(
   animation = createFrameAnimation(ctx, {
     update,
     draw,
-    isRunning: (state) => state.running && !isComplete?.(state),
+    isRunning: state => state.running && !isComplete?.(state),
     onComplete: () => {
       btnStart.textContent = doneLabel
       btnStart.disabled = true

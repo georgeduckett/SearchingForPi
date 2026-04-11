@@ -26,38 +26,47 @@ export class StatsPanelBuilder {
   /**
    * Add a π estimate stat card.
    */
-  addPiEstimate(valueId: string, options: {
-    label?: string
-    valueClass?: string
-    error?: boolean
-    errorId?: string
-    progress?: boolean
-    progressId?: string
-  } = {}): this {
+  addPiEstimate(
+    valueId: string,
+    options: {
+      label?: string
+      valueClass?: string
+      error?: boolean
+      errorId?: string
+      progress?: boolean
+      progressId?: string
+    } = {}
+  ): this {
     const {
       label = 'π estimate',
       valueClass = 'stat-value large',
       error = false,
       errorId = 'error',
       progress = false,
-      progressId = 'progress'
+      progressId = 'progress',
     } = options
 
-    this.parts.push(statCard(label, valueId, {
-      valueClass,
-      errorId: error ? errorId : undefined,
-      progressId: progress ? progressId : undefined,
-    }))
+    this.parts.push(
+      statCard(label, valueId, {
+        valueClass,
+        errorId: error ? errorId : undefined,
+        progressId: progress ? progressId : undefined,
+      })
+    )
     return this
   }
 
   /**
    * Add a counter stat card.
    */
-  addCounter(valueId: string, label: string, options: {
-    valueClass?: string
-    subtext?: string
-  } = {}): this {
+  addCounter(
+    valueId: string,
+    label: string,
+    options: {
+      valueClass?: string
+      subtext?: string
+    } = {}
+  ): this {
     this.parts.push(statCard(label, valueId, options))
     return this
   }

@@ -13,11 +13,7 @@ import { createStatsUpdater, type StatsElements } from './stats'
 /**
  * Add rectangles to the visualization.
  */
-export function addRects(
-  state: State,
-  count: number,
-  ctx2d: CanvasRenderingContext2D
-): void {
+export function addRects(state: State, count: number, ctx2d: CanvasRenderingContext2D): void {
   state.rects = Math.min(state.rects + count, MAX_RECTS)
   draw(ctx2d, state)
 }

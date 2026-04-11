@@ -2,7 +2,13 @@
 // Main page factory for the Wallis product method.
 
 import { getAmberColor, CANVAS_SIZE } from '../../colors'
-import { createMethodPageFactory, statCard, legend, explanation, cleanupController } from '../base/page'
+import {
+  createMethodPageFactory,
+  statCard,
+  legend,
+  explanation,
+  cleanupController,
+} from '../base/page'
 import { State, MAX_FACTORS, createInitialState } from './types'
 import { createWallisController, StatsElements } from './controller'
 import { C_OVER, C_UNDER } from './rendering'

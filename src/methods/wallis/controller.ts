@@ -14,10 +14,7 @@ import { createStatsUpdater, type StatsElements } from './stats'
 /**
  * Add a single factor to the product.
  */
-export function addFactor(
-  state: State,
-  ctx2d: CanvasRenderingContext2D
-): void {
+export function addFactor(state: State, ctx2d: CanvasRenderingContext2D): void {
   state.factors++
   state.product *= getFactor(state.factors)
   draw(ctx2d, state)

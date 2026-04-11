@@ -23,10 +23,7 @@ export interface StatsElements {
 /**
  * Creates a stats updater function for Galton method.
  */
-export function createStatsUpdater(
-  elements: StatsElements,
-  state: State
-): () => void {
+export function createStatsUpdater(elements: StatsElements, state: State): () => void {
   return function updateStats(): void {
     const piEstimate = estimatePi(state)
     const peak = Math.max(...state.bins)
@@ -91,9 +88,7 @@ export function tick(
 
   // Continue animation or stop
   if (activeBalls || state.dropping) {
-    state.rafId = requestAnimationFrame(() =>
-      tick(state, canvasSize, ctx2d, updateStats, buttons)
-    )
+    state.rafId = requestAnimationFrame(() => tick(state, canvasSize, ctx2d, updateStats, buttons))
   } else {
     state.running = false
     buttons.btnStart.textContent = 'Start'

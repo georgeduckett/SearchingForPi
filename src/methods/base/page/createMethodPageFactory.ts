@@ -98,7 +98,10 @@ export function createMethodPageFactory<S>(
         statsPanel: null as unknown as HTMLElement,
         $: () => null as unknown as HTMLElement,
         $required: () => null as unknown as HTMLElement,
-        $id: () => null as unknown as HTMLElement as any,
+        $id: (() => null as unknown as HTMLElement) as unknown as <T extends HTMLElement>(
+          id: string,
+          ctor: new () => T
+        ) => T,
       }
 
       methods.cleanup?.(ctx)

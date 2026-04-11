@@ -17,7 +17,14 @@ import type { StandardButtonsConfig, SimpleButtonBinder } from './types'
  * ```
  */
 export function bindButtons(buttons: StandardButtonsConfig): SimpleButtonBinder {
-  const { btnStart, btnStep, btnReset, runningLabel = 'Running…', resumeLabel = 'Resume', doneLabel = 'Done' } = buttons
+  const {
+    btnStart,
+    btnStep,
+    btnReset,
+    runningLabel = 'Running…',
+    resumeLabel = 'Resume',
+    doneLabel = 'Done',
+  } = buttons
 
   let startHandler: (() => void) | null = null
   let stepHandler: (() => void) | null = null

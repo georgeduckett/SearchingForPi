@@ -13,7 +13,13 @@ export { baselTerm, estimatePi, calculateConvergence } from './math'
 
 // Types (backward compatibility - re-exports from above)
 export type { State as State_ } from './types'
-export { MAX_TERMS as MAX_TERMS_, createInitialState as createInitialState_, baselTerm as baselTerm_, estimatePi as estimatePi_, calculateConvergence as calculateConvergence_ } from './types'
+export {
+  MAX_TERMS as MAX_TERMS_,
+  createInitialState as createInitialState_,
+  baselTerm as baselTerm_,
+  estimatePi as estimatePi_,
+  calculateConvergence as calculateConvergence_,
+} from './types'
 
 // Controller
 export { createBaselController, type StatsElements } from './controller'

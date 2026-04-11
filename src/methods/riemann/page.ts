@@ -2,7 +2,13 @@
 // Main page factory for the Riemann integral method.
 
 import { getInsideColor, getAmberColor, CANVAS_SIZE } from '../../colors'
-import { createMethodPageFactory, statCard, legend, explanation, cleanupController } from '../base/page'
+import {
+  createMethodPageFactory,
+  statCard,
+  legend,
+  explanation,
+  cleanupController,
+} from '../base/page'
 import { State, MAX_RECTS, createInitialState } from './types'
 import { createRiemannController, StatsElements } from './controller'
 

@@ -44,11 +44,7 @@ export interface StatCardOptions {
 /**
  * Creates HTML for a stat card with label, value, and optional subtext.
  */
-export function statCard(
-  label: string,
-  valueId: string,
-  options: StatCardOptions = {}
-): string {
+export function statCard(label: string, valueId: string, options: StatCardOptions = {}): string {
   const { valueClass = 'stat-value', subtext, errorId, progressId } = options
 
   let html = `

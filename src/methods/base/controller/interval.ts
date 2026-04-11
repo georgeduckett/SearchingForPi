@@ -22,8 +22,27 @@ import type { AnimationStateBase, IntervalControllerConfig, AnimationController 
 export function createIntervalController<S extends AnimationStateBase>(
   config: IntervalControllerConfig<S>
 ): AnimationController {
-  const { ctx, buttons, intervalMs, tick, isComplete, onComplete, onReset, onStep, onStart, onStop } = config
-  const { btnStart, btnStep, btnReset, startLabel = 'Start', runningLabel = 'Running…', resumeLabel = 'Resume', doneLabel = 'Done' } = buttons
+  const {
+    ctx,
+    buttons,
+    intervalMs,
+    tick,
+    isComplete,
+    onComplete,
+    onReset,
+    onStep,
+    onStart,
+    onStop,
+  } = config
+  const {
+    btnStart,
+    btnStep,
+    btnReset,
+    startLabel = 'Start',
+    runningLabel = 'Running…',
+    resumeLabel = 'Resume',
+    doneLabel = 'Done',
+  } = buttons
 
   let animation: IntervalAnimationLoop | null = null
 
@@ -31,7 +50,7 @@ export function createIntervalController<S extends AnimationStateBase>(
   animation = createIntervalAnimation(ctx, {
     intervalMs,
     tick,
-    isRunning: (state) => state.running && !isComplete?.(state),
+    isRunning: state => state.running && !isComplete?.(state),
     onComplete: () => {
       btnStart.textContent = doneLabel
       btnStart.disabled = true

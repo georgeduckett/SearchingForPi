@@ -17,7 +17,12 @@ export type { State } from './state'
 export { createInitialState } from './state'
 
 // Controller
-export { createMonteCarloController, createUpdateFunction, addDots, type StatsElements } from './controller'
+export {
+  createMonteCarloController,
+  createUpdateFunction,
+  addDots,
+  type StatsElements,
+} from './controller'
 
 // Page factory
 export { createMonteCarloPage } from './page'

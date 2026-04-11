@@ -2,7 +2,13 @@
 // Main page factory for the circle packing method.
 
 import { getInsideColor, CANVAS_SIZE } from '../../colors'
-import { createMethodPageFactory, statCard, explanation, legend, cleanupController } from '../base/page'
+import {
+  createMethodPageFactory,
+  statCard,
+  explanation,
+  legend,
+  cleanupController,
+} from '../base/page'
 import { State, MAX_CIRCLES, createInitialState } from './types'
 import { createCirclePackingController, StatsElements } from './controller'
 
