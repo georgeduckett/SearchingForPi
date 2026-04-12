@@ -260,7 +260,7 @@ body {
 
 /* ─── Page Transitions ──────────────────────────────────────────────────────── */
 .page {
-  padding: 48px 56px;
+  padding: 24px 32px;
   animation: fadeIn 0.3s ease;
 }
 
@@ -277,38 +277,31 @@ body {
 
 /* ─── Page Header ───────────────────────────────────────────────────────────── */
 .page-header {
-  margin-bottom: 40px;
-  padding-bottom: 28px;
+  margin-bottom: 24px;
+  padding-bottom: 16px;
   border-bottom: 1px solid var(--border);
-}
-
-.page-index {
-  font-family: var(--font-mono);
-  font-size: 0.7rem;
-  color: var(--amber-dim);
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  margin-bottom: 10px;
-  display: block;
+  display: flex;
+  align-items: baseline;
+  gap: 24px;
 }
 
 .page-title {
-  font-size: 3.2rem;
+  font-size: 2.4rem;
   font-weight: 300;
   color: var(--text-primary);
   line-height: 1.1;
   letter-spacing: -0.01em;
   font-style: italic;
+  flex-shrink: 0;
 }
 
 .page-subtitle {
-  margin-top: 12px;
-  font-size: 1rem;
+  font-size: 0.95rem;
   color: var(--text-secondary);
   font-weight: 300;
-  max-width: 600px;
   font-family: var(--font-display);
   font-style: normal;
+  line-height: 1.5;
 }
 
 /* ─── Visualisation Layout ──────────────────────────────────────────────────── */
@@ -884,17 +877,18 @@ canvas {
   }
 
   /* ── Typography ── */
+  .page-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
   .page-title {
-    font-size: 2.2rem;
+    font-size: 2rem;
   }
 
   .page-subtitle {
     font-size: 0.9rem;
-  }
-
-  .page-header {
-    margin-bottom: 24px;
-    padding-bottom: 20px;
   }
 
   /* ── Stats: single column on small screens ── */

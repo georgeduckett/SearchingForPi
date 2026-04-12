@@ -4,7 +4,8 @@
 // ─── Page Header ──────────────────────────────────────────────────────────────
 
 /**
- * Builds the page header HTML with optional index, title, and subtitle.
+ * Builds the page header HTML with title and optional subtitle inline.
+ * Index display removed for cleaner, more compact header.
  */
 export function buildPageHeader(options: {
   title: string
@@ -12,17 +13,15 @@ export function buildPageHeader(options: {
   index?: string
   indexPrefix?: string
 }): string {
-  const { title, subtitle, index, indexPrefix = '' } = options
-  const indexHtml = index ? `<span class="page-index">${indexPrefix}${index}</span>` : ''
+  const { title, subtitle } = options
   const subtitleHtml = subtitle ? `<p class="page-subtitle">${subtitle}</p>` : ''
 
   return `
-    <header class="page-header">
-      ${indexHtml}
-      <h2 class="page-title">${title}</h2>
-      ${subtitleHtml}
-    </header>
-  `
+<header class="page-header">
+  <h2 class="page-title">${title}</h2>
+  ${subtitleHtml}
+</header>
+`
 }
 
 // ─── Canvas Wrapper ───────────────────────────────────────────────────────────
