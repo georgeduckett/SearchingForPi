@@ -1,7 +1,7 @@
 // ─── Archimedes Animation Logic ────────────────────────────────────────────────
 // Animation transition functions for the Archimedes polygons method.
 
-import { State, INITIAL_SIDES, MAX_ITERATIONS, calculateBounds } from './types'
+import { State, INITIAL_SIDES, calculateBounds } from './types'
 import { draw } from './rendering'
 
 // ─── Button Types ──────────────────────────────────────────────────────────────

@@ -1,11 +1,12 @@
 # Run all quality checks before committing
+
+echo "Fixing formatting..."
+npm run format
+
 echo "Running type check..."
 npx tsc --noEmit || exit 1
 
 echo "Running linter..."
 npm run lint || exit 1
-
-echo "Running format check..."
-npm run format:check || exit 1
 
 echo "All checks passed!"
