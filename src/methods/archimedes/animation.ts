@@ -95,15 +95,22 @@ export function stepTo(
 
 /**
  * Perform a single step (double the sides).
+ * Updates the dropdown which triggers the animation via its change handler.
  */
 export function step(
   state: State,
-  _buttons: Pick<ArchimedesButtons, 'btnStep' | 'btnReset' | 'selectIter'>,
-  stepToFn: (sides: number) => void
+  buttons: Pick<ArchimedesButtons, 'selectIter'>,
+  _stepToFn: (sides: number) => void
 ): void {
   const nextSides = state.sides * 2
   if (nextSides > INITIAL_SIDES * Math.pow(2, MAX_ITERATIONS)) return
-  stepToFn(nextSides)
+
+  // Calculate the new iteration value and update the dropdown
+  const nextIteration = Math.log2(nextSides / INITIAL_SIDES)
+  buttons.selectIter.value = String(nextIteration)
+
+  // Dispatch change event to trigger the dropdown's change handler
+  buttons.selectIter.dispatchEvent(new Event('change', { bubbles: true }))
 }
 
 /**
